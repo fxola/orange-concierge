@@ -1,0 +1,9 @@
+docs/internal
+node_modules
+dist
+.next
+.env
+backups/*.gpg
+pgdata
+ollama_data
+.DS_Store
