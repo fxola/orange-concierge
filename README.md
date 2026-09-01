@@ -1,37 +1,39 @@
-# Orange Concierge — Sovereign Client Operations Copilot
+# Orange Concierge - Sovereign Client Operations Copilot
 
-> Orange Concierge is a self-hosted AI copilot that turns client notes/transcripts into structured profiles, risks, and consultant action plans — **without ever storing or sending secrets**.
+Orange Concierge is a self-hosted AI copilot that helps Bitcoin consultants turn client notes and meeting transcripts into structured client profiles, risk signals, evidence-backed recommendations, follow-up questions, and review-ready action plans, while rejecting wallet seeds, private keys, passwords, recovery codes, and similar secrets before they can be stored or sent to an AI model.
 
-**Stack (TS-only, pnpm):** Next.js 16.3.3 + TypeScript · Mastra (agents + workflows) · Zod · PostgreSQL + pgvector · Docker Compose + Nginx · DeepSeek / Gemini free + Ollama (sovereign) · pino
+## Stack
 
-## Monorepo (pnpm workspaces)
+- Next.js 16.3.3
+- TypeScript
+- pnpm workspaces
+- PostgreSQL + pgvector
+- Docker Compose
+- Nginx
 
-```
-apps/operations/          # Next.js App Router (internal tool)
-packages/
-  ai/                     # Mastra, provider abstraction (deepseek|gemini|ollama|mock), schemas, workflows, agents, RAG, evals
-  security/               # secret scanner (BIP39 12/24, xprv, WIF)
-  database/               # Drizzle + pgvector schema/migrations
-  observability/          # pino + audit helpers
-docker-compose.yml        # db, web, nginx, ollama (--profile sovereign)
-nginx.conf
-```
-
-## Quick start (local Docker)
+## Run With Docker
 
 ```bash
-cp .env.example .env        # set AUTH_SECRET; optional DEEPSEEK_API_KEY / GOOGLE_API_KEY
+cp .env.example .env
 docker compose up -d
 curl http://localhost/api/health
-# dev without Docker:
-pnpm install
-pnpm dev                    # → http://localhost:3000
 ```
 
-Sovereign mode (M9):
+The app is available through Nginx at `http://localhost`.
+
+## Run Locally
 
 ```bash
-docker compose --profile sovereign up -d ollama
-curl http://localhost:11434/api/pull -d '{"name":"llama3.1:8b"}'
+pnpm install
+pnpm dev
 ```
-MIT
+
+The local development server runs at `http://localhost:3000`.
+
+## Useful Commands
+
+```bash
+pnpm typecheck
+pnpm test
+pnpm build
+```
