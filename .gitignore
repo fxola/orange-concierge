@@ -7,3 +7,4 @@ backups/*.gpg
 pgdata
 ollama_data
 .DS_Store
+*.tsbuildinfo
