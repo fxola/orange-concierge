@@ -15,7 +15,14 @@ Feature: Analyze interaction
     And the structured LLM receives the interaction transcript
     And the interaction is marked analysis completed
     And the analysis audit events do not include transcript content
-    
+
+  Scenario: Complete analysis when audit recording fails
+    Given a received interaction with safe transcript
+    And audit recording fails
+    When a consultant analyzes the interaction
+    Then the analysis result succeeds
+    And the interaction is marked analysis completed
+
   Scenario: Reject an actor who cannot analyze interactions
     Given a received interaction with safe transcript
     When a reviewer analyzes the interaction
