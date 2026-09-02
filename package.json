@@ -13,11 +13,22 @@
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
+    "typecheck:core": "pnpm --filter @orange-concierge/core typecheck",
     "test": "pnpm -r test",
-    "db:generate": "pnpm --filter @orange-concierge/database generate",
-    "db:migrate": "pnpm --filter @orange-concierge/database migrate",
+    "test:core": "pnpm --filter @orange-concierge/core test",
+    "db:generate": "pnpm --filter @orange-concierge/db generate",
+    "db:migrate": "pnpm --filter @orange-concierge/db migrate",
+    "docker:up": "docker compose up -d",
     "eval": "pnpm --filter @orange-concierge/ai eval"
   },
-  "keywords": ["mastra", "self-hosted", "bitcoin", "sovereign"],
+  "keywords": [
+    "mastra",
+    "self-hosted",
+    "bitcoin",
+    "sovereign"
+  ],
+  "devDependencies": {
+    "vite": "^8.2.2"
+  },
   "license": "MIT"
 }
