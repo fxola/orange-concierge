@@ -12,6 +12,8 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@orange-concierge/core": "workspace:*",
+    "@orange-concierge/infrastructure": "workspace:*",
     "next": "^16.3.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

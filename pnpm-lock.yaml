@@ -14,6 +14,12 @@ importers:
 
   apps/operations:
     dependencies:
+      '@orange-concierge/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@orange-concierge/infrastructure':
+        specifier: workspace:*
+        version: link:../../packages/infrastructure
       next:
         specifier: ^16.3.3
         version: 16.3.3(@types/node@22.20.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
