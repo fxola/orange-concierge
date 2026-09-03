@@ -11,7 +11,7 @@ import type {
 } from '../../errors';
 import type { AuditPort } from '../../ports/audit';
 import type { InteractionRepository } from '../../ports/interaction-repository';
-import type { InteractionSubmissionStore } from '../../ports/interaction-submission-store';
+import type { SubmittedInteractionRecorder } from '../../ports/submitted-interaction-recorder';
 import type { SecretScanner } from '../../ports/secret-scanner';
 import type { StructuredLLM } from '../../ports/structured-llm';
 import type { Result } from './result';
@@ -43,7 +43,7 @@ export type SubmitInteractionInput = Readonly<{
 }>;
 
 export type SubmitInteractionDependencies = Readonly<{
-  submissionStore: InteractionSubmissionStore;
+  submittedInteractionRecorder: SubmittedInteractionRecorder;
   newInteractionId: () => string;
   now: () => Date;
 }>;

@@ -1,5 +1,5 @@
 import { SubmitInteraction, type Actor } from '../../../src';
-import { InMemoryInteractionSubmissionStore } from '../in-memory-adapters/inMemoryInteractionSubmissionStore';
+import { InMemorySubmittedInteractionRecorder } from '../in-memory-adapters/inMemorySubmittedInteractionRecorder';
 
 const meetingNotes = [
   'Consultant: Hi Sarah, thanks for joining today. You wanted to discuss moving bitcoin off the exchange?',
@@ -28,19 +28,19 @@ const required = <T>(value: T | undefined, name: string): T => {
 };
 
 export function submitInteractionWorld() {
-  const store = new InMemoryInteractionSubmissionStore();
+  const submittedInteractionRecorder = new InMemorySubmittedInteractionRecorder();
   const submitInteraction = new SubmitInteraction({
-    submissionStore: store,
+    submittedInteractionRecorder,
     newInteractionId: () => 'interaction-1',
     now: () => fixedDate,
   });
 
   const audit = {
     get events() {
-      return store.events;
+      return submittedInteractionRecorder.events;
     },
     failRecording() {
-      store.failNextAudit();
+      submittedInteractionRecorder.failNextAudit();
     },
   } as const;
 
@@ -74,7 +74,7 @@ export function submitInteractionWorld() {
     },
 
     savedInteraction() {
-      return required(store.interactions[0], 'savedInteraction');
+      return required(submittedInteractionRecorder.interactions[0], 'savedInteraction');
     },
 
     audit() {
@@ -82,15 +82,15 @@ export function submitInteractionWorld() {
     },
 
     interactions() {
-      return store.interactions;
+      return submittedInteractionRecorder.interactions;
     },
 
     failAuditRecording() {
-      store.failNextAudit();
+      submittedInteractionRecorder.failNextAudit();
     },
 
-    submissionStore() {
-      return store;
+    submittedInteractionRecorder() {
+      return submittedInteractionRecorder;
     },
   };
 }

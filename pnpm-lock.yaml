@@ -95,6 +95,9 @@ importers:
         specifier: ^3.4.0
         version: 3.4.9
     devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.1
       drizzle-kit:
         specifier: ^0.31.10
         version: 0.31.10
@@ -113,6 +116,9 @@ importers:
       '@orange-concierge/core':
         specifier: workspace:*
         version: link:../core
+      '@orange-concierge/db':
+        specifier: workspace:*
+        version: link:../db
     devDependencies:
       typescript:
         specifier: ^5.7.0
