@@ -1,0 +1,57 @@
+import type { Interaction } from '../../domain/interaction';
+import {
+  BlankTranscriptError,
+  InteractionSubmissionFailedError,
+  UnauthorizedSubmitInteractionError,
+} from '../../errors';
+import { AuditEvent } from '../../ports/audit';
+import { canSubmitInteractions } from './policy';
+import { Result } from './result';
+import type {
+  SubmitInteractionDependencies,
+  SubmitInteractionInput,
+  SubmitInteractionResult,
+} from './types';
+
+export class SubmitInteraction {
+  constructor(private readonly dependencies: SubmitInteractionDependencies) {}
+
+  async execute(input: SubmitInteractionInput): Promise<SubmitInteractionResult> {
+    const { clientId, actor, transcript } = input;
+
+    if (!canSubmitInteractions(actor)) {
+      return Result.failure(new UnauthorizedSubmitInteractionError(actor.role));
+    }
+
+    if (transcript.trim().length === 0) {
+      return Result.failure(new BlankTranscriptError());
+    }
+
+    const { submissionStore, newInteractionId, now } = this.dependencies;
+
+    const interaction: Interaction = {
+      id: newInteractionId(),
+      clientId: clientId,
+      submittedBy: actor.id,
+      status: 'received',
+      transcript,
+      createdAt: now(),
+    };
+
+    const auditEvent: AuditEvent = {
+      actor,
+      action: 'interaction_submitted',
+      resource: { type: 'interaction', id: interaction.id },
+      occurredAt: interaction.createdAt,
+      metadata: { clientId: interaction.clientId },
+    };
+
+    try {
+      await submissionStore.saveSubmittedInteraction({ interaction, auditEvent });
+    } catch (error) {
+      return Result.failure(new InteractionSubmissionFailedError(error));
+    }
+
+    return Result.success(interaction);
+  }
+}

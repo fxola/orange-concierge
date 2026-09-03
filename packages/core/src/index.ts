@@ -1,16 +1,26 @@
-export { AnalyzeInteraction } from './application/interaction';
+export { AnalyzeInteraction } from './application/interaction/analyze-interaction';
+export { SubmitInteraction } from './application/interaction/submit-interaction';
+export { canAnalyzeInteractions, canSubmitInteractions } from './application/interaction/policy';
+export { Result } from './application/interaction/result';
+
 export {
+  BlankTranscriptError,
   InteractionAnalysisFailedError,
   InteractionNotFoundError,
+  InteractionSubmissionFailedError,
   InvalidInteractionStateError,
   UnauthorizedAnalyzeInteractionError,
+  UnauthorizedSubmitInteractionError,
 } from './errors';
-export { canAnalyzeInteractions } from './application/interaction/policy';
-export {
-  type AnalyzeInteractionDependencies,
-  type AnalyzeInteractionError,
-  type AnalyzeInteractionInput,
-  type AnalyzeInteractionResult,
+export type {
+  AnalyzeInteractionDependencies,
+  AnalyzeInteractionError,
+  AnalyzeInteractionInput,
+  AnalyzeInteractionResult,
+  SubmitInteractionDependencies,
+  SubmitInteractionError,
+  SubmitInteractionInput,
+  SubmitInteractionResult,
 } from './application/interaction/types';
 export type { Actor, ActorRole } from './domain/actor';
 export type { Client } from './domain/client';
@@ -26,5 +36,11 @@ export type {
   AuditResourceType,
 } from './ports/audit';
 export type { InteractionRepository } from './ports/interaction-repository';
-export type { SecretFinding, SecretFindingType, SecretScanner, SecretScanResult } from './ports/secret-scanner';
+export type { InteractionSubmissionStore } from './ports/interaction-submission-store';
+export type {
+  SecretFinding,
+  SecretFindingType,
+  SecretScanner,
+  SecretScanResult,
+} from './ports/secret-scanner';
 export type { StructuredLLMInput, StructuredLLM } from './ports/structured-llm';

@@ -1,4 +1,4 @@
-import { Interaction } from '../../domain/interaction';
+import type { Interaction } from '../../domain/interaction';
 import {
   InteractionAnalysisFailedError,
   InteractionNotFoundError,
@@ -7,11 +7,11 @@ import {
 } from '../../errors';
 import type { AuditEvent } from '../../ports/audit';
 import { canAnalyzeInteractions } from './policy';
-import {
+import { Result } from './result';
+import type {
   AnalyzeInteractionDependencies,
   AnalyzeInteractionInput,
   AnalyzeInteractionResult,
-  Result,
 } from './types';
 
 export class AnalyzeInteraction {
