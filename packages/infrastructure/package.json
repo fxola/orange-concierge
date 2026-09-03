@@ -11,13 +11,19 @@
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "seed": "tsx src/seed.ts"
   },
   "dependencies": {
+    "@orange-concierge/auth": "workspace:*",
     "@orange-concierge/core": "workspace:*",
-    "@orange-concierge/db": "workspace:*"
+    "@orange-concierge/db": "workspace:*",
+    "drizzle-orm": "^0.45.2",
+    "postgres": "^3.4.0"
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
     "typescript": "^5.7.0",
     "vitest": "^4.1.11"
   }

@@ -14,6 +14,7 @@
   "dependencies": {
     "@orange-concierge/core": "workspace:*",
     "@orange-concierge/infrastructure": "workspace:*",
+    "better-auth": "^1.7.2",
     "next": "^16.3.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

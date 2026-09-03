@@ -49,3 +49,10 @@ export class InteractionSubmissionFailedError extends Error {
     this.cause = cause as Error | undefined;
   }
 }
+
+export class UnauthorizedError extends Error {
+  constructor() {
+    super('You need to be logged in to perform this operation');
+    this.name = 'UnauthorizedError';
+  }
+}

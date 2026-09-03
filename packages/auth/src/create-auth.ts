@@ -1,18 +1,14 @@
 import { drizzleAdapter } from '@better-auth/drizzle-adapter';
-import {
-  account,
-  session,
-  user,
-  verification,
-  type OrangeConciergeDB,
-} from '@orange-concierge/db';
+import { account, session, user, verification, type OrangeConciergeDB } from '@orange-concierge/db';
 import { betterAuth } from 'better-auth';
+import { nextCookies } from 'better-auth/next-js';
 
 export type CreateAuthInput = Readonly<{
   db: OrangeConciergeDB;
   baseURL?: string;
   secret?: string;
   trustedOrigins?: string[];
+  disableSignUp?: boolean;
 }>;
 
 const authSchema = {
@@ -34,7 +30,7 @@ export const createAuth = (input: CreateAuthInput) =>
     }),
     emailAndPassword: {
       enabled: true,
-      disableSignUp: true,
+      disableSignUp: input.disableSignUp ?? true,
     },
     session: {
       storeSessionInDatabase: true,
@@ -50,6 +46,7 @@ export const createAuth = (input: CreateAuthInput) =>
         },
       },
     },
+    plugins: [nextCookies()],
   });
 
 export type OrangeConciergeAuth = ReturnType<typeof createAuth>;

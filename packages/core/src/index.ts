@@ -11,6 +11,7 @@ export {
   InvalidInteractionStateError,
   UnauthorizedAnalyzeInteractionError,
   UnauthorizedSubmitInteractionError,
+  UnauthorizedError,
 } from './errors';
 export type {
   AnalyzeInteractionDependencies,
@@ -23,6 +24,7 @@ export type {
   SubmitInteractionResult,
 } from './application/interaction/types';
 export type { Actor, ActorRole } from './domain/actor';
+export { isActorRole } from './domain/actor';
 export type { Client } from './domain/client';
 export type { Interaction, InteractionStatus } from './domain/interaction';
 export type { Recommendation, RecommendationStatus } from './domain/recommendation';
