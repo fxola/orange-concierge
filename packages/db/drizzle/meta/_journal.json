@@ -8,6 +8,13 @@
       "when": 1788437432171,
       "tag": "0000_init_core_schema_with_auth",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788441986186,
+      "tag": "0001_add_account_issuer_identity_key",
+      "breakpoints": true
     }
   ]
 }
