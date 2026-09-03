@@ -1,4 +1,5 @@
 export {
+  account,
   auditAction,
   auditEvents,
   auditResourceType,
@@ -6,6 +7,9 @@ export {
   clients,
   interactionStatus,
   interactions,
+  session,
+  user,
+  verification,
 } from './schema';
 export { createDatabaseFromUrl } from './client';
 export type { AuditMetadataJson } from './schema';
