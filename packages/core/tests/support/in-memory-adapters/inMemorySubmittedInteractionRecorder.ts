@@ -1,8 +1,8 @@
 import type { AuditEvent } from '../../../src/ports/audit.js';
 import type { Interaction } from '../../../src/domain/interaction.js';
-import type { InteractionSubmissionStore } from '../../../src/ports/interaction-submission-store.js';
+import type { SubmittedInteractionRecorder } from '../../../src/ports/submitted-interaction-recorder.js';
 
-export class InMemoryInteractionSubmissionStore implements InteractionSubmissionStore {
+export class InMemorySubmittedInteractionRecorder implements SubmittedInteractionRecorder {
   interactions: Interaction[] = [];
   events: AuditEvent[] = [];
   private shouldFail = false;
@@ -19,13 +19,13 @@ export class InMemoryInteractionSubmissionStore implements InteractionSubmission
     this.shouldFail = true;
   }
 
-  async saveSubmittedInteraction(input: {
+  async record(input: {
     interaction: Interaction;
     auditEvent: AuditEvent;
   }): Promise<void> {
     if (this.shouldFail) {
       this.shouldFail = false;
-      throw new Error('InteractionSubmissionStore save failed');
+      throw new Error('SubmittedInteractionRecorder record failed');
     }
 
     // Atomic in-memory: only mutate after all preconditions succeed.

@@ -36,7 +36,7 @@ export type {
   AuditResourceType,
 } from './ports/audit';
 export type { InteractionRepository } from './ports/interaction-repository';
-export type { InteractionSubmissionStore } from './ports/interaction-submission-store';
+export type { SubmittedInteractionRecorder } from './ports/submitted-interaction-recorder';
 export type {
   SecretFinding,
   SecretFindingType,

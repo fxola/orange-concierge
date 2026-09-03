@@ -14,7 +14,8 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@orange-concierge/core": "workspace:*"
+    "@orange-concierge/core": "workspace:*",
+    "@orange-concierge/db": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

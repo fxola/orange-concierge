@@ -4,7 +4,7 @@ import {
   InteractionSubmissionFailedError,
   UnauthorizedSubmitInteractionError,
 } from '../../errors';
-import { AuditEvent } from '../../ports/audit';
+import type { AuditEvent } from '../../ports/audit';
 import { canSubmitInteractions } from './policy';
 import { Result } from './result';
 import type {
@@ -27,7 +27,7 @@ export class SubmitInteraction {
       return Result.failure(new BlankTranscriptError());
     }
 
-    const { submissionStore, newInteractionId, now } = this.dependencies;
+    const { submittedInteractionRecorder, newInteractionId, now } = this.dependencies;
 
     const interaction: Interaction = {
       id: newInteractionId(),
@@ -47,7 +47,7 @@ export class SubmitInteraction {
     };
 
     try {
-      await submissionStore.saveSubmittedInteraction({ interaction, auditEvent });
+      await submittedInteractionRecorder.record({ interaction, auditEvent });
     } catch (error) {
       return Result.failure(new InteractionSubmissionFailedError(error));
     }
