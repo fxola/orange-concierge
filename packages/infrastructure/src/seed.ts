@@ -4,6 +4,9 @@ import { clients, user, type OrangeConciergeDB } from './database';
 
 import { eq } from 'drizzle-orm';
 import { createDatabaseFromUrl } from './database/connection';
+import { loadPackageEnv, packageRootFrom } from './env';
+
+loadPackageEnv(packageRootFrom(import.meta.url, 1));
 
 export type SeedUserConfig = Readonly<{
   email: string;
