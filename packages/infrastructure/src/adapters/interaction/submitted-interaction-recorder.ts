@@ -1,5 +1,5 @@
 import type { AuditEvent, Interaction, SubmittedInteractionRecorder } from '@orange-concierge/core';
-import { auditEvents, interactions, type OrangeConciergeDB } from '@orange-concierge/db';
+import { auditEvents, interactions, type OrangeConciergeDB } from '../../database';
 
 export class DrizzleSubmittedInteractionRecorder implements SubmittedInteractionRecorder {
   constructor(private readonly db: OrangeConciergeDB) {}

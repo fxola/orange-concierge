@@ -13,7 +13,7 @@ export async function getCurrentActor(headers: Headers): Promise<Actor | null> {
     return null;
   }
 
-  const candidate = session.user;
+  const candidate = session.user as { id?: unknown; role?: unknown };
   const { id, role } = candidate;
 
   if (typeof id !== 'string' || typeof role !== 'string' || !isActorRole(role)) {

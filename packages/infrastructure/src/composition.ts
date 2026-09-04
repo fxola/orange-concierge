@@ -1,8 +1,8 @@
-import { createAuth, type OrangeConciergeAuth } from '@orange-concierge/auth';
+import { createAuth, type OrangeConciergeAuth } from './auth';
 import type { SubmittedInteractionRecorder } from '@orange-concierge/core';
-import type { OrangeConciergeDB, PostgresClient } from '@orange-concierge/db';
-import { createDatabaseFromUrl } from './database';
-import { DrizzleSubmittedInteractionRecorder } from './submitted-interaction-recorder';
+import { type OrangeConciergeDB, type PostgresClient } from './database';
+import { DrizzleSubmittedInteractionRecorder } from './adapters/interaction/submitted-interaction-recorder';
+import { createDatabaseFromUrl } from './database/connection';
 
 export type InfrastructureComposition = Readonly<{
   db: OrangeConciergeDB;
@@ -28,9 +28,10 @@ export const createInfrastructure = (
   input: CreateInfrastructureInput
 ): InfrastructureComposition => {
   const { db, client } = createDatabaseFromUrl(input.databaseUrl);
-  const { baseUrl, authSecret: secret, trustedOrigins } = input;
 
+  const { baseUrl, authSecret: secret, trustedOrigins } = input;
   const auth = createAuth({ db, baseURL: baseUrl, secret, trustedOrigins });
+
   const submittedInteractionRecorder = new DrizzleSubmittedInteractionRecorder(db);
 
   return {

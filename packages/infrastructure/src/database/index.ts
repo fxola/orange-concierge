@@ -12,4 +12,4 @@ export {
   verification,
 } from './schema';
 export type { AuditMetadataJson } from './schema';
-export type { OrangeConciergeDB, OrangeConciergeSchema, PostgresClient } from './client';
+export type { OrangeConciergeDB, OrangeConciergeSchema, PostgresClient } from './connection';

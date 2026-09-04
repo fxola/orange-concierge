@@ -1,9 +1,9 @@
 import type { ActorRole } from '@orange-concierge/core';
-import { createAuth } from '@orange-concierge/auth';
-import { clients, user, type OrangeConciergeDB } from '@orange-concierge/db';
+import { createAuth } from './auth';
+import { clients, user, type OrangeConciergeDB } from './database';
 
 import { eq } from 'drizzle-orm';
-import { createDatabaseFromUrl } from './database';
+import { createDatabaseFromUrl } from './database/connection';
 
 export type SeedUserConfig = Readonly<{
   email: string;
@@ -35,41 +35,23 @@ type SeedClient = Readonly<{
   displayName: string;
 }>;
 
-const DEFAULT_SEED_USERS = {
-  admin: {
-    name: 'Test Admin',
-    email: 'admin@orangeconcierge.test',
-    password: 'DemoAdmin123!',
-  },
-  consultant: {
-    name: 'Test Consultant',
-    email: 'consultant@orangeconcierge.test',
-    password: 'DemoConsultant123!',
-  },
-  reviewer: {
-    name: 'Test Reviewer',
-    email: 'reviewer@orangeconcierge.test',
-    password: 'DemoReviewer123!',
-  },
-} as const satisfies Record<string, SeedUserConfig>;
-
 export const createSeedUsersFromEnvironment = (
   env: NodeJS.ProcessEnv = process.env
 ): SeedConfig['users'] => ({
   admin: {
-    email: env.SEED_ADMIN_EMAIL?.trim() || DEFAULT_SEED_USERS.admin.email,
-    name: env.SEED_ADMIN_NAME?.trim() || DEFAULT_SEED_USERS.admin.name,
-    password: env.SEED_ADMIN_PASSWORD?.trim() || DEFAULT_SEED_USERS.admin.password,
+    email: env.SEED_ADMIN_EMAIL?.trim() || '',
+    name: env.SEED_ADMIN_NAME?.trim() || '',
+    password: env.SEED_ADMIN_PASSWORD?.trim() || '',
   },
   consultant: {
-    email: env.SEED_CONSULTANT_EMAIL?.trim() || DEFAULT_SEED_USERS.consultant.email,
-    name: env.SEED_CONSULTANT_NAME?.trim() || DEFAULT_SEED_USERS.consultant.name,
-    password: env.SEED_CONSULTANT_PASSWORD?.trim() || DEFAULT_SEED_USERS.consultant.password,
+    email: env.SEED_CONSULTANT_EMAIL?.trim() || '',
+    name: env.SEED_CONSULTANT_NAME?.trim() || '',
+    password: env.SEED_CONSULTANT_PASSWORD?.trim() || '',
   },
   reviewer: {
-    email: env.SEED_REVIEWER_EMAIL?.trim() || DEFAULT_SEED_USERS.reviewer.email,
-    name: env.SEED_REVIEWER_NAME?.trim() || DEFAULT_SEED_USERS.reviewer.name,
-    password: env.SEED_REVIEWER_PASSWORD?.trim() || DEFAULT_SEED_USERS.reviewer.password,
+    email: env.SEED_REVIEWER_EMAIL?.trim() || '',
+    name: env.SEED_REVIEWER_NAME?.trim() || '',
+    password: env.SEED_REVIEWER_PASSWORD?.trim() || '',
   },
 });
 

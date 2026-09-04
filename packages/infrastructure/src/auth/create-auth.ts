@@ -1,6 +1,6 @@
 import { drizzleAdapter } from '@better-auth/drizzle-adapter';
-import { account, session, user, verification, type OrangeConciergeDB } from '@orange-concierge/db';
-import { betterAuth } from 'better-auth';
+import { account, session, user, verification, type OrangeConciergeDB } from '../database';
+import { betterAuth, type Auth } from 'better-auth';
 import { nextCookies } from 'better-auth/next-js';
 
 export type CreateAuthInput = Readonly<{
@@ -18,7 +18,7 @@ const authSchema = {
   verification,
 };
 
-export const createAuth = (input: CreateAuthInput) =>
+export const createAuth = (input: CreateAuthInput): Auth<any> =>
   betterAuth({
     appName: 'Orange Concierge',
     baseURL: input.baseURL,

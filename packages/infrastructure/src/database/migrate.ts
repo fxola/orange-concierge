@@ -10,8 +10,7 @@ const runMigration = async () => {
     throw new Error('DATABASE_URL is required to run migrations');
   }
 
-  // Migration-only connection: owned here, never exported for runtime use.
-  // Runtime connections live in @orange-concierge/infrastructure via ./database.ts.
+  // Migration connection is local here; runtime connections live in ./connection.ts.
   const client = postgres(databaseUrl);
   const db = drizzle(client, { schema });
 
