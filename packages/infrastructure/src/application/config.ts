@@ -1,44 +1,46 @@
-import 'server-only';
-
-export type SeedUserConfig = Readonly<{
-  email: string;
-  name: string;
-  password: string;
-}>;
-
-export type AppConfig = Readonly<{
+/**
+ * Backend environment configuration.
+ *
+ * Single centralized parser for everything concrete backend composition
+ * needs.
+ *
+ * Lives in infrastructure so the dependency direction remains:
+ *
+ *   apps/operations → infrastructure → core
+ *
+ * Must not import `server-only`: this module also runs under `tsx`
+ * (seed/migrate scripts), where `server-only` throws.
+ *
+ * Behavior:
+ * - missing values fall back to local-development defaults
+ * - provided URLs are validated
+ * - explicitly exported environment variables win over `.env` files
+ *   (see `../env.ts`)
+ */
+export type BackendConfig = Readonly<{
   databaseUrl: string;
   baseUrl: string;
   authSecret?: string;
   trustedOrigins?: string[];
-  seedUsers: Readonly<{
-    admin: SeedUserConfig;
-    consultant: SeedUserConfig;
-    reviewer: SeedUserConfig;
-  }>;
 }>;
 
 const DEFAULT_DATABASE_URL = 'postgresql://concierge:concierge@localhost:5433/concierge';
+
 const DEFAULT_BASE_URL = 'http://localhost:3000';
 
-export function createAppConfigFromEnvironment(env: NodeJS.ProcessEnv = process.env): AppConfig {
+export function createBackendConfigFromEnvironment(
+  env: NodeJS.ProcessEnv = process.env
+): BackendConfig {
   return {
     databaseUrl: resolveDatabaseUrl(env),
     baseUrl: resolveBaseUrl(env),
     authSecret: resolveAuthSecret(env),
     trustedOrigins: resolveTrustedOrigins(env),
-    seedUsers: resolveSeedUsers(env),
   };
 }
 
 function resolveDatabaseUrl(env: NodeJS.ProcessEnv): string {
-  const databaseUrl = readEnvironmentVariable(env, 'DATABASE_URL');
-
-  if (databaseUrl) {
-    return databaseUrl;
-  }
-
-  return DEFAULT_DATABASE_URL;
+  return readEnvironmentVariable(env, 'DATABASE_URL') ?? DEFAULT_DATABASE_URL;
 }
 
 function resolveBaseUrl(env: NodeJS.ProcessEnv): string {
@@ -46,23 +48,18 @@ function resolveBaseUrl(env: NodeJS.ProcessEnv): string {
     readEnvironmentVariable(env, 'BETTER_AUTH_URL') ??
     readEnvironmentVariable(env, 'NEXT_PUBLIC_APP_URL');
 
-  if (baseUrl) {
-    return validateHttpUrl('Application base URL', baseUrl);
+  if (!baseUrl) {
+    return DEFAULT_BASE_URL;
   }
 
-  return DEFAULT_BASE_URL;
+  return validateHttpUrl('Application base URL', baseUrl);
 }
 
 function resolveAuthSecret(env: NodeJS.ProcessEnv): string | undefined {
-  const authSecret =
+  return (
     readSecretEnvironmentVariable(env, 'BETTER_AUTH_SECRET') ??
-    readSecretEnvironmentVariable(env, 'AUTH_SECRET');
-
-  if (authSecret) {
-    return authSecret;
-  }
-
-  return undefined;
+    readSecretEnvironmentVariable(env, 'AUTH_SECRET')
+  );
 }
 
 function resolveTrustedOrigins(env: NodeJS.ProcessEnv): string[] | undefined {
@@ -100,39 +97,25 @@ function validateHttpUrl(name: string, value: string): string {
     throw new Error(`${name} must use the http or https protocol: "${value}".`);
   }
 
-  return url.toString().replace(/\/$/, '');
+  return url.toString().replace(/\/+$/, '');
 }
 
 function readEnvironmentVariable(env: NodeJS.ProcessEnv, name: string): string | undefined {
   const value = env[name]?.trim();
-  return value || '';
+
+  return value || undefined;
 }
 
+/**
+ * Secrets are checked for blank/whitespace-only values without modifying
+ * the actual secret.
+ */
 function readSecretEnvironmentVariable(env: NodeJS.ProcessEnv, name: string): string | undefined {
   const value = env[name];
+
   if (!value || value.trim().length === 0) {
     return undefined;
   }
 
   return value;
-}
-
-function resolveSeedUsers(env: NodeJS.ProcessEnv): AppConfig['seedUsers'] {
-  return {
-    admin: {
-      email: readEnvironmentVariable(env, 'SEED_ADMIN_EMAIL'),
-      name: readEnvironmentVariable(env, 'SEED_ADMIN_NAME'),
-      password: readSecretEnvironmentVariable(env, 'SEED_ADMIN_PASSWORD'),
-    },
-    consultant: {
-      email: readEnvironmentVariable(env, 'SEED_CONSULTANT_EMAIL'),
-      name: readEnvironmentVariable(env, 'SEED_CONSULTANT_NAME'),
-      password: readSecretEnvironmentVariable(env, 'SEED_CONSULTANT_PASSWORD'),
-    },
-    reviewer: {
-      email: readEnvironmentVariable(env, 'SEED_REVIEWER_EMAIL'),
-      name: readEnvironmentVariable(env, 'SEED_REVIEWER_NAME'),
-      password: readSecretEnvironmentVariable(env, 'SEED_REVIEWER_PASSWORD'),
-    },
-  };
 }

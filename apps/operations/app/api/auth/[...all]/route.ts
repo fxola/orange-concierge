@@ -1,4 +1,4 @@
 import { toNextJsHandler } from 'better-auth/next-js';
-import { getAuth } from '../../../../src/server/composition';
+import { getApplication } from '@orange-concierge/infrastructure';
 
-export const { GET, POST } = toNextJsHandler(getAuth());
+export const { GET, POST } = toNextJsHandler(getApplication().auth);

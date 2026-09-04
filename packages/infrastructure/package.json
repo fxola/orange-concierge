@@ -14,7 +14,7 @@
     "test": "vitest run --passWithNoTests",
     "generate": "drizzle-kit generate",
     "migrate": "tsx src/database/migrate.ts",
-    "seed": "tsx src/seed.ts"
+    "seed": "tsx src/database/seed/cli.ts"
   },
   "dependencies": {
     "@orange-concierge/core": "workspace:*",

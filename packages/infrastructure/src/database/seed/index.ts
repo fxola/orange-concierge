@@ -1,12 +1,20 @@
 import type { ActorRole } from '@orange-concierge/core';
-import { createAuth } from './auth';
-import { clients, user, type OrangeConciergeDB } from './database';
-
 import { eq } from 'drizzle-orm';
-import { createDatabaseFromUrl } from './database/connection';
-import { loadPackageEnv, packageRootFrom } from './env';
 
-loadPackageEnv(packageRootFrom(import.meta.url, 1));
+import { createBackendConfigFromEnvironment, type BackendConfig } from '../../application/config';
+import { createAuth } from '../../auth';
+import { clients, user, type OrangeConciergeDB } from '..';
+import { createDatabaseFromUrl } from '../connection';
+
+function assertDemoSeedAllowed(): void {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Demo seed data cannot be applied when NODE_ENV=production.');
+  }
+
+  if (process.env.ALLOW_DEMO_SEED !== 'true') {
+    throw new Error('Demo seeding is disabled. Set ALLOW_DEMO_SEED=true to enable it.');
+  }
+}
 
 export type SeedUserConfig = Readonly<{
   email: string;
@@ -14,18 +22,15 @@ export type SeedUserConfig = Readonly<{
   password: string;
 }>;
 
-export type SeedConfig = Readonly<{
-  databaseUrl: string;
-  baseUrl: string;
-  authSecret?: string;
-  trustedOrigins?: string[];
-
-  users: Readonly<{
-    admin: SeedUserConfig;
-    consultant: SeedUserConfig;
-    reviewer: SeedUserConfig;
+export type SeedConfig = BackendConfig &
+  Readonly<{
+    users: Readonly<{
+      admin: SeedUserConfig;
+      consultant: SeedUserConfig;
+      reviewer: SeedUserConfig;
+    }>;
   }>;
-}>;
+
 type SeedUser = Readonly<{
   name: string;
   email: string;
@@ -38,30 +43,43 @@ type SeedClient = Readonly<{
   displayName: string;
 }>;
 
+type Database = OrangeConciergeDB;
+
 export const createSeedUsersFromEnvironment = (
   env: NodeJS.ProcessEnv = process.env
 ): SeedConfig['users'] => ({
   admin: {
-    email: env.SEED_ADMIN_EMAIL?.trim() || '',
-    name: env.SEED_ADMIN_NAME?.trim() || '',
-    password: env.SEED_ADMIN_PASSWORD?.trim() || '',
+    email: readSeedText(env, 'SEED_ADMIN_EMAIL'),
+    name: readSeedText(env, 'SEED_ADMIN_NAME'),
+    password: readSeedSecret(env, 'SEED_ADMIN_PASSWORD'),
   },
+
   consultant: {
-    email: env.SEED_CONSULTANT_EMAIL?.trim() || '',
-    name: env.SEED_CONSULTANT_NAME?.trim() || '',
-    password: env.SEED_CONSULTANT_PASSWORD?.trim() || '',
+    email: readSeedText(env, 'SEED_CONSULTANT_EMAIL'),
+    name: readSeedText(env, 'SEED_CONSULTANT_NAME'),
+    password: readSeedSecret(env, 'SEED_CONSULTANT_PASSWORD'),
   },
+
   reviewer: {
-    email: env.SEED_REVIEWER_EMAIL?.trim() || '',
-    name: env.SEED_REVIEWER_NAME?.trim() || '',
-    password: env.SEED_REVIEWER_PASSWORD?.trim() || '',
+    email: readSeedText(env, 'SEED_REVIEWER_EMAIL'),
+    name: readSeedText(env, 'SEED_REVIEWER_NAME'),
+    password: readSeedSecret(env, 'SEED_REVIEWER_PASSWORD'),
   },
 });
 
 const buildSeedUsers = (users: SeedConfig['users']): readonly SeedUser[] => [
-  { ...users.admin, role: 'admin' },
-  { ...users.consultant, role: 'consultant' },
-  { ...users.reviewer, role: 'reviewer' },
+  {
+    ...users.admin,
+    role: 'admin',
+  },
+  {
+    ...users.consultant,
+    role: 'consultant',
+  },
+  {
+    ...users.reviewer,
+    role: 'reviewer',
+  },
 ];
 
 const SEED_CLIENTS = [
@@ -78,8 +96,6 @@ const SEED_CLIENTS = [
     displayName: 'Origami',
   },
 ] as const satisfies readonly SeedClient[];
-
-type Database = OrangeConciergeDB;
 
 async function seedClients(db: Database): Promise<void> {
   console.log('Seeding clients…');
@@ -161,7 +177,7 @@ async function seedUsers(
     const requiresUpdate = current.name !== seedUser.name || current.role !== seedUser.role;
 
     if (!requiresUpdate) {
-      console.log(`    → name and role already correct`);
+      console.log('    → name and role already correct');
 
       continue;
     }
@@ -178,7 +194,16 @@ async function seedUsers(
   }
 }
 
+/**
+ * Seed demo data.
+ *
+ * Safety checks and required-user validation happen before a database client
+ * is created so invalid seed invocations fail without touching Postgres.
+ */
 export async function seed(config: SeedConfig): Promise<void> {
+  assertDemoSeedAllowed();
+  assertSeedUsersConfigured(config.users);
+
   const { db, client } = createDatabaseFromUrl(config.databaseUrl);
 
   try {
@@ -187,10 +212,14 @@ export async function seed(config: SeedConfig): Promise<void> {
       baseURL: config.baseUrl,
       secret: config.authSecret,
       trustedOrigins: config.trustedOrigins,
+
+      // Runtime signup remains disabled. Demo seed explicitly enables it only
+      // for this temporary auth instance.
       disableSignUp: false,
     });
 
     await seedClients(db);
+
     await seedUsers(db, seedAuth, buildSeedUsers(config.users));
 
     console.log('Seed complete.');
@@ -199,36 +228,63 @@ export async function seed(config: SeedConfig): Promise<void> {
   }
 }
 
-const DEFAULT_DATABASE_URL = 'postgresql://concierge:concierge@localhost:5433/concierge';
-const DEFAULT_BASE_URL = 'http://localhost:3000';
-
 export const createSeedConfigFromEnvironment = (
   env: NodeJS.ProcessEnv = process.env
 ): SeedConfig => ({
-  databaseUrl: env.DATABASE_URL?.trim() || DEFAULT_DATABASE_URL,
-  baseUrl: env.BETTER_AUTH_URL?.trim() || env.NEXT_PUBLIC_APP_URL?.trim() || DEFAULT_BASE_URL,
-  authSecret: env.BETTER_AUTH_SECRET?.trim() || env.AUTH_SECRET?.trim() || undefined,
-  trustedOrigins: env.BETTER_AUTH_TRUSTED_ORIGINS?.trim()
-    ? env.BETTER_AUTH_TRUSTED_ORIGINS.split(',')
-        .map((s) => s.trim())
-        .filter(Boolean)
-    : env.TRUSTED_ORIGINS?.trim()
-      ? env.TRUSTED_ORIGINS.split(',')
-          .map((s) => s.trim())
-          .filter(Boolean)
-      : undefined,
+  ...createBackendConfigFromEnvironment(env),
   users: createSeedUsersFromEnvironment(env),
 });
 
-const isSeedMain =
-  process.argv[1] !== undefined &&
-  (process.argv[1].endsWith('/infrastructure/src/seed.ts') ||
-    process.argv[1].endsWith('\\infrastructure\\src\\seed.ts') ||
-    process.argv[1].endsWith('seed.ts'));
+function assertSeedUsersConfigured(users: SeedConfig['users']): void {
+  const missing: string[] = [];
 
-if (isSeedMain) {
-  seed(createSeedConfigFromEnvironment()).catch((error: unknown) => {
-    console.error('Seed failed:', error);
-    process.exitCode = 1;
-  });
+  assertSeedUserConfigured('SEED_ADMIN', users.admin, missing);
+
+  assertSeedUserConfigured('SEED_CONSULTANT', users.consultant, missing);
+
+  assertSeedUserConfigured('SEED_REVIEWER', users.reviewer, missing);
+
+  if (missing.length === 0) {
+    return;
+  }
+
+  throw new Error(`Missing required demo seed environment variables: ${missing.join(', ')}.`);
+}
+
+function assertSeedUserConfigured(
+  prefix: string,
+  seedUser: SeedUserConfig,
+  missing: string[]
+): void {
+  if (seedUser.email.trim().length === 0) {
+    missing.push(`${prefix}_EMAIL`);
+  }
+
+  if (seedUser.name.trim().length === 0) {
+    missing.push(`${prefix}_NAME`);
+  }
+
+  if (seedUser.password.trim().length === 0) {
+    missing.push(`${prefix}_PASSWORD`);
+  }
+}
+
+function readSeedText(env: NodeJS.ProcessEnv, name: string): string {
+  return env[name]?.trim() ?? '';
+}
+
+/**
+ * Determine whether a password exists without modifying it.
+ *
+ * Password whitespace is meaningful, unlike names/emails, so we should not
+ * silently trim a configured password.
+ */
+function readSeedSecret(env: NodeJS.ProcessEnv, name: string): string {
+  const value = env[name];
+
+  if (!value || value.trim().length === 0) {
+    return '';
+  }
+
+  return value;
 }

@@ -10,7 +10,7 @@ loadPackageEnv(packageRootFrom(import.meta.url, 2));
 
 // Resolved from this file's location, so `pnpm migrate` works whether the
 // cwd is the package dir or the repo root (via `pnpm --filter`).
-const migrationsFolder = path.join(path.dirname(fileURLToPath(import.meta.url)), 'drizzle');
+const migrationsFolder = path.join(path.dirname(fileURLToPath(import.meta.url)), 'migrations');
 
 const runMigration = async () => {
   const databaseUrl = process.env.DATABASE_URL;

@@ -1,9 +1,20 @@
-import { isActorRole, UnauthorizedError, type Actor } from '@orange-concierge/core';
-import { getAuth, toActor } from './composition';
+import 'server-only';
+import { isActorRole, UnauthorizedError, type Actor, type ActorRole } from '@orange-concierge/core';
+import { getApplication } from '@orange-concierge/infrastructure';
+
+export type AuthenticatedUser = Readonly<{
+  id: string;
+  role: ActorRole;
+}>;
+
+export const toActor = (user: AuthenticatedUser): Actor => ({
+  id: user.id,
+  role: user.role,
+});
 
 export async function getSession(headers: Headers) {
-  const auth = getAuth();
-  return auth.api.getSession({ headers });
+  const application = getApplication();
+  return application.auth.api.getSession({ headers });
 }
 
 export async function getCurrentActor(headers: Headers): Promise<Actor | null> {
