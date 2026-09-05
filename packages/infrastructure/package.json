@@ -11,13 +11,22 @@
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "generate": "drizzle-kit generate",
+    "migrate": "tsx src/database/migrate.ts",
+    "seed": "tsx src/database/seed/cli.ts"
   },
   "dependencies": {
     "@orange-concierge/core": "workspace:*",
-    "@orange-concierge/db": "workspace:*"
+    "@better-auth/drizzle-adapter": "^1.7.2",
+    "better-auth": "^1.7.2",
+    "drizzle-orm": "^0.45.2",
+    "postgres": "^3.4.0"
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
+    "drizzle-kit": "^0.31.10",
+    "tsx": "^4.19.0",
     "typescript": "^5.7.0",
     "vitest": "^4.1.11"
   }

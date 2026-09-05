@@ -1,3 +1,6 @@
-export { createInfrastructure } from './composition';
-export { DrizzleSubmittedInteractionRecorder } from './submitted-interaction-recorder';
-export type { InfrastructureComposition } from './composition';
+export { getApplication } from './application/composition';
+export type {
+  Application,
+  SubmitInteractionInput,
+  SubmitInteractionResult,
+} from './application/types';
