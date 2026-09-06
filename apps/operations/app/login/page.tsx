@@ -1,67 +1,72 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, useTransition, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { authClient } from '../../src/auth-client';
+import { Button } from '../../src/components/ui/button';
+import { Card } from '../../src/components/ui/card';
+import { Field } from '../../src/components/ui/field';
+import { Input } from '../../src/components/ui/input';
+import { Text } from '../../src/components/ui/text';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
-    setPending(true);
 
-    await authClient.signIn.email(
-      { email, password },
-      {
-        onSuccess: () => {
-          router.push('/');
-          router.refresh();
-        },
-        onError: (context) => {
-          setError(context.error.message);
-          setPending(false);
-        },
-      }
-    );
+    startTransition(async () => {
+      await authClient.signIn.email(
+        { email, password },
+        {
+          onSuccess: () => {
+            router.push('/');
+            router.refresh();
+          },
+          onError: (context) => {
+            setError(context.error.message);
+          },
+        }
+      );
+    });
   };
 
   return (
-    <main>
-      <h1>Sign in</h1>
-      <form onSubmit={onSubmit}>
-        <div>
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-          />
-        </div>
-        {error ? <p role="alert">{error}</p> : null}
-        <button type="submit" disabled={pending}>
-          {pending ? 'Signing in…' : 'Sign in'}
-        </button>
-      </form>
+    <main className="flex min-h-dvh items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md p-8">
+        <Text variant="h1">Sign in</Text>
+        <Text tone="muted" className="mb-5 mt-1">
+          Orange Concierge operations
+        </Text>
+        <form className="grid gap-4" onSubmit={onSubmit}>
+          <Field label="Email">
+            <Input
+              type="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+            />
+          </Field>
+          <Field label="Password" error={error}>
+            <Input
+              type="password"
+              autoComplete="current-password"
+              required
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+          </Field>
+          <Button type="submit" disabled={isPending} className="w-full">
+            {isPending ? 'Signing in…' : 'Sign in'}
+          </Button>
+        </form>
+      </Card>
     </main>
   );
 }

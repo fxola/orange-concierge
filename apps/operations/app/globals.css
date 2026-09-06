@@ -1,0 +1,207 @@
+@import 'tailwindcss';
+
+:root {
+  color-scheme: light;
+
+  /* Brand */
+  --oc-brand-navy: #000f1a;
+  --oc-brand-orange: #eb8500;
+
+  /* Backgrounds */
+  --oc-background: #f7f4ed;
+  --oc-surface: #fffaf2;
+  --oc-surface-raised: #ffffff;
+  --oc-surface-muted: #ece7de;
+
+  /* Foreground */
+  --oc-foreground: #000f1a;
+  --oc-foreground-muted: #5d6e77;
+  --oc-foreground-subtle: #77858c;
+  --oc-foreground-inverse: #f7f4ed;
+
+  /* Borders */
+  --oc-border: #d9d4ca;
+  --oc-border-strong: #b7afa3;
+
+  /* Primary action */
+  --oc-primary: #eb8500;
+  --oc-primary-hover: #d97700;
+  --oc-primary-active: #c56f00;
+  --oc-primary-foreground: #000f1a;
+
+  /* Secondary action */
+  --oc-secondary: #000f1a;
+  --oc-secondary-hover: #112b39;
+  --oc-secondary-foreground: #f7f4ed;
+
+  /* Interactive */
+  --oc-link: #8a4b08;
+  --oc-focus: #c56f00;
+
+  /* Status */
+  --oc-success: #176b4a;
+  --oc-success-surface: #e8f5ee;
+
+  --oc-warning: #8a4b08;
+  --oc-warning-surface: #fff3dd;
+
+  --oc-danger: #b42318;
+  --oc-danger-surface: #fdecea;
+
+  --oc-info: #175cd3;
+  --oc-info-surface: #eaf2ff;
+
+  /* Shape */
+  --oc-radius-sm: 6px;
+  --oc-radius-md: 10px;
+  --oc-radius-lg: 14px;
+
+  /* Elevation */
+  --oc-shadow-xs: 0 1px 2px rgb(0 15 26 / 0.05);
+
+  --oc-shadow-sm: 0 1px 3px rgb(0 15 26 / 0.08), 0 1px 2px rgb(0 15 26 / 0.04);
+
+  --oc-shadow-md: 0 8px 24px rgb(0 15 26 / 0.1);
+}
+
+/*
+ * Dark theme. Light-first values above are normative (see the UI design
+ * system doc); these dark values are derived to preserve the same
+ * semantic roles: navy becomes the workspace, warm white becomes
+ * typography, orange stays the single action color.
+ */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --oc-background: #000f1a;
+  --oc-surface: #0b1d2d;
+  --oc-surface-raised: #123043;
+  --oc-surface-muted: #152a3e;
+
+  --oc-foreground: #f7f4ed;
+  --oc-foreground-muted: #a8b4c0;
+  --oc-foreground-subtle: #7d8b97;
+  --oc-foreground-inverse: #000f1a;
+
+  --oc-border: rgb(247 244 237 / 14%);
+  --oc-border-strong: rgb(247 244 237 / 30%);
+
+  --oc-primary: #eb8500;
+  --oc-primary-hover: #ff9d1f;
+  --oc-primary-active: #c56f00;
+  --oc-primary-foreground: #000f1a;
+
+  --oc-secondary: #f7f4ed;
+  --oc-secondary-hover: #ddd6c8;
+  --oc-secondary-foreground: #000f1a;
+
+  --oc-link: #eb8500;
+  --oc-focus: #ff9d1f;
+
+  --oc-success: #6fd3a0;
+  --oc-success-surface: rgb(111 211 160 / 12%);
+
+  --oc-warning: #f0b35c;
+  --oc-warning-surface: rgb(240 179 92 / 12%);
+
+  --oc-danger: #f27f77;
+  --oc-danger-surface: rgb(242 127 119 / 12%);
+
+  --oc-info: #7aa8f5;
+  --oc-info-surface: rgb(122 168 245 / 12%);
+}
+
+@theme inline {
+  --font-display: var(--font-display), Georgia, serif;
+
+  --ease-cubic: cubic-bezier(0.23, 1, 0.32, 1);
+
+  --color-background: var(--oc-background);
+  --color-surface: var(--oc-surface);
+  --color-surface-raised: var(--oc-surface-raised);
+  --color-surface-muted: var(--oc-surface-muted);
+
+  --color-foreground: var(--oc-foreground);
+  --color-muted-foreground: var(--oc-foreground-muted);
+  --color-subtle-foreground: var(--oc-foreground-subtle);
+  --color-inverse-foreground: var(--oc-foreground-inverse);
+
+  --color-border: var(--oc-border);
+  --color-border-strong: var(--oc-border-strong);
+
+  --color-primary: var(--oc-primary);
+  --color-primary-hover: var(--oc-primary-hover);
+  --color-primary-active: var(--oc-primary-active);
+  --color-primary-foreground: var(--oc-primary-foreground);
+
+  --color-secondary: var(--oc-secondary);
+  --color-secondary-hover: var(--oc-secondary-hover);
+  --color-secondary-foreground: var(--oc-secondary-foreground);
+
+  --color-link: var(--oc-link);
+  --color-focus: var(--oc-focus);
+
+  --color-success: var(--oc-success);
+  --color-success-surface: var(--oc-success-surface);
+
+  --color-warning: var(--oc-warning);
+  --color-warning-surface: var(--oc-warning-surface);
+
+  --color-danger: var(--oc-danger);
+  --color-danger-surface: var(--oc-danger-surface);
+
+  --color-info: var(--oc-info);
+  --color-info-surface: var(--oc-info-surface);
+
+  --radius-sm: var(--oc-radius-sm);
+  --radius-md: var(--oc-radius-md);
+  --radius-lg: var(--oc-radius-lg);
+
+  --shadow-xs: var(--oc-shadow-xs);
+  --shadow-sm: var(--oc-shadow-sm);
+  --shadow-md: var(--oc-shadow-md);
+}
+
+@layer base {
+  * {
+    border-color: var(--oc-border);
+  }
+
+  html {
+    background: var(--oc-background);
+  }
+
+  body {
+    min-height: 100dvh;
+    background: var(--oc-background);
+    color: var(--oc-foreground);
+    font-family: var(--font-sans), 'Inter', ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.5;
+    text-rendering: optimizeLegibility;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--oc-focus);
+    outline-offset: 2px;
+  }
+
+  a {
+    color: var(--oc-link);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+  }
+}
