@@ -1,4 +1,5 @@
 import 'server-only';
+import { cache } from 'react';
 import { isActorRole, UnauthorizedError, type Actor, type ActorRole } from '@orange-concierge/core';
 import { getApplication } from '@orange-concierge/infrastructure';
 
@@ -12,9 +13,24 @@ export const toActor = (user: AuthenticatedUser): Actor => ({
   role: user.role,
 });
 
-export async function getSession(headers: Headers) {
+/**
+ * Per-request session lookup, deduplicated by session cookie.
+ *
+ * Keyed on the cookie string (a primitive) rather than the `Headers`
+ * object: `React.cache()` compares arguments with `Object.is`, and each
+ * `await headers()` call site produces a distinct instance that would
+ * never hit the cache. Session resolution only needs the cookie, so a
+ * cookie-only `Headers` is forwarded to Better Auth.
+ */
+const getSessionByCookie = cache(async (cookie: string) => {
   const application = getApplication();
-  return application.auth.api.getSession({ headers });
+  return application.auth.api.getSession({
+    headers: new Headers(cookie ? { cookie } : {}),
+  });
+});
+
+export async function getSession(headers: Headers) {
+  return getSessionByCookie(headers.get('cookie') ?? '');
 }
 
 export async function getCurrentActor(headers: Headers): Promise<Actor | null> {
