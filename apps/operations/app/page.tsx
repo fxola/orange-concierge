@@ -1,9 +1,9 @@
 import { headers } from 'next/headers';
-import { getCurrentActor } from '../src/server/session';
-import { getSidebarCollapsed } from '../src/server/sidebar';
-import { AppShell } from '../src/components/app-shell';
-import { Card } from '../src/components/ui/card';
-import { Text } from '../src/components/ui/text';
+import { getCurrentActor } from '@/server/session';
+import { getSidebarCollapsed } from '@/server/sidebar';
+import { AppShell } from '@/components/app-shell';
+import { Card } from '@/components/ui/card';
+import { Text } from '@/components/ui/text';
 
 export default async function Home() {
   const [actor, sidebarCollapsed] = await Promise.all([

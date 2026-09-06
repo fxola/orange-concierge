@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Menu } from 'lucide-react';
-import { ThemeToggle } from '../theme-toggle';
-import { Badge } from '../ui/card';
+import { ThemeToggle } from '@/components/theme-toggle';
+import { Badge } from '@/components/ui/card';
 
 export function TopBar({
   userId,

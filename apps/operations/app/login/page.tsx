@@ -2,12 +2,12 @@
 
 import { useState, useTransition, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { authClient } from '../../src/auth-client';
-import { Button } from '../../src/components/ui/button';
-import { Card } from '../../src/components/ui/card';
-import { Field } from '../../src/components/ui/field';
-import { Input } from '../../src/components/ui/input';
-import { Text } from '../../src/components/ui/text';
+import { authClient } from '@/auth-client';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Field } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { Text } from '@/components/ui/text';
 
 export default function LoginPage() {
   const router = useRouter();

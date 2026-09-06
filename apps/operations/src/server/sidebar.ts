@@ -1,6 +1,6 @@
 import 'server-only';
 import { cookies } from 'next/headers';
-import { SIDEBAR_COOKIE } from '../components/app-shell/sidebar-cookie';
+import { SIDEBAR_COOKIE } from '@/components/app-shell/sidebar-cookie';
 
 export { SIDEBAR_COOKIE };
 

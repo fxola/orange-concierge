@@ -1,8 +1,8 @@
 import { headers } from 'next/headers';
-import { AppShell } from '../../src/components/app-shell';
-import { PageHeader, TableEmpty } from '../../src/components/ui/page';
-import { getCurrentActor } from '../../src/server/session';
-import { getSidebarCollapsed } from '../../src/server/sidebar';
+import { AppShell } from '@/components/app-shell';
+import { PageHeader, TableEmpty } from '@/components/ui/page';
+import { getCurrentActor } from '@/server/session';
+import { getSidebarCollapsed } from '@/server/sidebar';
 
 export default async function ReviewsPage() {
   const [actor, sidebarCollapsed] = await Promise.all([

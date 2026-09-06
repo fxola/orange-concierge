@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
-import { Text } from '../ui/text';
+import { Text } from '@/components/ui/text';
 
 export function NavLink({
   href,

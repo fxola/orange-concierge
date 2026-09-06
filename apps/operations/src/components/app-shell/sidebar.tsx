@@ -2,8 +2,8 @@
 
 import { usePathname } from 'next/navigation';
 import { ChevronsLeft, ChevronsRight } from 'lucide-react';
-import { SignOutButton } from '../sign-out-button';
-import { Button } from '../ui/button';
+import { SignOutButton } from '@/components/sign-out-button';
+import { Button } from '@/components/ui/button';
 import { BrandMark } from './brand-mark';
 import { NAV_ITEMS } from './nav-items';
 import { NavLink } from './nav-link';

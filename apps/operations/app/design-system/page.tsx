@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react';
-import { ThemeToggle } from '../../src/components/theme-toggle';
-import { Alert, Badge, Card } from '../../src/components/ui/card';
-import { Button } from '../../src/components/ui/button';
-import { Field } from '../../src/components/ui/field';
-import { Input, Textarea } from '../../src/components/ui/input';
-import { PageHeader, Table, TableBody, TableEmpty, TableHead } from '../../src/components/ui/page';
-import { Avatar } from '../../src/components/ui/avatar';
-import { Text } from '../../src/components/ui/text';
+import { ThemeToggle } from '@/components/theme-toggle';
+import { Alert, Badge, Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Field } from '@/components/ui/field';
+import { Input, Textarea } from '@/components/ui/input';
+import { PageHeader, Table, TableBody, TableEmpty, TableHead } from '@/components/ui/page';
+import { Avatar } from '@/components/ui/avatar';
+import { Text } from '@/components/ui/text';
 
 const SWATCHES: ReadonlyArray<{ token: string; value: string; className: string }> = [
   { token: 'background', value: '#f7f4ed', className: 'bg-background' },
