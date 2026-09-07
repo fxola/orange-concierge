@@ -1,0 +1,61 @@
+import 'server-only';
+
+import {
+  ClientNotFoundError,
+  InvalidClientIdError,
+  type Client,
+  type GetClientResult,
+  type ListClientsResult,
+} from '@orange-concierge/core';
+
+export type ClientRow = Readonly<{
+  id: string;
+  displayName: string;
+  createdAtLabel: string;
+}>;
+
+export type ClientListViewModel =
+  | Readonly<{ status: 'ok'; rows: readonly ClientRow[] }>
+  | Readonly<{ status: 'empty' }>;
+
+export type ClientDetailViewModel =
+  | Readonly<{ status: 'ok'; client: ClientRow }>
+  | Readonly<{ status: 'notFound' }>;
+
+export function formatDateLabel(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
+function toClientRow(client: Client): ClientRow {
+  return {
+    id: client.id,
+    displayName: client.displayName,
+    createdAtLabel: formatDateLabel(client.createdAt),
+  };
+}
+
+export function toClientListViewModel(result: ListClientsResult): ClientListViewModel {
+  if (result.isFailure()) {
+    throw result.getError();
+  }
+
+  const clients = result.getValue();
+  if (clients.length === 0) {
+    return { status: 'empty' };
+  }
+
+  return { status: 'ok', rows: clients.map(toClientRow) };
+}
+
+export function toClientDetailViewModel(result: GetClientResult): ClientDetailViewModel {
+  if (result.isSuccess()) {
+    return { status: 'ok', client: toClientRow(result.getValue()) };
+  }
+
+  const error = result.getError();
+  if (error instanceof ClientNotFoundError || error instanceof InvalidClientIdError) {
+    return { status: 'notFound' };
+  }
+
+  throw error;
+}
