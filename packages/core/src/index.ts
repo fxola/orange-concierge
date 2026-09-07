@@ -1,10 +1,24 @@
 export { AnalyzeInteraction } from './application/interaction/analyze-interaction';
 export { SubmitInteraction } from './application/interaction/submit-interaction';
+export { ListClients } from './application/client/list-clients';
+export { GetClient } from './application/client/get-client';
+export {
+  MAX_LIST_LIMIT,
+  clientIdSchema,
+  paginationSchema,
+  parseClientId,
+  parsePagination,
+} from './application/client/client-id';
+export { canViewClients } from './application/client/policy';
 export { canAnalyzeInteractions, canSubmitInteractions } from './application/interaction/policy';
-export { Result } from './application/interaction/result';
+export { Result } from './application/result';
 
 export {
   BlankTranscriptError,
+  ClientNotFoundError,
+  InvalidClientIdError,
+  InvalidPaginationError,
+  UnauthorizedViewClientsError,
   InteractionAnalysisFailedError,
   InteractionNotFoundError,
   InteractionSubmissionFailedError,
@@ -23,6 +37,16 @@ export type {
   SubmitInteractionInput,
   SubmitInteractionResult,
 } from './application/interaction/types';
+export type {
+  GetClientDependencies,
+  GetClientError,
+  GetClientInput,
+  GetClientResult,
+  ListClientsDependencies,
+  ListClientsError,
+  ListClientsInput,
+  ListClientsResult,
+} from './application/client/types';
 export type { Actor, ActorRole } from './domain/actor';
 export { isActorRole } from './domain/actor';
 export type { Client } from './domain/client';
@@ -38,6 +62,7 @@ export type {
   AuditResourceType,
 } from './ports/audit';
 export type { InteractionRepository } from './ports/interaction-repository';
+export type { ClientRepository } from './ports/client-repository';
 export type { SubmittedInteractionRecorder } from './ports/submitted-interaction-recorder';
 export type {
   SecretFinding,

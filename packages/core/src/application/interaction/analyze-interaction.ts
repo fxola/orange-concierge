@@ -7,7 +7,7 @@ import {
 } from '../../errors';
 import type { AuditEvent } from '../../ports/audit';
 import { canAnalyzeInteractions } from './policy';
-import { Result } from './result';
+import { Result } from '../result';
 import type {
   AnalyzeInteractionDependencies,
   AnalyzeInteractionInput,

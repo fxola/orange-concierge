@@ -36,3 +36,24 @@ Feature: Submit interaction
     When the consultant submits meeting notes for a client
     Then the submission is rejected as submission failed
     And no interaction is saved
+
+  Scenario: Reject unknown client without side effects
+    Given a consultant actor
+    When the consultant submits meeting notes for an unknown client
+    Then the submission is rejected as unknown client
+    And no interaction is saved
+    And no audit event is recorded
+
+  Scenario: Reject blank client id without side effects
+    Given a consultant actor
+    When the consultant submits meeting notes for a blank client id
+    Then the submission is rejected as invalid client id
+    And no interaction is saved
+    And no audit event is recorded
+
+  Scenario: Reject overlong client id without side effects
+    Given a consultant actor
+    When the consultant submits meeting notes for an overlong client id
+    Then the submission is rejected as invalid client id
+    And no interaction is saved
+    And no audit event is recorded

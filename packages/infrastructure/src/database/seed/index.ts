@@ -84,15 +84,15 @@ const buildSeedUsers = (users: SeedConfig['users']): readonly SeedUser[] => [
 
 const SEED_CLIENTS = [
   {
-    id: 'client-acme',
+    id: '11111111-1111-4111-9111-111111111111',
     displayName: 'Acme Fund',
   },
   {
-    id: 'client-tbw',
+    id: '22222222-2222-4222-a222-222222222222',
     displayName: 'TBW',
   },
   {
-    id: 'client-og',
+    id: '33333333-3333-4333-b333-333333333333',
     displayName: 'Origami',
   },
 ] as const satisfies readonly SeedClient[];
