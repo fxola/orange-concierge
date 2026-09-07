@@ -50,6 +50,34 @@ export class InteractionSubmissionFailedError extends Error {
   }
 }
 
+export class ClientNotFoundError extends Error {
+  constructor(id: string) {
+    super(`Client:${id} not found`);
+    this.name = 'ClientNotFoundError';
+  }
+}
+
+export class InvalidClientIdError extends Error {
+  constructor() {
+    super('Client id must be a valid UUID');
+    this.name = 'InvalidClientIdError';
+  }
+}
+
+export class InvalidPaginationError extends Error {
+  constructor() {
+    super('Pagination must satisfy limit 1-100 and a non-negative integer offset');
+    this.name = 'InvalidPaginationError';
+  }
+}
+
+export class UnauthorizedViewClientsError extends Error {
+  constructor(role: Actor['role']) {
+    super(`Actor role ${role} cannot view clients`);
+    this.name = 'UnauthorizedViewClientsError';
+  }
+}
+
 export class UnauthorizedError extends Error {
   constructor() {
     super('You need to be logged in to perform this operation');

@@ -1,4 +1,4 @@
-import { expect } from 'vitest';
+import { expect, vi } from 'vitest';
 import { describeFeature, loadFeature } from '@amiceli/vitest-cucumber';
 import type { SubmitInteractionResult } from '../../src';
 import { submitInteractionWorld } from '../support/worlds/submitInteractionWorld';
@@ -169,6 +169,101 @@ describeFeature(feature, ({ Scenario }) => {
 
     And('no interaction is saved', () => {
       expect(world.interactions()).toHaveLength(0);
+      expect(world.audit().events).toHaveLength(0);
+    });
+  });
+
+  Scenario('Reject unknown client without side effects', ({ Given, When, Then, And }) => {
+    const world = submitInteractionWorld();
+    let result: SubmitInteractionResult;
+
+    Given('a consultant actor', () => {
+      expect(world.consultant().role).toBe('consultant');
+    });
+
+    When('the consultant submits meeting notes for an unknown client', async () => {
+      result = await world.submitInteraction().execute({
+        actor: world.consultant(),
+        clientId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+        transcript: world.meetingNotes(),
+      });
+    });
+
+    Then('the submission is rejected as unknown client', () => {
+      expect(result.isFailure()).toBe(true);
+      expect(result.getError().name).toBe('ClientNotFoundError');
+    });
+
+    And('no interaction is saved', () => {
+      expect(world.interactions()).toHaveLength(0);
+    });
+
+    And('no audit event is recorded', () => {
+      expect(world.audit().events).toHaveLength(0);
+    });
+  });
+
+  Scenario('Reject blank client id without side effects', ({ Given, When, Then, And }) => {
+    const world = submitInteractionWorld();
+    let result: SubmitInteractionResult;
+    let existsSpy: ReturnType<typeof vi.spyOn>;
+    Given('a consultant actor', () => {
+      expect(world.consultant().role).toBe('consultant');
+      existsSpy = vi.spyOn(world.clientRepository(), 'exists');
+    });
+
+    When('the consultant submits meeting notes for a blank client id', async () => {
+      result = await world.submitInteraction().execute({
+        actor: world.consultant(),
+        clientId: '   ',
+        transcript: world.meetingNotes(),
+      });
+    });
+
+    Then('the submission is rejected as invalid client id', () => {
+      expect(result.isFailure()).toBe(true);
+      expect(result.getError().name).toBe('InvalidClientIdError');
+    });
+
+    And('no interaction is saved', () => {
+      expect(world.interactions()).toHaveLength(0);
+      expect(existsSpy).not.toHaveBeenCalled();
+    });
+
+    And('no audit event is recorded', () => {
+      expect(world.audit().events).toHaveLength(0);
+    });
+  });
+
+  Scenario('Reject overlong client id without side effects', ({ Given, When, Then, And }) => {
+    const world = submitInteractionWorld();
+    let result: SubmitInteractionResult;
+    let existsSpy: ReturnType<typeof vi.spyOn>;
+
+    Given('a consultant actor', () => {
+      expect(world.consultant().role).toBe('consultant');
+      existsSpy = vi.spyOn(world.clientRepository(), 'exists');
+    });
+
+    When('the consultant submits meeting notes for an overlong client id', async () => {
+      result = await world.submitInteraction().execute({
+        actor: world.consultant(),
+        clientId: `client-${'x'.repeat(128)}`,
+        transcript: world.meetingNotes(),
+      });
+    });
+
+    Then('the submission is rejected as invalid client id', () => {
+      expect(result.isFailure()).toBe(true);
+      expect(result.getError().name).toBe('InvalidClientIdError');
+    });
+
+    And('no interaction is saved', () => {
+      expect(world.interactions()).toHaveLength(0);
+      expect(existsSpy).not.toHaveBeenCalled();
+    });
+
+    And('no audit event is recorded', () => {
       expect(world.audit().events).toHaveLength(0);
     });
   });

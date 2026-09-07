@@ -1,12 +1,13 @@
 import { randomUUID } from 'node:crypto';
 
-import { SubmitInteraction } from '@orange-concierge/core';
+import { GetClient, ListClients, SubmitInteraction } from '@orange-concierge/core';
 
 import { DrizzleSubmittedInteractionRecorder } from '../adapters/interaction/submitted-interaction-recorder';
 import { createAuth } from '../auth';
 import { createDatabaseFromUrl } from '../database/connection';
 import { createBackendConfigFromEnvironment, type BackendConfig } from './config';
 import type { Application } from './types';
+import { DrizzleClientRepository } from '../adapters/client/drizzle-client-repository';
 
 type ApplicationRuntime = Readonly<{
   application: Application;
@@ -31,16 +32,25 @@ const createApplicationRuntime = (config: BackendConfig): ApplicationRuntime => 
   const auth = createAuth({ db, baseURL, secret, trustedOrigins });
 
   const submittedInteractionRecorder = new DrizzleSubmittedInteractionRecorder(db);
+  const clientRepository = new DrizzleClientRepository(db);
+
   const submitInteractionUseCase = new SubmitInteraction({
     submittedInteractionRecorder,
+    clientRepository,
     newInteractionId: randomUUID,
     now: () => new Date(),
   });
+  const listClientsUseCase = new ListClients({ clientRepository });
+  const getClientUseCase = new GetClient({ clientRepository });
 
   const application: Application = {
     auth,
     interaction: {
       submit: (input) => submitInteractionUseCase.execute(input),
+    },
+    client: {
+      getAll: (input) => listClientsUseCase.execute(input),
+      getOne: (input) => getClientUseCase.execute(input),
     },
   };
 

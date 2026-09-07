@@ -1,4 +1,5 @@
 import { SubmitInteraction, type Actor } from '../../../src';
+import { InMemoryClientRepository } from '../in-memory-adapters/inMemoryClientAdapter';
 import { InMemorySubmittedInteractionRecorder } from '../in-memory-adapters/inMemorySubmittedInteractionRecorder';
 
 const meetingNotes = [
@@ -29,8 +30,15 @@ const required = <T>(value: T | undefined, name: string): T => {
 
 export function submitInteractionWorld() {
   const submittedInteractionRecorder = new InMemorySubmittedInteractionRecorder();
+  const clientRepository = new InMemoryClientRepository();
+  clientRepository.clients.push({
+    id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+    displayName: 'Test Client',
+    createdAt: fixedDate,
+  });
   const submitInteraction = new SubmitInteraction({
     submittedInteractionRecorder,
+    clientRepository,
     newInteractionId: () => 'interaction-1',
     now: () => fixedDate,
   });
@@ -54,7 +62,7 @@ export function submitInteractionWorld() {
     },
 
     clientId() {
-      return 'client-1';
+      return 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
     },
 
     meetingNotes() {
@@ -91,6 +99,10 @@ export function submitInteractionWorld() {
 
     submittedInteractionRecorder() {
       return submittedInteractionRecorder;
+    },
+
+    clientRepository() {
+      return clientRepository;
     },
   };
 }

@@ -1,5 +1,4 @@
-import { headers } from 'next/headers';
-import { getCurrentActor } from '@/server/session';
+import { getCurrentActor } from '@/server/actor';
 import { getSidebarCollapsed } from '@/server/sidebar';
 import { AppShell } from '@/components/app-shell';
 import { Card } from '@/components/ui/card';
@@ -7,7 +6,7 @@ import { Text } from '@/components/ui/text';
 
 export default async function Home() {
   const [actor, sidebarCollapsed] = await Promise.all([
-    getCurrentActor(await headers()),
+    getCurrentActor(),
     getSidebarCollapsed(),
   ]);
 
