@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { LogOut } from 'lucide-react';
-import { authClient } from '@/auth-client';
+import { authClient } from '@/lib/auth-client';
 
 export function SignOutButton({ collapsed }: Readonly<{ collapsed?: boolean }>) {
   const router = useRouter();

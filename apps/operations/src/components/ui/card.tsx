@@ -59,7 +59,7 @@ export function Alert({
     <div
       role="alert"
       className={[
-        'rounded-md border px-3 py-2.5 text-sm',
+        'rounded-none border px-3 py-2.5 text-sm',
         tone === 'success' && 'border-success bg-success-surface text-success',
         tone === 'warning' && 'border-warning bg-warning-surface text-warning',
         tone === 'danger' && 'border-danger bg-danger-surface text-danger',

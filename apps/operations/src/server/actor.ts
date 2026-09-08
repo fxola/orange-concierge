@@ -49,6 +49,17 @@ export async function requirePageActor(): Promise<Actor> {
   return actor;
 }
 
+export function isNextControlFlowError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    'digest' in error &&
+    typeof error.digest === 'string' &&
+    (error.digest === 'DYNAMIC_SERVER_USAGE' ||
+      error.digest.startsWith('NEXT_REDIRECT') ||
+      error.digest.startsWith('NEXT_NOT_FOUND'))
+  );
+}
+
 export async function requireRequestActor(request?: Request): Promise<Actor> {
   const actor = request ? await getActorFromHeaders(request.headers) : await getCurrentActor();
   if (!actor) {

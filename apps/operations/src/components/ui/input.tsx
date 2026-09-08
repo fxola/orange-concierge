@@ -1,4 +1,8 @@
-import type { InputHTMLAttributes, TextareaHTMLAttributes } from 'react';
+import type {
+  InputHTMLAttributes,
+  SelectHTMLAttributes,
+  TextareaHTMLAttributes,
+} from 'react';
 
 const CONTROL = `
    w-full rounded-none border border-border bg-surface
@@ -11,6 +15,16 @@ export type InputProps = InputHTMLAttributes<HTMLInputElement>;
 
 export function Input({ className, ...props }: InputProps) {
   return <input className={[CONTROL, 'h-11', className ?? ''].join(' ')} {...props} />;
+}
+
+export type SelectProps = SelectHTMLAttributes<HTMLSelectElement>;
+
+export function Select({ className, children, ...props }: SelectProps) {
+  return (
+    <select className={[CONTROL, 'h-11', className ?? ''].join(' ')} {...props}>
+      {children}
+    </select>
+  );
 }
 
 export type TextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement>;

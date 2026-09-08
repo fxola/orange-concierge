@@ -1,12 +1,6 @@
 import 'server-only';
 
-import {
-  ClientNotFoundError,
-  InvalidClientIdError,
-  type Client,
-  type GetClientResult,
-  type ListClientsResult,
-} from '@orange-concierge/core';
+import type { Client, GetClientResult, ListClientsResult } from '@orange-concierge/core';
 
 export type ClientRow = Readonly<{
   id: string;
@@ -16,11 +10,13 @@ export type ClientRow = Readonly<{
 
 export type ClientListViewModel =
   | Readonly<{ status: 'ok'; rows: readonly ClientRow[] }>
-  | Readonly<{ status: 'empty' }>;
+  | Readonly<{ status: 'empty' }>
+  | Readonly<{ status: 'unavailable' }>;
 
 export type ClientDetailViewModel =
   | Readonly<{ status: 'ok'; client: ClientRow }>
-  | Readonly<{ status: 'notFound' }>;
+  | Readonly<{ status: 'notFound' }>
+  | Readonly<{ status: 'unavailable' }>;
 
 export function formatDateLabel(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -36,7 +32,7 @@ function toClientRow(client: Client): ClientRow {
 
 export function toClientListViewModel(result: ListClientsResult): ClientListViewModel {
   if (result.isFailure()) {
-    throw result.getError();
+    return { status: 'unavailable' };
   }
 
   const clients = result.getValue();
@@ -53,9 +49,10 @@ export function toClientDetailViewModel(result: GetClientResult): ClientDetailVi
   }
 
   const error = result.getError();
-  if (error instanceof ClientNotFoundError || error instanceof InvalidClientIdError) {
+  const code = error.code;
+  if (code === 'client_not_found' || code === 'invalid_client_id') {
     return { status: 'notFound' };
   }
 
-  throw error;
+  return { status: 'unavailable' };
 }
