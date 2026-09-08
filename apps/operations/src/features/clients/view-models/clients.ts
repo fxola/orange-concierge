@@ -10,11 +10,13 @@ export type ClientRow = Readonly<{
 
 export type ClientListViewModel =
   | Readonly<{ status: 'ok'; rows: readonly ClientRow[] }>
-  | Readonly<{ status: 'empty' }>;
+  | Readonly<{ status: 'empty' }>
+  | Readonly<{ status: 'unavailable' }>;
 
 export type ClientDetailViewModel =
   | Readonly<{ status: 'ok'; client: ClientRow }>
-  | Readonly<{ status: 'notFound' }>;
+  | Readonly<{ status: 'notFound' }>
+  | Readonly<{ status: 'unavailable' }>;
 
 export function formatDateLabel(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -30,7 +32,7 @@ function toClientRow(client: Client): ClientRow {
 
 export function toClientListViewModel(result: ListClientsResult): ClientListViewModel {
   if (result.isFailure()) {
-    throw result.getError();
+    return { status: 'unavailable' };
   }
 
   const clients = result.getValue();
@@ -52,5 +54,5 @@ export function toClientDetailViewModel(result: GetClientResult): ClientDetailVi
     return { status: 'notFound' };
   }
 
-  throw error;
+  return { status: 'unavailable' };
 }

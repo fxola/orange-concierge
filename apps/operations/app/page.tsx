@@ -1,4 +1,4 @@
-import { getCurrentActor } from '@/server/actor';
+import { getCurrentActor, isNextControlFlowError } from '@/server/actor';
 import { getSidebarCollapsed } from '@/server/sidebar';
 import { AppShell } from '@/components/app-shell';
 import { Card } from '@/components/ui/card';
@@ -8,7 +8,13 @@ export default async function Home() {
   const [actor, sidebarCollapsed] = await Promise.all([
     getCurrentActor(),
     getSidebarCollapsed(),
-  ]);
+  ]).catch((error: unknown) => {
+    if (isNextControlFlowError(error)) {
+      throw error;
+    }
+    // Show the signed out home page instead of throwing into a boundary.
+    return [null, false] as const;
+  });
 
   return (
     <AppShell userEmail={actor?.id} userRole={actor?.role} sidebarCollapsed={sidebarCollapsed}>

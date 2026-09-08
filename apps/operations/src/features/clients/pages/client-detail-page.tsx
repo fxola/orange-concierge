@@ -1,9 +1,38 @@
-import { PageHeader } from '@/components/ui/page';
+import Link from 'next/link';
+
+import { PageHeader, TableEmpty } from '@/components/ui/page';
 import { Text } from '@/components/ui/text';
-import type { ClientRow } from '@/features/clients/view-models/clients';
+import type { ClientDetailViewModel } from '@/features/clients/view-models/clients';
 import { ClientInteractionsSection } from '@/features/interactions/components/client-interactions-section';
 
-export function ClientDetailPage({ client }: { client: ClientRow }) {
+export function ClientDetailPage({ vm }: { vm: ClientDetailViewModel }) {
+  if (vm.status === 'unavailable') {
+    return (
+      <>
+        <PageHeader title="Client" description="Client record." />
+        <div className="overflow-hidden rounded-none border border-border bg-surface">
+          <TableEmpty
+            title="Couldn't load this client"
+            description="The record is unreachable right now. Nothing was lost."
+            action={
+              <Link
+                href="/clients"
+                className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover active:bg-primary-active"
+              >
+                Back to clients
+              </Link>
+            }
+          />
+        </div>
+      </>
+    );
+  }
+
+  if (vm.status === 'notFound') {
+    return null;
+  }
+
+  const { client } = vm;
   return (
     <>
       <PageHeader title={client.displayName} description="Client record." />

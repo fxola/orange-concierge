@@ -13,5 +13,5 @@ export default async function ClientDetailRoute({
     notFound();
   }
 
-  return <ClientDetailPage client={vm.client} />;
+  return <ClientDetailPage vm={vm} />;
 }
