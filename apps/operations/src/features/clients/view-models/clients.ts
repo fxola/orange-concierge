@@ -1,12 +1,6 @@
 import 'server-only';
 
-import {
-  ClientNotFoundError,
-  InvalidClientIdError,
-  type Client,
-  type GetClientResult,
-  type ListClientsResult,
-} from '@orange-concierge/core';
+import type { Client, GetClientResult, ListClientsResult } from '@orange-concierge/core';
 
 export type ClientRow = Readonly<{
   id: string;
@@ -53,7 +47,8 @@ export function toClientDetailViewModel(result: GetClientResult): ClientDetailVi
   }
 
   const error = result.getError();
-  if (error instanceof ClientNotFoundError || error instanceof InvalidClientIdError) {
+  const code = error.code;
+  if (code === 'client_not_found' || code === 'invalid_client_id') {
     return { status: 'notFound' };
   }
 

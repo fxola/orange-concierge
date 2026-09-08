@@ -7,7 +7,7 @@ export function PageHeader({
   action,
 }: Readonly<{ title: string; description?: string; action?: ReactNode }>) {
   return (
-    <div className="mb-8">
+    <div className="mb-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <Text variant="h1">{title}</Text>
@@ -67,7 +67,7 @@ export function TableEmpty({
     <div className="grid justify-items-center gap-2 px-6 py-12 text-center">
       <Text variant="h3">{title}</Text>
       {description ? (
-        <Text variant="small" tone="muted" className="max-w-sm">
+        <Text variant="small" tone="muted" className="max-w-sm mb-4">
           {description}
         </Text>
       ) : null}
