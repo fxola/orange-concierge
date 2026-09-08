@@ -17,7 +17,19 @@ export function withRequestActor(handler: AuthenticatedHandler) {
         return Response.json({ error: 'unauthorized' }, { status: 401 });
       }
 
-      throw error;
+      // Next control-flow throws (`redirect()`, `notFound()`) must keep
+      // propagating — only real failures become JSON 500s.
+      if (
+        error instanceof Error &&
+        'digest' in error &&
+        typeof error.digest === 'string' &&
+        error.digest.startsWith('NEXT_')
+      ) {
+        throw error;
+      }
+
+      console.error('[api] unhandled route error', error);
+      return Response.json({ error: 'internal_error' }, { status: 500 });
     }
   };
 }
