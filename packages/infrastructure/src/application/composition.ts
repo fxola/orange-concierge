@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 import { GetClient, ListClients, SubmitInteraction } from '@orange-concierge/core';
 
-import { DrizzleSubmittedInteractionRecorder } from '../adapters/interaction/submitted-interaction-recorder';
+import { DrizzleTransactionManager } from '../adapters/interaction/drizzle-transaction-manager';
 import { createAuth } from '../auth';
 import { createDatabaseFromUrl } from '../database/connection';
 import { createBackendConfigFromEnvironment, type BackendConfig } from './config';
@@ -31,11 +31,11 @@ const createApplicationRuntime = (config: BackendConfig): ApplicationRuntime => 
 
   const auth = createAuth({ db, baseURL, secret, trustedOrigins });
 
-  const submittedInteractionRecorder = new DrizzleSubmittedInteractionRecorder(db);
+  const transactionManager = new DrizzleTransactionManager(db);
   const clientRepository = new DrizzleClientRepository(db);
 
   const submitInteractionUseCase = new SubmitInteraction({
-    submittedInteractionRecorder,
+    transactionManager,
     clientRepository,
     newInteractionId: randomUUID,
     now: () => new Date(),

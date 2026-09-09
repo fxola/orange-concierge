@@ -63,7 +63,11 @@ export type {
 } from './ports/audit';
 export type { InteractionRepository } from './ports/interaction-repository';
 export type { ClientRepository } from './ports/client-repository';
-export type { SubmittedInteractionRecorder } from './ports/submitted-interaction-recorder';
+export type {
+  TransactionManager,
+  TransactionalInteractionWriter,
+  TransactionalPorts,
+} from './ports/transaction-manager';
 export type {
   SecretFinding,
   SecretFindingType,

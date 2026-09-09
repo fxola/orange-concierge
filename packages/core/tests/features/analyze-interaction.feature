@@ -16,12 +16,25 @@ Feature: Analyze interaction
     And the interaction is marked analysis completed
     And the analysis audit events do not include transcript content
 
-  Scenario: Complete analysis when audit recording fails
+  Scenario: Fail transactionally when audit recording fails during completion
     Given a received interaction with safe transcript
-    And audit recording fails
+    And transactional audit recording fails
     When a consultant analyzes the interaction
-    Then the analysis result succeeds
-    And the interaction is marked analysis completed
+    Then the analysis fails
+    And the interaction remains received with only scan passed audit
+
+  Scenario: Fail transactionally when audit recording fails during blocking
+    Given a received interaction containing a prohibited secret
+    And transactional audit recording fails
+    When a consultant analyzes the interaction
+    Then the analysis fails
+    And the interaction remains received without audit events
+
+  Scenario: Succeed when independent scan passed audit fails
+    Given a received interaction with safe transcript
+    And independent audit recording fails once
+    When a consultant analyzes the interaction
+    Then the analysis succeeds with completed audit and without scan passed audit
 
   Scenario: Reject an actor who cannot analyze interactions
     Given a received interaction with safe transcript

@@ -24,10 +24,11 @@ describeFeature(feature, ({ Scenario }) => {
     });
 
     When('a consultant analyzes the interaction', async () => {
-      await world.analyzeInteraction().execute({
+      const result = await world.analyzeInteraction().execute({
         actor: world.consultant(),
         interactionId: world.interaction().id,
       });
+      expect(result.isSuccess()).toBe(true);
     });
 
     Then('the secret scanner runs before any structured LLM call', () => {
@@ -76,10 +77,11 @@ describeFeature(feature, ({ Scenario }) => {
     });
 
     When('a consultant analyzes the interaction', async () => {
-      await world.analyzeInteraction().execute({
+      const result = await world.analyzeInteraction().execute({
         actor: world.consultant(),
         interactionId: world.interaction().id,
       });
+      expect(result.isSuccess()).toBe(true);
     });
 
     Then('the secret scanner runs before the structured LLM', () => {
@@ -96,6 +98,17 @@ describeFeature(feature, ({ Scenario }) => {
 
     And('the interaction is marked analysis completed', () => {
       expect(world.interaction().status).toBe('analysis_completed');
+      expect(world.audit().events).toHaveLength(2);
+      expect(world.audit().events).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            action: 'interaction_scan_passed',
+          }),
+          expect.objectContaining({
+            action: 'interaction_analysis_completed',
+          }),
+        ])
+      );
     });
 
     And('the analysis audit events do not include transcript content', () => {
@@ -103,7 +116,81 @@ describeFeature(feature, ({ Scenario }) => {
     });
   });
 
-  Scenario('Complete analysis when audit recording fails', ({ Given, When, Then, And }) => {
+  Scenario(
+    'Fail transactionally when audit recording fails during completion',
+    ({ Given, When, Then, And }) => {
+      const world = analyzeInteractionWorld();
+      let result: AnalyzeInteractionResult;
+
+      Given('a received interaction with safe transcript', () => {
+        world.givenReceivedInteractionWithSafeTranscript();
+      });
+
+      And('transactional audit recording fails', () => {
+        world.failTransactionalAuditRecording();
+      });
+
+      When('a consultant analyzes the interaction', async () => {
+        result = await world.analyzeInteraction().execute({
+          actor: world.consultant(),
+          interactionId: world.interaction().id,
+        });
+      });
+
+      Then('the analysis fails', () => {
+        expect(result.isFailure()).toBe(true);
+        if (!result.isFailure()) expect.fail('Expected analysis failure');
+        expect(result.getError()).toBeInstanceOf(InteractionAnalysisFailedError);
+      });
+
+      And('the interaction remains received with only scan passed audit', () => {
+        expect(world.interaction().status).toBe('received');
+        expect(world.audit().events).toHaveLength(1);
+        expect(world.audit().events).toContainEqual(
+          expect.objectContaining({ action: 'interaction_scan_passed' })
+        );
+        expect(world.audit().events).not.toContainEqual(
+          expect.objectContaining({ action: 'interaction_analysis_completed' })
+        );
+      });
+    }
+  );
+
+  Scenario(
+    'Fail transactionally when audit recording fails during blocking',
+    ({ Given, When, Then, And }) => {
+      const world = analyzeInteractionWorld();
+      let result: AnalyzeInteractionResult;
+
+      Given('a received interaction containing a prohibited secret', () => {
+        world.givenReceivedInteractionContainingProhibitedSecret();
+      });
+
+      And('transactional audit recording fails', () => {
+        world.failTransactionalAuditRecording();
+      });
+
+      When('a consultant analyzes the interaction', async () => {
+        result = await world.analyzeInteraction().execute({
+          actor: world.consultant(),
+          interactionId: world.interaction().id,
+        });
+      });
+
+      Then('the analysis fails', () => {
+        expect(result.isFailure()).toBe(true);
+        if (!result.isFailure()) expect.fail('Expected analysis failure');
+        expect(result.getError()).toBeInstanceOf(InteractionAnalysisFailedError);
+      });
+
+      And('the interaction remains received without audit events', () => {
+        expect(world.interaction().status).toBe('received');
+        expect(world.audit().events).toHaveLength(0);
+      });
+    }
+  );
+
+  Scenario('Succeed when independent scan passed audit fails', ({ Given, When, Then, And }) => {
     const world = analyzeInteractionWorld();
     let result: AnalyzeInteractionResult;
 
@@ -111,8 +198,8 @@ describeFeature(feature, ({ Scenario }) => {
       world.givenReceivedInteractionWithSafeTranscript();
     });
 
-    And('audit recording fails', () => {
-      world.audit().failRecording();
+    And('independent audit recording fails once', () => {
+      world.audit().failNextRecording();
     });
 
     When('a consultant analyzes the interaction', async () => {
@@ -122,12 +209,15 @@ describeFeature(feature, ({ Scenario }) => {
       });
     });
 
-    Then('the analysis result succeeds', () => {
+    Then('the analysis succeeds with completed audit and without scan passed audit', () => {
       expect(result.isSuccess()).toBe(true);
-    });
-
-    And('the interaction is marked analysis completed', () => {
       expect(world.interaction().status).toBe('analysis_completed');
+      expect(world.audit().events).toContainEqual(
+        expect.objectContaining({ action: 'interaction_analysis_completed' })
+      );
+      expect(world.audit().events).not.toContainEqual(
+        expect.objectContaining({ action: 'interaction_scan_passed' })
+      );
     });
   });
 
@@ -155,7 +245,7 @@ describeFeature(feature, ({ Scenario }) => {
       });
 
       Then('the interaction is not marked analysis completed', () => {
-        expect(world.interaction().status).not.toBe('analysis_completed');
+        expect(world.interaction().status).toBe('received');
         if (!result.isFailure()) expect.fail('Expected analysis failure');
         expect(result.getError()).toBeInstanceOf(InteractionAnalysisFailedError);
       });
