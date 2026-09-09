@@ -9,7 +9,7 @@ import {
 export async function getClientDetail(clientId: string): Promise<ClientDetailViewModel> {
   try {
     const actor = await requirePageActor();
-    const result = await getApplication().client.getOne({ actor, clientId });
+    const result = await getApplication().clients.getOne({ actor, clientId });
 
     return toClientDetailViewModel(result);
   } catch (error) {

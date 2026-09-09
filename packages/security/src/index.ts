@@ -1,1 +1,1 @@
-export const placeholder = "security package — see M4 for implementation";
+export { PatternSecretScanner } from './pattern-secret-scanner';

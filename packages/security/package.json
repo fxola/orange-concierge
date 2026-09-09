@@ -10,6 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@orange-concierge/core": "workspace:*",
     "zod": "^4.5.4"
   },
   "devDependencies": {

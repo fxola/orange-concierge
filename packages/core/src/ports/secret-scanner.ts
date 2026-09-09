@@ -1,4 +1,9 @@
-export type SecretFindingType = 'seed_phrase' | 'private_key' | 'password' | 'api_key' | 'recovery_code';
+export type SecretFindingType =
+  | 'seed_phrase'
+  | 'private_key'
+  | 'password'
+  | 'api_key'
+  | 'recovery_code';
 
 export type SecretFinding = Readonly<{
   type: SecretFindingType;
@@ -12,6 +17,6 @@ export type SecretScanResult = Readonly<{
   findings: readonly SecretFinding[];
 }>;
 
-export interface SecretScanner {
-  scan(input: { text: string }): Promise<SecretScanResult>;
+export interface SecretScannerAPI {
+  scan(input: { text: string }): SecretScanResult;
 }
