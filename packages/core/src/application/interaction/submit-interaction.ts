@@ -30,7 +30,7 @@ export class SubmitInteraction {
       return Result.failure(new BlankTranscriptError());
     }
 
-    const { submittedInteractionRecorder, clientRepository, newInteractionId, now } = this.deps;
+    const { transactionManager, clientRepository, newInteractionId, now } = this.deps;
 
     const parsedClientId = parseClientId(clientId);
     if (!parsedClientId.ok) {
@@ -60,7 +60,10 @@ export class SubmitInteraction {
     };
 
     try {
-      await submittedInteractionRecorder.record({ interaction, auditEvent });
+      await transactionManager.execute(async (tx) => {
+        await tx.interactions.save(interaction);
+        await tx.audit.record(auditEvent);
+      });
     } catch (error) {
       return Result.failure(new InteractionSubmissionFailedError(error));
     }

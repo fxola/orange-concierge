@@ -1,6 +1,8 @@
 import { SubmitInteraction, type Actor } from '../../../src';
 import { InMemoryClientRepository } from '../in-memory-adapters/inMemoryClientAdapter';
-import { InMemorySubmittedInteractionRecorder } from '../in-memory-adapters/inMemorySubmittedInteractionRecorder';
+import { RecordingAudit } from '../in-memory-adapters/inMemoryAuditPort';
+import { InMemoryInteractionRepository } from '../in-memory-adapters/inMemoryInteractionRepository';
+import { InMemoryTransactionManager } from '../in-memory-adapters/inMemoryTransactionManager';
 
 const meetingNotes = [
   'Consultant: Hi Sarah, thanks for joining today. You wanted to discuss moving bitcoin off the exchange?',
@@ -29,7 +31,9 @@ const required = <T>(value: T | undefined, name: string): T => {
 };
 
 export function submitInteractionWorld() {
-  const submittedInteractionRecorder = new InMemorySubmittedInteractionRecorder();
+  const interactionsRepo = new InMemoryInteractionRepository(null);
+  const auditRecorder = new RecordingAudit();
+  const transactionManager = new InMemoryTransactionManager(interactionsRepo, auditRecorder);
   const clientRepository = new InMemoryClientRepository();
   clientRepository.clients.push({
     id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
@@ -37,20 +41,11 @@ export function submitInteractionWorld() {
     createdAt: fixedDate,
   });
   const submitInteraction = new SubmitInteraction({
-    submittedInteractionRecorder,
+    transactionManager,
     clientRepository,
     newInteractionId: () => 'interaction-1',
     now: () => fixedDate,
   });
-
-  const audit = {
-    get events() {
-      return submittedInteractionRecorder.events;
-    },
-    failRecording() {
-      submittedInteractionRecorder.failNextAudit();
-    },
-  } as const;
 
   return {
     consultant() {
@@ -82,23 +77,27 @@ export function submitInteractionWorld() {
     },
 
     savedInteraction() {
-      return required(submittedInteractionRecorder.interactions[0], 'savedInteraction');
+      return required(interactionsRepo.interactions[0], 'savedInteraction');
     },
 
     audit() {
-      return audit;
+      return auditRecorder;
     },
 
     interactions() {
-      return submittedInteractionRecorder.interactions;
+      return interactionsRepo.interactions;
     },
 
     failAuditRecording() {
-      submittedInteractionRecorder.failNextAudit();
+      auditRecorder.failRecording();
     },
 
-    submittedInteractionRecorder() {
-      return submittedInteractionRecorder;
+    interactionsRepo() {
+      return interactionsRepo;
+    },
+
+    transactionManager() {
+      return transactionManager;
     },
 
     clientRepository() {

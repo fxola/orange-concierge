@@ -4,6 +4,7 @@ import { RecordingAudit } from '../in-memory-adapters/inMemoryAuditPort';
 import { InMemoryInteractionRepository } from '../in-memory-adapters/inMemoryInteractionRepository';
 import { RecordingSecretScanner } from '../in-memory-adapters/inMemorySecretScannerAdapter';
 import { RecordingStructuredLLM } from '../in-memory-adapters/inMemoryStructuredLLMAdapter';
+import { InMemoryTransactionManager } from '../in-memory-adapters/inMemoryTransactionManager';
 
 const safeTranscript = [
   'Consultant: Hi Sarah, thanks for joining today. You mentioned wanting to move your bitcoin off the exchange?',
@@ -52,6 +53,7 @@ export function analyzeInteractionWorld() {
   let secretScanner: RecordingSecretScanner | undefined;
   let structuredLLM: RecordingStructuredLLM | undefined;
   let audit: RecordingAudit | undefined;
+  let transactionManager: InMemoryTransactionManager | undefined;
   let analyzeInteraction: AnalyzeInteraction | undefined;
 
   const composeAnalysisFixture = (
@@ -64,11 +66,13 @@ export function analyzeInteractionWorld() {
     secretScanner = new RecordingSecretScanner({ findings }, operations);
     structuredLLM = new RecordingStructuredLLM(operations);
     audit = new RecordingAudit();
+    transactionManager = new InMemoryTransactionManager(interactionsRepo, audit);
     analyzeInteraction = new AnalyzeInteraction({
       interactionsRepo,
       secretScanner,
       structuredLLM,
       audit,
+      transactionManager,
     });
   };
 
@@ -121,6 +125,18 @@ export function analyzeInteractionWorld() {
 
     audit() {
       return required(audit, 'audit');
+    },
+
+    interactionsRepo() {
+      return required(interactionsRepo, 'interactionsRepo');
+    },
+
+    transactionManager() {
+      return required(transactionManager, 'transactionManager');
+    },
+
+    failTransactionalAuditRecording() {
+      required(transactionManager, 'transactionManager').failNextTransactionalAudit();
     },
   };
 }

@@ -15,7 +15,7 @@ import type {
 } from './types';
 
 export class AnalyzeInteraction {
-  constructor(private readonly dependencies: AnalyzeInteractionDependencies) {}
+  constructor(private readonly deps: AnalyzeInteractionDependencies) {}
 
   async execute(input: AnalyzeInteractionInput): Promise<AnalyzeInteractionResult> {
     const { actor, interactionId } = input;
@@ -24,7 +24,7 @@ export class AnalyzeInteraction {
       return Result.failure(new UnauthorizedAnalyzeInteractionError(actor.role));
     }
 
-    const { secretScanner, interactionsRepo, structuredLLM } = this.dependencies;
+    const { secretScanner, interactionsRepo, structuredLLM, transactionManager } = this.deps;
 
     const interaction = await interactionsRepo.findById(interactionId);
     if (!interaction) {
@@ -39,8 +39,7 @@ export class AnalyzeInteraction {
     const prohibitedResults = scannedResults.findings.some((f) => f.severity === 'prohibited');
     if (prohibitedResults) {
       const blockedInteraction: Interaction = { ...interaction, status: 'analysis_blocked' };
-      await interactionsRepo.save(blockedInteraction);
-      await this.recordAudit({
+      const blockedAuditEvent: AuditEvent = {
         actor,
         action: 'interaction_scan_blocked',
         resource: { type: 'interaction', id: interactionId },
@@ -48,7 +47,16 @@ export class AnalyzeInteraction {
         metadata: {
           findingCount: scannedResults.findings.length,
         },
-      });
+      };
+
+      try {
+        await transactionManager.execute(async (tx) => {
+          await tx.interactions.save(blockedInteraction);
+          await tx.audit.record(blockedAuditEvent);
+        });
+      } catch {
+        return Result.failure(new InteractionAnalysisFailedError());
+      }
 
       return Result.success(blockedInteraction);
     }
@@ -59,7 +67,7 @@ export class AnalyzeInteraction {
         transcript: interaction.transcript,
       });
     } catch {
-      await this.recordAudit({
+      await this.recordIndependentAudit({
         actor,
         action: 'interaction_analysis_failed',
         resource: { type: 'interaction', id: interactionId },
@@ -70,7 +78,7 @@ export class AnalyzeInteraction {
       return Result.failure(new InteractionAnalysisFailedError());
     }
 
-    await this.recordAudit({
+    await this.recordIndependentAudit({
       actor,
       action: 'interaction_scan_passed',
       resource: { type: 'interaction', id: interactionId },
@@ -78,21 +86,29 @@ export class AnalyzeInteraction {
     });
 
     const updatedInteraction: Interaction = { ...interaction, status: 'analysis_completed' };
-    await interactionsRepo.save(updatedInteraction);
-    await this.recordAudit({
+    const completedAuditEvent: AuditEvent = {
       actor,
       action: 'interaction_analysis_completed',
       resource: { type: 'interaction', id: interactionId },
       occurredAt: new Date(),
-    });
+    };
+
+    try {
+      await transactionManager.execute(async (tx) => {
+        await tx.interactions.save(updatedInteraction);
+        await tx.audit.record(completedAuditEvent);
+      });
+    } catch {
+      return Result.failure(new InteractionAnalysisFailedError());
+    }
     return Result.success(updatedInteraction);
   }
 
-  private async recordAudit(event: AuditEvent): Promise<void> {
+  private async recordIndependentAudit(event: AuditEvent): Promise<void> {
     try {
-      await this.dependencies.audit.record(event);
+      await this.deps.audit.record(event);
     } catch {
-      // Best-effort for now. Later, state changes and audit writes should be transactional.
+      // Best-effort: independent observation audits must not fail the use case.
     }
   }
 }

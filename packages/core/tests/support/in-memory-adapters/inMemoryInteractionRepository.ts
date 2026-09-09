@@ -23,4 +23,14 @@ export class InMemoryInteractionRepository implements InteractionRepository {
   getCurrent(): Interaction | null {
     return this.current;
   }
+
+  snapshot(): { current: Interaction | null; interactions: Interaction[] } {
+    return { current: this.current, interactions: [...this.interactions] };
+  }
+
+  restore(snapshot: { current: Interaction | null; interactions: Interaction[] }): void {
+    this.current = snapshot.current;
+    this.interactions.length = 0;
+    this.interactions.push(...snapshot.interactions);
+  }
 }
