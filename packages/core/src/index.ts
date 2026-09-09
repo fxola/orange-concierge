@@ -71,7 +71,7 @@ export type {
 export type {
   SecretFinding,
   SecretFindingType,
-  SecretScanner,
+  SecretScannerAPI,
   SecretScanResult,
 } from './ports/secret-scanner';
 export type { StructuredLLMInput, StructuredLLM } from './ports/structured-llm';

@@ -24,7 +24,7 @@ export class AnalyzeInteraction {
       return Result.failure(new UnauthorizedAnalyzeInteractionError(actor.role));
     }
 
-    const { secretScanner, interactionsRepo, structuredLLM, transactionManager } = this.deps;
+    const { secretScanner, interactionsRepo, structuredLLM, transactionManager, now } = this.deps;
 
     const interaction = await interactionsRepo.findById(interactionId);
     if (!interaction) {
@@ -43,7 +43,7 @@ export class AnalyzeInteraction {
         actor,
         action: 'interaction_scan_blocked',
         resource: { type: 'interaction', id: interactionId },
-        occurredAt: new Date(),
+        occurredAt: now(),
         metadata: {
           findingCount: scannedResults.findings.length,
         },
@@ -71,7 +71,7 @@ export class AnalyzeInteraction {
         actor,
         action: 'interaction_analysis_failed',
         resource: { type: 'interaction', id: interactionId },
-        occurredAt: new Date(),
+        occurredAt: now(),
         metadata: { failureSource: 'structured_llm' },
       });
 
@@ -82,7 +82,7 @@ export class AnalyzeInteraction {
       actor,
       action: 'interaction_scan_passed',
       resource: { type: 'interaction', id: interactionId },
-      occurredAt: new Date(),
+      occurredAt: now(),
     });
 
     const updatedInteraction: Interaction = { ...interaction, status: 'analysis_completed' };
@@ -90,7 +90,7 @@ export class AnalyzeInteraction {
       actor,
       action: 'interaction_analysis_completed',
       resource: { type: 'interaction', id: interactionId },
-      occurredAt: new Date(),
+      occurredAt: now(),
     };
 
     try {

@@ -1,10 +1,19 @@
 import { randomUUID } from 'node:crypto';
 
-import { GetClient, ListClients, SubmitInteraction } from '@orange-concierge/core';
+import {
+  AnalyzeInteraction,
+  GetClient,
+  ListClients,
+  SubmitInteraction,
+} from '@orange-concierge/core';
+import { PatternSecretScanner } from '@orange-concierge/security';
 
+import { DrizzleAuditPort } from '../adapters/audit/drizzle-audit-port';
 import { DrizzleTransactionManager } from '../adapters/interaction/drizzle-transaction-manager';
+import { DrizzleInteractionRepository } from '../adapters/interaction/drizzle-interaction-repository';
+import { UnavailableStructuredLLM } from '../adapters/interaction/unavailable-structured-llm';
 import { createAuth } from '../auth';
-import { createDatabaseFromUrl } from '../database/connection';
+import { createDatabaseFromUrl, OrangeConciergeDB } from '../database/connection';
 import { createBackendConfigFromEnvironment, type BackendConfig } from './config';
 import type { Application } from './types';
 import { DrizzleClientRepository } from '../adapters/client/drizzle-client-repository';
@@ -15,48 +24,69 @@ type ApplicationRuntime = Readonly<{
 }>;
 
 declare global {
-  var __orangeConciergeApplicationRuntime: ApplicationRuntime | undefined;
+  var __appRuntime: ApplicationRuntime | undefined;
 }
 
-/**
- * Compose the concrete backend runtime from explicit configuration.
- *
- * The returned runtime owns infrastructure lifecycle, while its public
- * `application` facade exposes only application capabilities.
- */
 const createApplicationRuntime = (config: BackendConfig): ApplicationRuntime => {
   const { databaseUrl, baseUrl: baseURL, authSecret: secret, trustedOrigins } = config;
-
   const { db, client } = createDatabaseFromUrl(databaseUrl);
 
-  const auth = createAuth({ db, baseURL, secret, trustedOrigins });
-
-  const transactionManager = new DrizzleTransactionManager(db);
   const clientRepository = new DrizzleClientRepository(db);
+  const transactionManager = new DrizzleTransactionManager(db);
 
+  const auth = createAuth({ db, baseURL, secret, trustedOrigins });
+  const interaction = buildInteraction(db, transactionManager, clientRepository);
+  const clients = buildClients(clientRepository);
+
+  const application: Application = {
+    auth,
+    interaction,
+    clients,
+  };
+
+  return {
+    application,
+    close: () => client.end(),
+  };
+};
+
+const buildInteraction = (
+  db: OrangeConciergeDB,
+  transactionManager: DrizzleTransactionManager,
+  clientRepository: DrizzleClientRepository
+): Application['interaction'] => {
   const submitInteractionUseCase = new SubmitInteraction({
     transactionManager,
     clientRepository,
     newInteractionId: randomUUID,
     now: () => new Date(),
   });
-  const listClientsUseCase = new ListClients({ clientRepository });
-  const getClientUseCase = new GetClient({ clientRepository });
 
-  const application: Application = {
-    auth,
-    interaction: {
-      submit: (input) => submitInteractionUseCase.execute(input),
-    },
-    client: {
-      getAll: (input) => listClientsUseCase.execute(input),
-      getOne: (input) => getClientUseCase.execute(input),
-    },
-  };
+  const audit = new DrizzleAuditPort(db);
+  const interactionRepository = new DrizzleInteractionRepository(db);
+  const secretScanner = new PatternSecretScanner();
+  const structuredLLM = new UnavailableStructuredLLM();
+  const analyzeInteractionUseCase = new AnalyzeInteraction({
+    interactionsRepo: interactionRepository,
+    secretScanner,
+    structuredLLM,
+    audit,
+    transactionManager,
+    now: () => new Date(),
+  });
 
   return {
-    application,
-    close: () => client.end(),
+    submit: (input) => submitInteractionUseCase.execute(input),
+    analyze: (input) => analyzeInteractionUseCase.execute(input),
+  };
+};
+
+const buildClients = (clientRepository: DrizzleClientRepository): Application['clients'] => {
+  const listClientsUseCase = new ListClients({ clientRepository });
+  const getClientUseCase = new GetClient({ clientRepository });
+  return {
+    getAll: (input) => listClientsUseCase.execute(input),
+    getOne: (input) => getClientUseCase.execute(input),
   };
 };
 
@@ -71,7 +101,7 @@ const createApplicationRuntime = (config: BackendConfig): ApplicationRuntime => 
  * a database socket until the first query.
  */
 export const getApplication = (): Application => {
-  const existing = globalThis.__orangeConciergeApplicationRuntime;
+  const existing = globalThis.__appRuntime;
 
   if (existing) {
     return existing.application;
@@ -79,7 +109,7 @@ export const getApplication = (): Application => {
 
   const runtime = createApplicationRuntime(createBackendConfigFromEnvironment());
 
-  globalThis.__orangeConciergeApplicationRuntime = runtime;
+  globalThis.__appRuntime = runtime;
 
   return runtime.application;
 };
@@ -92,9 +122,9 @@ export const getApplication = (): Application => {
  * process singleton between test cases.
  */
 export const resetApplicationForTests = async (): Promise<void> => {
-  const runtime = globalThis.__orangeConciergeApplicationRuntime;
+  const runtime = globalThis.__appRuntime;
 
-  globalThis.__orangeConciergeApplicationRuntime = undefined;
+  globalThis.__appRuntime = undefined;
 
   if (runtime) {
     await runtime.close();

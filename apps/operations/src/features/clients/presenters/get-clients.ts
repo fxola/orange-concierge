@@ -11,7 +11,7 @@ const LIST_LIMIT = 20;
 export async function getClients(): Promise<ClientListViewModel> {
   try {
     const actor = await requirePageActor();
-    const result = await getApplication().client.getAll({
+    const result = await getApplication().clients.getAll({
       actor,
       limit: LIST_LIMIT,
       offset: 0,
