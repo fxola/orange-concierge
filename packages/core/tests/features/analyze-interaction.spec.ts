@@ -67,6 +67,7 @@ describeFeature(feature, ({ Scenario }) => {
 
   Scenario('Complete analysis for a safe received interaction', ({ Given, When, Then, And }) => {
     const world = analyzeInteractionWorld();
+    let result: AnalyzeInteractionResult;
     let scanSpy: ReturnType<typeof vi.spyOn>;
     let extractSpy: ReturnType<typeof vi.spyOn>;
 
@@ -77,7 +78,7 @@ describeFeature(feature, ({ Scenario }) => {
     });
 
     When('a consultant analyzes the interaction', async () => {
-      const result = await world.analyzeInteraction().execute({
+      result = await world.analyzeInteraction().execute({
         actor: world.consultant(),
         interactionId: world.interaction().id,
       });
@@ -109,6 +110,28 @@ describeFeature(feature, ({ Scenario }) => {
           }),
         ])
       );
+    });
+
+    And('typed assessment facts are returned', () => {
+      if (!result.isSuccess()) expect.fail('Expected analysis success');
+      expect(result.getValue()).toEqual({
+        interaction: expect.objectContaining({
+          id: world.interaction().id,
+          status: 'analysis_completed',
+        }),
+        extractedFacts: {
+          custody: {
+            currentArrangement: 'Client holds bitcoin on Coinbase.',
+            concerns: ['Wants to move funds off exchange'],
+          },
+          cybersecurity: {
+            controls: ['Uses hardware wallet'],
+          },
+          planning: {
+            goals: ['Learn safe self-custody'],
+          },
+        },
+      });
     });
 
     And('the analysis audit events do not include transcript content', () => {
@@ -259,6 +282,52 @@ describeFeature(feature, ({ Scenario }) => {
               id: world.interaction().id,
               type: 'interaction',
             },
+          })
+        );
+        expect(JSON.stringify(world.audit().events)).not.toContain(world.interaction().transcript);
+      });
+    }
+  );
+
+  Scenario(
+    'Reject invalid structured LLM response without completing analysis',
+    ({ Given, When, Then, And }) => {
+      const world = analyzeInteractionWorld();
+      let result: AnalyzeInteractionResult;
+      let auditSpy: ReturnType<typeof vi.spyOn>;
+
+      Given('a received interaction with safe transcript', () => {
+        world.givenReceivedInteractionWithSafeTranscript();
+        auditSpy = vi.spyOn(world.audit(), 'record');
+      });
+
+      And('the structured LLM reports an invalid response', () => {
+        world.structuredLLM().failNextExtraction('invalid_response');
+      });
+
+      When('a consultant analyzes the interaction', async () => {
+        result = await world.analyzeInteraction().execute({
+          actor: world.consultant(),
+          interactionId: world.interaction().id,
+        });
+      });
+
+      Then('the interaction is not marked analysis completed', () => {
+        expect(world.interaction().status).toBe('received');
+        if (!result.isFailure()) expect.fail('Expected analysis failure');
+        expect(result.getError()).toBeInstanceOf(InteractionAnalysisFailedError);
+      });
+
+      And('an analysis failed audit event is recorded without transcript content', () => {
+        expect(auditSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            action: 'interaction_analysis_failed',
+            actor: world.consultant(),
+            resource: {
+              id: world.interaction().id,
+              type: 'interaction',
+            },
+            metadata: { failureSource: 'structured_llm', failureReason: 'invalid_response' },
           })
         );
         expect(JSON.stringify(world.audit().events)).not.toContain(world.interaction().transcript);

@@ -19,7 +19,20 @@ docker compose up -d
 curl http://localhost/api/health
 ```
 
-The app is available through Nginx at `http://localhost`.
+The app is available through Nginx at `http://localhost`. Docker starts local Ollama by default, pulls `AI_MODEL` (`llama3.2` by default) with a one-shot `ollama-pull` service, and blocks `web` startup until the pull succeeds.
+
+Set `AI_MODEL` in `.env` before `docker compose up -d` if you want a different Ollama model.
+
+## Run With Gemini Cloud
+
+```bash
+cp .env.example .env
+# Set AI_API_KEY in .env
+docker compose -f docker-compose.yml -f docker-compose.cloud.yml up -d
+curl http://localhost/api/health
+```
+
+The explicit `-f` command skips `docker-compose.override.yml`, so cloud mode does not start Ollama or wait for `ollama-pull`.
 
 ## Run Locally
 

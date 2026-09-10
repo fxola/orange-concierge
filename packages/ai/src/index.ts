@@ -1,1 +1,13 @@
-export const placeholder = "ai package — see M5 for implementation";
+export {
+  createStructuredLLM,
+  type AIConfig,
+} from './factory';
+
+export {
+  type LLMProvider,
+  type StructuredGenerationRequest,
+} from './provider/llm-provider';
+
+export {
+  AssessmentLLM,
+} from './structured/assessment-llm';

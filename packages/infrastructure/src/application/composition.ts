@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
+import { createStructuredLLM, type AIConfig } from '@orange-concierge/ai';
 import {
   AnalyzeInteraction,
   GetClient,
@@ -11,10 +12,9 @@ import { PatternSecretScanner } from '@orange-concierge/security';
 import { DrizzleAuditPort } from '../adapters/audit/drizzle-audit-port';
 import { DrizzleTransactionManager } from '../adapters/interaction/drizzle-transaction-manager';
 import { DrizzleInteractionRepository } from '../adapters/interaction/drizzle-interaction-repository';
-import { UnavailableStructuredLLM } from '../adapters/interaction/unavailable-structured-llm';
 import { createAuth } from '../auth';
 import { createDatabaseFromUrl, OrangeConciergeDB } from '../database/connection';
-import { createBackendConfigFromEnvironment, type BackendConfig } from './config';
+import { config, type BackendConfig } from './config';
 import type { Application } from './types';
 import { DrizzleClientRepository } from '../adapters/client/drizzle-client-repository';
 
@@ -27,15 +27,17 @@ declare global {
   var __appRuntime: ApplicationRuntime | undefined;
 }
 
-const createApplicationRuntime = (config: BackendConfig): ApplicationRuntime => {
-  const { databaseUrl, baseUrl: baseURL, authSecret: secret, trustedOrigins } = config;
-  const { db, client } = createDatabaseFromUrl(databaseUrl);
+const createApplicationRuntime = (runtimeConfig: BackendConfig): ApplicationRuntime => {
+  const { db, client } = createDatabaseFromUrl(runtimeConfig.db.url);
+  const baseURL = runtimeConfig.general.baseUrl;
+  const secret = runtimeConfig.auth.secret;
+  const trustedOrigins = runtimeConfig.auth.trustedOrigins;
 
   const clientRepository = new DrizzleClientRepository(db);
   const transactionManager = new DrizzleTransactionManager(db);
 
   const auth = createAuth({ db, baseURL, secret, trustedOrigins });
-  const interaction = buildInteraction(db, transactionManager, clientRepository);
+  const interaction = buildInteraction(db, transactionManager, clientRepository, runtimeConfig.ai);
   const clients = buildClients(clientRepository);
 
   const application: Application = {
@@ -53,7 +55,8 @@ const createApplicationRuntime = (config: BackendConfig): ApplicationRuntime => 
 const buildInteraction = (
   db: OrangeConciergeDB,
   transactionManager: DrizzleTransactionManager,
-  clientRepository: DrizzleClientRepository
+  clientRepository: DrizzleClientRepository,
+  aiConfig: AIConfig
 ): Application['interaction'] => {
   const submitInteractionUseCase = new SubmitInteraction({
     transactionManager,
@@ -65,7 +68,7 @@ const buildInteraction = (
   const audit = new DrizzleAuditPort(db);
   const interactionRepository = new DrizzleInteractionRepository(db);
   const secretScanner = new PatternSecretScanner();
-  const structuredLLM = new UnavailableStructuredLLM();
+  const structuredLLM = createStructuredLLM(aiConfig);
   const analyzeInteractionUseCase = new AnalyzeInteraction({
     interactionsRepo: interactionRepository,
     secretScanner,
@@ -107,7 +110,7 @@ export const getApplication = (): Application => {
     return existing.application;
   }
 
-  const runtime = createApplicationRuntime(createBackendConfigFromEnvironment());
+  const runtime = createApplicationRuntime(config);
 
   globalThis.__appRuntime = runtime;
 
