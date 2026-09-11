@@ -1,7 +1,4 @@
-import type {
-  BaseProviderConfig,
-  StructuredGenerationRequest,
-} from '../provider/llm-provider';
+import type { BaseProviderConfig, StructuredGenerationRequest } from '../provider/llm-provider';
 import { ProviderError } from '../provider/provider-error';
 import { BaseHttpAdapter, isRecord } from './base-adapter';
 

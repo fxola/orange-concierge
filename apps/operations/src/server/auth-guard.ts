@@ -4,14 +4,18 @@ import { type Actor } from '@orange-concierge/core';
 
 import { requireRequestActor } from '@/server/actor';
 
-type AuthenticatedHandler = (request: Request, actor: Actor) => Promise<Response>;
+type AuthenticatedHandler<T extends unknown[]> = (
+  request: Request,
+  actor: Actor,
+  ...rest: T
+) => Promise<Response>;
 
-export function withRequestActor(handler: AuthenticatedHandler) {
-  return async function authenticatedHandler(request: Request): Promise<Response> {
+export function withRequestActor<T extends unknown[]>(handler: AuthenticatedHandler<T>) {
+  return async function authenticatedHandler(request: Request, ...rest: T): Promise<Response> {
     try {
       const actor = await requireRequestActor(request);
 
-      return await handler(request, actor);
+      return await handler(request, actor, ...rest);
     } catch (error) {
       if (error instanceof Error && 'code' in error && error.code === 'unauthorized') {
         return Response.json({ error: 'unauthorized' }, { status: 401 });

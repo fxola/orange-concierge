@@ -6,6 +6,7 @@ import type {
 } from '@orange-concierge/core';
 import { auditEvents, interactions } from '../../database';
 import type { OrangeConciergeDB } from '../../database';
+import { toInteractionRow } from './drizzle-interaction-repository';
 
 export class DrizzleTransactionManager implements TransactionManager {
   constructor(private readonly db: OrangeConciergeDB) {}
@@ -15,26 +16,12 @@ export class DrizzleTransactionManager implements TransactionManager {
       const tx: TransactionalPorts = {
         interactions: {
           save: async (interaction: Interaction): Promise<void> => {
-            await dbTx
-              .insert(interactions)
-              .values({
-                id: interaction.id,
-                clientId: interaction.clientId,
-                submittedBy: interaction.submittedBy,
-                status: interaction.status,
-                transcript: interaction.transcript,
-                createdAt: interaction.createdAt,
-              })
-              .onConflictDoUpdate({
-                target: interactions.id,
-                set: {
-                  clientId: interaction.clientId,
-                  submittedBy: interaction.submittedBy,
-                  status: interaction.status,
-                  transcript: interaction.transcript,
-                  createdAt: interaction.createdAt,
-                },
-              });
+            const row = toInteractionRow(interaction);
+
+            await dbTx.insert(interactions).values(row).onConflictDoUpdate({
+              target: interactions.id,
+              set: row,
+            });
           },
         },
         audit: {

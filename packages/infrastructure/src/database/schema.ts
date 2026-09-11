@@ -1,3 +1,4 @@
+import type { ExtractedFacts } from '@orange-concierge/core';
 import {
   boolean,
   index,
@@ -49,6 +50,7 @@ export const interactions = pgTable('interactions', {
   submittedBy: text('submitted_by').notNull(),
   status: interactionStatus('status').notNull(),
   transcript: text('transcript').notNull(),
+  extractedFacts: jsonb('extracted_facts').$type<ExtractedFacts>(),
   createdAt: timestamp('created_at', { mode: 'date', withTimezone: true }).notNull(),
 });
 

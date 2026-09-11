@@ -5,6 +5,7 @@ import {
   AnalyzeInteraction,
   GetClient,
   ListClients,
+  ListInteractions,
   SubmitInteraction,
 } from '@orange-concierge/core';
 import { PatternSecretScanner } from '@orange-concierge/security';
@@ -77,10 +78,15 @@ const buildInteraction = (
     transactionManager,
     now: () => new Date(),
   });
+  const listInteractionsUseCase = new ListInteractions({
+    clientRepository,
+    interactionsRepo: interactionRepository,
+  });
 
   return {
     submit: (input) => submitInteractionUseCase.execute(input),
     analyze: (input) => analyzeInteractionUseCase.execute(input),
+    list: (input) => listInteractionsUseCase.execute(input),
   };
 };
 
