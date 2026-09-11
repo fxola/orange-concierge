@@ -1,17 +1,18 @@
 import type { ActorRole } from '@orange-concierge/core';
 import { eq } from 'drizzle-orm';
 
-import { createBackendConfigFromEnvironment, type BackendConfig } from '../../application/config';
+import { config as backendConfig, type BackendConfig } from '../../application/config';
 import { createAuth } from '../../auth';
 import { clients, user, type OrangeConciergeDB } from '..';
 import { createDatabaseFromUrl } from '../connection';
+import { env } from '../../env';
 
 function assertDemoSeedAllowed(): void {
-  if (process.env.NODE_ENV === 'production') {
+  if (env.NODE_ENV === 'production') {
     throw new Error('Demo seed data cannot be applied when NODE_ENV=production.');
   }
 
-  if (process.env.ALLOW_DEMO_SEED !== 'true') {
+  if (env.ALLOW_DEMO_SEED !== 'true') {
     throw new Error('Demo seeding is disabled. Set ALLOW_DEMO_SEED=true to enable it.');
   }
 }
@@ -45,25 +46,23 @@ type SeedClient = Readonly<{
 
 type Database = OrangeConciergeDB;
 
-export const createSeedUsersFromEnvironment = (
-  env: NodeJS.ProcessEnv = process.env
-): SeedConfig['users'] => ({
+export const createSeedUsersFromEnvironment = (): SeedConfig['users'] => ({
   admin: {
-    email: readSeedText(env, 'SEED_ADMIN_EMAIL'),
-    name: readSeedText(env, 'SEED_ADMIN_NAME'),
-    password: readSeedSecret(env, 'SEED_ADMIN_PASSWORD'),
+    email: readSeedText(env.SEED_ADMIN_EMAIL),
+    name: readSeedText(env.SEED_ADMIN_NAME),
+    password: readSeedSecret(env.SEED_ADMIN_PASSWORD),
   },
 
   consultant: {
-    email: readSeedText(env, 'SEED_CONSULTANT_EMAIL'),
-    name: readSeedText(env, 'SEED_CONSULTANT_NAME'),
-    password: readSeedSecret(env, 'SEED_CONSULTANT_PASSWORD'),
+    email: readSeedText(env.SEED_CONSULTANT_EMAIL),
+    name: readSeedText(env.SEED_CONSULTANT_NAME),
+    password: readSeedSecret(env.SEED_CONSULTANT_PASSWORD),
   },
 
   reviewer: {
-    email: readSeedText(env, 'SEED_REVIEWER_EMAIL'),
-    name: readSeedText(env, 'SEED_REVIEWER_NAME'),
-    password: readSeedSecret(env, 'SEED_REVIEWER_PASSWORD'),
+    email: readSeedText(env.SEED_REVIEWER_EMAIL),
+    name: readSeedText(env.SEED_REVIEWER_NAME),
+    password: readSeedSecret(env.SEED_REVIEWER_PASSWORD),
   },
 });
 
@@ -194,24 +193,18 @@ async function seedUsers(
   }
 }
 
-/**
- * Seed demo data.
- *
- * Safety checks and required-user validation happen before a database client
- * is created so invalid seed invocations fail without touching Postgres.
- */
 export async function seed(config: SeedConfig): Promise<void> {
   assertDemoSeedAllowed();
   assertSeedUsersConfigured(config.users);
 
-  const { db, client } = createDatabaseFromUrl(config.databaseUrl);
+  const { db, client } = createDatabaseFromUrl(config.db.url);
 
   try {
     const seedAuth = createAuth({
       db,
-      baseURL: config.baseUrl,
-      secret: config.authSecret,
-      trustedOrigins: config.trustedOrigins,
+      baseURL: config.general.baseUrl,
+      secret: config.auth.secret,
+      trustedOrigins: config.auth.trustedOrigins,
 
       // Runtime signup remains disabled. Demo seed explicitly enables it only
       // for this temporary auth instance.
@@ -228,11 +221,9 @@ export async function seed(config: SeedConfig): Promise<void> {
   }
 }
 
-export const createSeedConfigFromEnvironment = (
-  env: NodeJS.ProcessEnv = process.env
-): SeedConfig => ({
-  ...createBackendConfigFromEnvironment(env),
-  users: createSeedUsersFromEnvironment(env),
+export const createSeedConfig = (): SeedConfig => ({
+  ...backendConfig,
+  users: createSeedUsersFromEnvironment(),
 });
 
 function assertSeedUsersConfigured(users: SeedConfig['users']): void {
@@ -269,19 +260,11 @@ function assertSeedUserConfigured(
   }
 }
 
-function readSeedText(env: NodeJS.ProcessEnv, name: string): string {
-  return env[name]?.trim() ?? '';
+function readSeedText(value: string | undefined): string {
+  return value?.trim() ?? '';
 }
 
-/**
- * Determine whether a password exists without modifying it.
- *
- * Password whitespace is meaningful, unlike names/emails, so we should not
- * silently trim a configured password.
- */
-function readSeedSecret(env: NodeJS.ProcessEnv, name: string): string {
-  const value = env[name];
-
+function readSeedSecret(value: string | undefined): string {
   if (!value || value.trim().length === 0) {
     return '';
   }

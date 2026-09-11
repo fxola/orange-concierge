@@ -26,10 +26,10 @@ services:
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-concierge}:${POSTGRES_PASSWORD:-concierge}@db:5432/${POSTGRES_DB:-concierge}
       AUTH_SECRET: ${AUTH_SECRET:-change-me}
-      AI_PROVIDER: ${AI_PROVIDER:-mock}
-      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
-      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
-      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+      AI_PROVIDER: ${AI_PROVIDER:-ollama}
+      AI_MODEL: ${AI_MODEL:-llama3.2}
+      AI_TIMEOUT_MS: ${AI_TIMEOUT_MS:-30000}
+      AI_BASE_URL: ${AI_BASE_URL:-http://ollama:11434}
     depends_on:
       db:
         condition: service_healthy
@@ -52,16 +52,5 @@ services:
       web:
         condition: service_healthy
 
-  # Sovereign local LLM — only with --profile sovereign 
-  ollama:
-    image: ollama/ollama:latest
-    profiles: ["sovereign"]
-    restart: unless-stopped
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-
 volumes:
   pgdata:
-  ollama_data:

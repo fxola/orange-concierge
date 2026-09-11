@@ -73,6 +73,7 @@ export function analyzeInteractionWorld() {
       structuredLLM,
       audit,
       transactionManager,
+      now: () => fixedDate,
     });
   };
 

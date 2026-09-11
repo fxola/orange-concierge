@@ -11,6 +11,7 @@ export {
 } from './application/client/client-id';
 export { canViewClients } from './application/client/policy';
 export { canAnalyzeInteractions, canSubmitInteractions } from './application/interaction/policy';
+export { extractedFactsSchema, parseExtractedFacts } from './application/interaction/extracted-facts';
 export { Result } from './application/result';
 
 export {
@@ -32,11 +33,13 @@ export type {
   AnalyzeInteractionError,
   AnalyzeInteractionInput,
   AnalyzeInteractionResult,
+  AnalyzeInteractionSuccess,
   SubmitInteractionDependencies,
   SubmitInteractionError,
   SubmitInteractionInput,
   SubmitInteractionResult,
 } from './application/interaction/types';
+export type { ExtractedFacts, ParseExtractedFactsResult } from './application/interaction/extracted-facts';
 export type {
   GetClientDependencies,
   GetClientError,
@@ -74,4 +77,9 @@ export type {
   SecretScannerAPI,
   SecretScanResult,
 } from './ports/secret-scanner';
-export type { StructuredLLMInput, StructuredLLM } from './ports/structured-llm';
+export type {
+  ExtractAssessmentFailureReason,
+  ExtractAssessmentResult,
+  StructuredLLMInput,
+  StructuredLLM,
+} from './ports/structured-llm';

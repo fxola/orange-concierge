@@ -1,34 +1,48 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createEnv } from '@t3-oss/env-core';
+import { z } from 'zod';
 
-/**
- * Load the package-local `.env` file (`packages/<name>/.env`) into
- * `process.env` using Node's native loader.
- *
- * Explicitly exported variables always win: `process.loadEnvFile()` never
- * overrides existing entries. Missing file is not an error (CI/production
- * inject env directly).
- *
- * Call this at the top of script entry-points (`migrate.ts`, `seed.ts`,
- * `drizzle.config.ts`) — `tsx` and `drizzle-kit` do not load `.env` files
- * on their own. Next.js runtime loads env itself; this is only for scripts.
- */
-export function loadPackageEnv(packageDir: string): void {
-  const envFile = path.join(packageDir, '.env');
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+const rootEnvFile = path.join(repoRoot, '.env');
 
-  if (existsSync(envFile)) {
-    process.loadEnvFile(envFile);
-  }
+if (existsSync(rootEnvFile)) {
+  process.loadEnvFile(rootEnvFile);
 }
 
-/** Resolve the package root from a module URL, e.g. `src/database/` → 2 levels up. */
-export function packageRootFrom(moduleUrl: string, levelsUp: number): string {
-  let dir = path.dirname(fileURLToPath(moduleUrl));
+export const env = createEnv({
+  clientPrefix: 'NEXT_PUBLIC_',
+  client: {
+    NEXT_PUBLIC_APP_URL: z.string().default('http://localhost:3000'),
+  },
+  server: {
+    DATABASE_URL: z.string().default('postgresql://concierge:concierge@localhost:5433/concierge'),
 
-  for (let i = 0; i < levelsUp; i++) {
-    dir = path.dirname(dir);
-  }
+    BETTER_AUTH_URL: z.string().optional(),
+    BETTER_AUTH_SECRET: z.string().optional(),
+    AUTH_SECRET: z.string().optional(),
+    BETTER_AUTH_TRUSTED_ORIGINS: z.string().optional(),
+    TRUSTED_ORIGINS: z.string().optional(),
 
-  return dir;
-}
+    AI_PROVIDER: z.string().default('ollama'),
+    AI_MODEL: z.string().optional(),
+    AI_BASE_URL: z.string().optional(),
+    AI_API_KEY: z.string().optional(),
+    AI_TIMEOUT_MS: z.coerce.number().optional(),
+
+    NODE_ENV: z.string().optional(),
+    ALLOW_DEMO_SEED: z.string().optional(),
+    SEED_ADMIN_EMAIL: z.string().optional(),
+    SEED_ADMIN_NAME: z.string().optional(),
+    SEED_ADMIN_PASSWORD: z.string().optional(),
+    SEED_CONSULTANT_EMAIL: z.string().optional(),
+    SEED_CONSULTANT_NAME: z.string().optional(),
+    SEED_CONSULTANT_PASSWORD: z.string().optional(),
+    SEED_REVIEWER_EMAIL: z.string().optional(),
+    SEED_REVIEWER_NAME: z.string().optional(),
+    SEED_REVIEWER_PASSWORD: z.string().optional(),
+  },
+  runtimeEnv: process.env,
+  emptyStringAsUndefined: true,
+});

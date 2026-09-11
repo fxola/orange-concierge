@@ -1,22 +1,42 @@
-import type { StructuredLLM, StructuredLLMInput } from '../../../src/ports/structured-llm.js';
+import { Result, type ExtractedFacts } from '../../../src';
+import type {
+  ExtractAssessmentFailureReason,
+  ExtractAssessmentResult,
+  StructuredLLM,
+  StructuredLLMInput,
+} from '../../../src/ports/structured-llm.js';
 
 export class RecordingStructuredLLM implements StructuredLLM {
   inputs: StructuredLLMInput[] = [];
-  private nextError: Error | undefined;
+  private nextFailure: ExtractAssessmentFailureReason | undefined;
 
   constructor(private readonly operations: string[] = []) {}
 
-  failNextExtraction(error = new Error('Structured LLM failed')): void {
-    this.nextError = error;
+  failNextExtraction(reason: ExtractAssessmentFailureReason = 'request_failed'): void {
+    this.nextFailure = reason;
   }
 
-  async extractClientAssessment(input: StructuredLLMInput): Promise<unknown> {
+  async extractClientAssessment(input: StructuredLLMInput): Promise<ExtractAssessmentResult> {
     this.operations.push('llm');
     this.inputs.push(input);
-    if (this.nextError) {
-      throw this.nextError;
+
+    if (this.nextFailure) {
+      const reason = this.nextFailure;
+      this.nextFailure = undefined;
+      return Result.failure<ExtractedFacts, ExtractAssessmentFailureReason>(reason);
     }
 
-    return { summary: 'Safe assessment placeholder' };
+    return Result.success<ExtractedFacts, ExtractAssessmentFailureReason>({
+      custody: {
+        currentArrangement: 'Client holds bitcoin on Coinbase.',
+        concerns: ['Wants to move funds off exchange'],
+      },
+      cybersecurity: {
+        controls: ['Uses hardware wallet'],
+      },
+      planning: {
+        goals: ['Learn safe self-custody'],
+      },
+    });
   }
 }

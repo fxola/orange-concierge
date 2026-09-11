@@ -35,7 +35,8 @@ export class AnalyzeInteraction {
       return Result.failure(new InvalidInteractionStateError(interaction.status));
     }
 
-    const scannedResults = await secretScanner.scan({ text: interaction.transcript });
+    const { transcript } = interaction;
+    const scannedResults = secretScanner.scan({ text: transcript });
     const prohibitedResults = scannedResults.findings.some((f) => f.severity === 'prohibited');
     if (prohibitedResults) {
       const blockedInteraction: Interaction = { ...interaction, status: 'analysis_blocked' };
@@ -58,25 +59,27 @@ export class AnalyzeInteraction {
         return Result.failure(new InteractionAnalysisFailedError());
       }
 
-      return Result.success(blockedInteraction);
+      return Result.success({ interaction: blockedInteraction });
     }
 
-    try {
-      await structuredLLM.extractClientAssessment({
-        interactionId: interaction.id,
-        transcript: interaction.transcript,
-      });
-    } catch {
+    const assessmentResult = await structuredLLM.extractClientAssessment({
+      interactionId,
+      transcript,
+    });
+
+    if (assessmentResult.isFailure()) {
       await this.recordIndependentAudit({
         actor,
         action: 'interaction_analysis_failed',
         resource: { type: 'interaction', id: interactionId },
         occurredAt: now(),
-        metadata: { failureSource: 'structured_llm' },
+        metadata: { failureSource: 'structured_llm', failureReason: assessmentResult.getError() },
       });
 
       return Result.failure(new InteractionAnalysisFailedError());
     }
+
+    const extractedFacts = assessmentResult.getValue();
 
     await this.recordIndependentAudit({
       actor,
@@ -101,7 +104,7 @@ export class AnalyzeInteraction {
     } catch {
       return Result.failure(new InteractionAnalysisFailedError());
     }
-    return Result.success(updatedInteraction);
+    return Result.success({ interaction: updatedInteraction, extractedFacts });
   }
 
   private async recordIndependentAudit(event: AuditEvent): Promise<void> {

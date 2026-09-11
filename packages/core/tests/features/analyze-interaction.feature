@@ -14,6 +14,7 @@ Feature: Analyze interaction
     Then the secret scanner runs before the structured LLM
     And the structured LLM receives the interaction transcript
     And the interaction is marked analysis completed
+    And typed assessment facts are returned
     And the analysis audit events do not include transcript content
 
   Scenario: Fail transactionally when audit recording fails during completion
@@ -62,6 +63,13 @@ Feature: Analyze interaction
   Scenario: Record model failure without leaking transcript content
     Given a received interaction with safe transcript
     And the structured LLM fails during extraction
+    When a consultant analyzes the interaction
+    Then the interaction is not marked analysis completed
+    And an analysis failed audit event is recorded without transcript content
+
+  Scenario: Reject invalid structured LLM response without completing analysis
+    Given a received interaction with safe transcript
+    And the structured LLM reports an invalid response
     When a consultant analyzes the interaction
     Then the interaction is not marked analysis completed
     And an analysis failed audit event is recorded without transcript content

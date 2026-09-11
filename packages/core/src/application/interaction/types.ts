@@ -1,5 +1,6 @@
 import type { Actor } from '../../domain/actor';
 import type { Interaction } from '../../domain/interaction';
+import type { ExtractedFacts } from './extracted-facts';
 import type {
   BlankTranscriptError,
   ClientNotFoundError,
@@ -39,7 +40,12 @@ export type AnalyzeInteractionError =
   | InteractionNotFoundError
   | InvalidInteractionStateError;
 
-export type AnalyzeInteractionResult = Result<Interaction, AnalyzeInteractionError>;
+export type AnalyzeInteractionSuccess = Readonly<{
+  interaction: Interaction;
+  extractedFacts?: ExtractedFacts;
+}>;
+
+export type AnalyzeInteractionResult = Result<AnalyzeInteractionSuccess, AnalyzeInteractionError>;
 
 export type SubmitInteractionInput = Readonly<{
   actor: Actor;
