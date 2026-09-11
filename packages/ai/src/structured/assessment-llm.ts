@@ -12,9 +12,13 @@ import { ProviderError } from '../provider/provider-error';
 
 const ASSESSMENT_SYSTEM_PROMPT = [
   'Extract client assessment facts from the transcript.',
-  'Return only valid JSON matching this shape:',
-  '{"custody":{"currentArrangement":"string","assetsDiscussed":["string"],"concerns":["string"]},"cybersecurity":{"controls":["string"],"risks":["string"],"incidentHistory":"string"},"planning":{"goals":["string"],"constraints":["string"],"nextSteps":["string"]}}',
-  'All groups and fields are optional. Do not invent facts that are not present.',
+  'Return only a JSON object. Copy words from the transcript; never invent facts.',
+  'Omit any field you have no evidence for. Never use placeholder values.',
+  'Groups (all optional):',
+  'custody: currentArrangement (text), assetsDiscussed (list of texts), concerns (list of texts).',
+  'cybersecurity: controls (list of texts), risks (list of texts), incidentHistory (text).',
+  'planning: goals (list of texts), constraints (list of texts), nextSteps (list of texts).',
+  'If the transcript has no relevant facts, return {}.',
 ].join(' ');
 
 function buildAssessmentUserPrompt(input: StructuredLLMInput): string {

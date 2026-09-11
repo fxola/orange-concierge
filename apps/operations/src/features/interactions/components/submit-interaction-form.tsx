@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Field } from '@/components/ui/field';
 import { Select, Textarea } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
@@ -26,9 +25,11 @@ export function SubmitInteractionForm({
 
   if (!fixedClient && clients.length === 0) {
     return (
-      <Card>
-        <Text tone="muted">No clients yet. Add a client before submitting an interaction.</Text>
-      </Card>
+      <div className="rounded-sm border border-border bg-surface p-5 sm:p-6">
+        <Text tone="muted" variant="small">
+          No clients yet. Add a client before submitting an interaction.
+        </Text>
+      </div>
     );
   }
 
@@ -42,6 +43,7 @@ export function SubmitInteractionForm({
       if (viewModel.status === 'ok') {
         setTranscript('');
         toast.success('Interaction received. Queued for analysis.');
+        router.refresh();
         return;
       }
 
@@ -57,14 +59,25 @@ export function SubmitInteractionForm({
   };
 
   return (
-    <Card>
-      <form className="grid gap-4" onSubmit={onSubmit}>
+    <div className="rounded-sm border border-border bg-surface p-5 sm:p-6">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <h3 className="text-base font-semibold tracking-[-0.01em]">New interaction</h3>
+          <Text tone="muted" variant="small" className="mt-1">
+            {fixedClient
+              ? `Intake for ${fixedClient.displayName}. Screening runs before any model call.`
+              : 'Paste meeting notes. Screening runs before any model call.'}
+          </Text>
+        </div>
+      </div>
+      <form className="mt-4 grid gap-4" onSubmit={onSubmit}>
         {!fixedClient ? (
           <Field label="Client">
             <Select
               value={clientId}
               onChange={(event) => setClientId(event.target.value)}
               disabled={isPending}
+              className="rounded-sm"
             >
               {clients.map((client) => (
                 <option key={client.id} value={client.id}>
@@ -78,15 +91,22 @@ export function SubmitInteractionForm({
           <Textarea
             placeholder="Paste meeting notes here…"
             required
+            rows={6}
             value={transcript}
             onChange={(event) => setTranscript(event.target.value)}
             disabled={isPending}
+            className="min-h-32 rounded-sm"
           />
         </Field>
-        <Button type="submit" disabled={isPending}>
-          {isPending ? 'Submitting…' : 'Submit interaction'}
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button type="submit" disabled={isPending}>
+            {isPending ? 'Submitting…' : 'Submit interaction'}
+          </Button>
+          <Text tone="muted" variant="caption">
+            Saved as received, then ready for analysis.
+          </Text>
+        </div>
       </form>
-    </Card>
+    </div>
   );
 }

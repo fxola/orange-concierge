@@ -15,6 +15,13 @@
       "when": 1788441986186,
       "tag": "0001_add_account_issuer_identity_key",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789137363119,
+      "tag": "0002_add_extracted_facts_column",
+      "breakpoints": true
     }
   ]
 }

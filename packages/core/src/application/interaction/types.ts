@@ -9,8 +9,10 @@ import type {
   InteractionSubmissionFailedError,
   InvalidClientIdError,
   InvalidInteractionStateError,
+  InvalidPaginationError,
   UnauthorizedAnalyzeInteractionError,
   UnauthorizedSubmitInteractionError,
+  UnauthorizedViewClientsError,
 } from '../../errors';
 import type { AuditPort } from '../../ports/audit';
 import type { ClientRepository } from '../../ports/client-repository';
@@ -46,6 +48,26 @@ export type AnalyzeInteractionSuccess = Readonly<{
 }>;
 
 export type AnalyzeInteractionResult = Result<AnalyzeInteractionSuccess, AnalyzeInteractionError>;
+
+export type ListInteractionsInput = Readonly<{
+  actor: Actor;
+  clientId: string;
+  limit: number;
+  offset: number;
+}>;
+
+export type ListInteractionsDependencies = Readonly<{
+  clientRepository: ClientRepository;
+  interactionsRepo: InteractionRepository;
+}>;
+
+export type ListInteractionsError =
+  | UnauthorizedViewClientsError
+  | InvalidClientIdError
+  | InvalidPaginationError
+  | ClientNotFoundError;
+
+export type ListInteractionsResult = Result<readonly Interaction[], ListInteractionsError>;
 
 export type SubmitInteractionInput = Readonly<{
   actor: Actor;

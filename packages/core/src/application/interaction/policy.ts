@@ -11,3 +11,7 @@ export const canSubmitInteractions = (actor: Actor): boolean => {
   const isConsultant = actor.role === 'consultant';
   return isAdmin || isConsultant;
 };
+
+export const canViewInteractions = (actor: Actor): boolean => {
+  return actor.role === 'admin' || actor.role === 'consultant' || actor.role === 'reviewer';
+};

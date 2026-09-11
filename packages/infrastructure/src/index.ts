@@ -3,6 +3,8 @@ export type {
   Application,
   AnalyzeInteractionInput,
   AnalyzeInteractionResult,
+  ListInteractionsInput,
+  ListInteractionsResult,
   SubmitInteractionInput,
   SubmitInteractionResult,
 } from './application/types';

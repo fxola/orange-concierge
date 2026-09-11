@@ -1,8 +1,4 @@
-import type {
-  InputHTMLAttributes,
-  SelectHTMLAttributes,
-  TextareaHTMLAttributes,
-} from 'react';
+import type { InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
 
 const CONTROL = `
    w-full rounded-none border border-border bg-surface

@@ -1,4 +1,5 @@
 export { AnalyzeInteraction } from './application/interaction/analyze-interaction';
+export { ListInteractions } from './application/interaction/list-interactions';
 export { SubmitInteraction } from './application/interaction/submit-interaction';
 export { ListClients } from './application/client/list-clients';
 export { GetClient } from './application/client/get-client';
@@ -10,7 +11,11 @@ export {
   parsePagination,
 } from './application/client/client-id';
 export { canViewClients } from './application/client/policy';
-export { canAnalyzeInteractions, canSubmitInteractions } from './application/interaction/policy';
+export {
+  canAnalyzeInteractions,
+  canSubmitInteractions,
+  canViewInteractions,
+} from './application/interaction/policy';
 export { extractedFactsSchema, parseExtractedFacts } from './application/interaction/extracted-facts';
 export { Result } from './application/result';
 
@@ -34,6 +39,10 @@ export type {
   AnalyzeInteractionInput,
   AnalyzeInteractionResult,
   AnalyzeInteractionSuccess,
+  ListInteractionsDependencies,
+  ListInteractionsError,
+  ListInteractionsInput,
+  ListInteractionsResult,
   SubmitInteractionDependencies,
   SubmitInteractionError,
   SubmitInteractionInput,

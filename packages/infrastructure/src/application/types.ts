@@ -6,6 +6,8 @@ import type {
   AnalyzeInteractionResult,
   ListClientsInput,
   ListClientsResult,
+  ListInteractionsInput,
+  ListInteractionsResult,
   SubmitInteractionInput,
   SubmitInteractionResult,
 } from '@orange-concierge/core';
@@ -17,6 +19,8 @@ export type {
   AnalyzeInteractionResult,
   ListClientsInput,
   ListClientsResult,
+  ListInteractionsInput,
+  ListInteractionsResult,
 };
 export type { SubmitInteractionInput, SubmitInteractionResult };
 
@@ -25,6 +29,7 @@ export type Application = Readonly<{
   interaction: {
     submit: (input: SubmitInteractionInput) => Promise<SubmitInteractionResult>;
     analyze: (input: AnalyzeInteractionInput) => Promise<AnalyzeInteractionResult>;
+    list: (input: ListInteractionsInput) => Promise<ListInteractionsResult>;
   };
   clients: {
     getAll: (input: ListClientsInput) => Promise<ListClientsResult>;

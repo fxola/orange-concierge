@@ -88,7 +88,11 @@ export class AnalyzeInteraction {
       occurredAt: now(),
     });
 
-    const updatedInteraction: Interaction = { ...interaction, status: 'analysis_completed' };
+    const updatedInteraction: Interaction = {
+      ...interaction,
+      status: 'analysis_completed',
+      extractedFacts,
+    };
     const completedAuditEvent: AuditEvent = {
       actor,
       action: 'interaction_analysis_completed',

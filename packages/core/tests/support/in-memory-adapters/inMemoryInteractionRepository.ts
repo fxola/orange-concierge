@@ -20,6 +20,26 @@ export class InMemoryInteractionRepository implements InteractionRepository {
     this.interactions.push(interaction);
   }
 
+  async listByClient(
+    clientId: string,
+    limit: number,
+    offset: number
+  ): Promise<readonly Interaction[]> {
+    const seen = new Set<string>();
+    const all: Interaction[] = [];
+
+    for (const interaction of [...this.interactions, ...(this.current ? [this.current] : [])]) {
+      if (interaction.clientId !== clientId || seen.has(interaction.id)) {
+        continue;
+      }
+
+      seen.add(interaction.id);
+      all.push(interaction);
+    }
+
+    return all.slice(offset, offset + limit);
+  }
+
   getCurrent(): Interaction | null {
     return this.current;
   }
