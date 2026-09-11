@@ -11,7 +11,6 @@ export const POST = withRequestActor(async (request, actor, context: RouteContex
 
   if (result.isFailure()) {
     const code = result.getError().code;
-    console.log({ error: result.getError() });
     if (code === 'interaction_not_found') {
       return Response.json({ error: code }, { status: 404 });
     }
