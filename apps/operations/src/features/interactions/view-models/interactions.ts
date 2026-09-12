@@ -5,7 +5,9 @@ import type {
   Interaction,
   InteractionStatus,
   ListInteractionsResult,
+  ReadinessScore,
 } from '@orange-concierge/core';
+import { calculateReadinessScore } from '@orange-concierge/core';
 
 import { formatDateLabel } from '@/features/clients/view-models/clients';
 
@@ -22,6 +24,7 @@ export type InteractionRow = Readonly<{
   createdAtLabel: string;
   transcript: string;
   extractedFacts?: ExtractedFacts;
+  readinessScore?: ReadinessScore;
 }>;
 
 export type ClientInteractionsViewModel =
@@ -30,13 +33,17 @@ export type ClientInteractionsViewModel =
   | Readonly<{ status: 'unavailable' }>;
 
 function toInteractionRow(interaction: Interaction): InteractionRow {
+  const { extractedFacts } = interaction;
+
   return {
     id: interaction.id,
     status: interaction.status,
     statusLabel: STATUS_LABELS[interaction.status],
     createdAtLabel: formatDateLabel(interaction.createdAt),
     transcript: interaction.transcript,
-    ...(interaction.extractedFacts ? { extractedFacts: interaction.extractedFacts } : {}),
+    ...(extractedFacts
+      ? { extractedFacts, readinessScore: calculateReadinessScore(extractedFacts) }
+      : {}),
   };
 }
 

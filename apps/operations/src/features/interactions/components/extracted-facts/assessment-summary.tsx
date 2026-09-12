@@ -1,6 +1,7 @@
+import type { ReadinessScore } from '@orange-concierge/core';
 import { FileSearch } from 'lucide-react';
-import { Badge } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
+import { ReadinessScoreCard } from './readiness-score-card';
 
 export function EmptyFacts() {
   return (
@@ -14,12 +15,11 @@ export function EmptyFacts() {
 }
 
 export function AssessmentSummary({
-  total,
-  sourced,
-}: Readonly<{ total: number; sourced: number }>) {
+  readinessScore,
+}: Readonly<{ total: number; sourced: number; readinessScore?: ReadinessScore }>) {
   return (
-    <div className="flex flex-wrap items-start justify-between gap-3">
-      <div className="min-w-0">
+    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_330px] lg:items-start">
+      <div className="min-w-0 max-w-4xl">
         <Text variant="caption" tone="muted" className="uppercase tracking-[0.12em]">
           Extracted assessment
         </Text>
@@ -31,12 +31,7 @@ export function AssessmentSummary({
           quote.
         </p>
       </div>
-      <div className="flex shrink-0 flex-col items-start gap-1.5 sm:items-end">
-        <Badge tone={sourced >= total ? 'success' : 'warning'}>
-          {sourced} of {total} sourced
-        </Badge>
-        <span className="text-xs text-subtle-foreground">Review before using</span>
-      </div>
+      <ReadinessScoreCard score={readinessScore} />
     </div>
   );
 }

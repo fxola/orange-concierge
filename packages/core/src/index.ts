@@ -17,6 +17,7 @@ export {
   canViewInteractions,
 } from './application/interaction/policy';
 export { extractedFactsSchema, parseExtractedFacts } from './application/interaction/extracted-facts';
+export { calculateReadinessScore } from './domain/readiness-score';
 export { Result } from './application/result';
 
 export {
@@ -67,6 +68,7 @@ export type { Actor, ActorRole } from './domain/actor';
 export { isActorRole } from './domain/actor';
 export type { Client } from './domain/client';
 export type { Interaction, InteractionStatus } from './domain/interaction';
+export type { ReadinessLevel, ReadinessScore, ReadinessScoreBand } from './domain/readiness-score';
 export type { Recommendation, RecommendationStatus } from './domain/recommendation';
 export type {
   AuditAction,

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { EvidenceReference, ExtractedFacts } from '@orange-concierge/core';
+import type { EvidenceReference, ExtractedFacts, ReadinessScore } from '@orange-concierge/core';
 import { AssessmentSummary, EmptyFacts } from './extracted-facts/assessment-summary';
 import { EvidenceDialog } from './extracted-facts/evidence-dialog';
 import {
@@ -15,7 +15,8 @@ import { FactGroupCard } from './extracted-facts/fact-group-card';
 export function ExtractedFactsView({
   facts,
   transcript,
-}: Readonly<{ facts: ExtractedFacts; transcript: string }>) {
+  readinessScore,
+}: Readonly<{ facts: ExtractedFacts; transcript: string; readinessScore?: ReadinessScore }>) {
   const [activeEvidence, setActiveEvidence] = useState<EvidenceReference | null>(null);
 
   useEffect(() => {
@@ -42,7 +43,7 @@ export function ExtractedFactsView({
 
   return (
     <div className="rounded-sm border border-border bg-surface p-4 sm:p-5">
-      <AssessmentSummary total={items.length} sourced={sourcedCount} />
+      <AssessmentSummary total={items.length} sourced={sourcedCount} readinessScore={readinessScore} />
 
       <div className="mt-4 grid gap-4">
         {FACT_GROUPS.map((group) => (
