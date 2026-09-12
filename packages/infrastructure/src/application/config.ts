@@ -21,7 +21,7 @@ export const config = {
 export type BackendConfig = typeof config;
 
 function createAIConfig(): AIConfig {
-  const provider = env.AI_PROVIDER === 'gemini' ? 'gemini' : 'ollama';
+  const provider = env.AI_PROVIDER;
 
   if (provider === 'gemini') {
     return {

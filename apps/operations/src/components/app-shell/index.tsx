@@ -51,7 +51,7 @@ export function AppShell({
 
   return (
     <div className="flex min-h-dvh">
-      <div className="hidden md:block">
+      <div className="sticky top-0 hidden h-dvh shrink-0 md:block">
         <Sidebar collapsed={collapsed} onToggleCollapse={toggleCollapse} showCollapseToggle />
       </div>
       {menuOpen ? <MobileNav onClose={() => setMenuOpen(false)} /> : null}

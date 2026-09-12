@@ -1,7 +1,10 @@
 import type { SecretFinding, SecretScannerAPI, SecretScanResult } from '@orange-concierge/core';
 
 const WORD = '[a-z]{3,12}';
-const SEED_PHRASE_PATTERN = new RegExp(`\\b${WORD}(?:\\s+${WORD}){11}\\b`, 'gi');
+const SEED_PHRASE_ASSIGNMENT_PATTERN = new RegExp(
+  `\\b(?:seed|recovery|mnemonic)\\s+(?:phrase|words?)\\s*(?::|=|is|are)\\s*(${WORD}(?:\\s+${WORD}){11})\\b`,
+  'gi'
+);
 const EXTENDED_PRIVATE_KEY_PATTERN = /\b(?:xprv|xpriv|tprv|yprv|zprv)[1-9A-HJ-NP-Za-km-z]{20,}\b/g;
 const HEX_PRIVATE_KEY_PATTERN = /\b0x[a-fA-F0-9]{64}\b/g;
 const API_KEY_ASSIGNMENT_PATTERN = /\bapi\s+key\b\s*[:=]\s*([A-Za-z0-9_-]{16,})\b/gi;
@@ -30,14 +33,16 @@ export class PatternSecretScanner implements SecretScannerAPI {
     const findings: PendingFinding[] = [];
     let order = 0;
 
-    for (const match of input.text.matchAll(SEED_PHRASE_PATTERN)) {
-      if (match.index === undefined) continue;
+    for (const match of input.text.matchAll(SEED_PHRASE_ASSIGNMENT_PATTERN)) {
+      if (match.index === undefined || match[1] === undefined) continue;
+
+      const start = match.index + match[0].indexOf(match[1]);
 
       findings.push({
         type: 'seed_phrase',
         severity: 'prohibited',
-        start: match.index,
-        end: match.index + match[0].length,
+        start,
+        end: start + match[1].length,
         label: 'Possible seed phrase',
         order: order++,
       });

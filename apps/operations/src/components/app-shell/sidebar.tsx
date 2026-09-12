@@ -25,14 +25,14 @@ export function Sidebar({
   return (
     <aside
       className={[
-        'flex h-full shrink-0 flex-col bg-[#000f1a] text-[#f7f4ed]',
+        'flex h-full shrink-0 flex-col overflow-hidden bg-[#000f1a] text-[#f7f4ed]',
         'transition-[width] duration-200 ease-cubic border-r border-white/10',
         collapsed ? 'w-[76px]' : 'w-60',
       ].join(' ')}
     >
       <div
         className={[
-          'flex items-center gap-2 pb-6 pt-6 transition-[padding] duration-200 ease-cubic',
+          'flex shrink-0 items-center gap-2 pb-6 pt-6 transition-[padding] duration-200 ease-cubic',
           collapsed ? 'justify-start px-[10px]' : 'justify-between px-5',
         ].join(' ')}
       >
@@ -53,7 +53,11 @@ export function Sidebar({
         ) : null}
       </div>
 
-      <nav aria-label="Primary" className="flex-1 px-3" onClick={onNavigate}>
+      <nav
+        aria-label="Primary"
+        className="min-h-0 flex-1 overflow-y-auto px-3"
+        onClick={onNavigate}
+      >
         <ul className="grid gap-1">
           {NAV_ITEMS.map((item) => (
             <li key={item.href}>
@@ -68,7 +72,7 @@ export function Sidebar({
           ))}
         </ul>
       </nav>
-      <div className="grid gap-1 border-t border-white/10 px-3 py-4">
+      <div className="grid shrink-0 gap-1 border-t border-white/10 px-3 py-4">
         <SignOutButton collapsed={collapsed} />
       </div>
     </aside>

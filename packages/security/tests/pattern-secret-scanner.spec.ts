@@ -22,6 +22,15 @@ describe('PatternSecretScanner', () => {
     expect(result.findings[0]?.label).not.toContain('abandon');
   });
 
+  it('does not flag ordinary 12-word prose as a seed phrase', () => {
+    const scanner = new PatternSecretScanner();
+    const text = 'Client wants to learn about estate planning and custody controls before buying bitcoin.';
+
+    const result = scanner.scan({ text });
+
+    expect(result.findings).toEqual([]);
+  });
+
   it('flags an xprv-style private key without copying it into the label', () => {
     const scanner = new PatternSecretScanner();
     const key = 'xprv9s21ZrQH143K3QTDL4LXw2FfakeKeyForScannerTestNay';

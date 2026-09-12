@@ -28,6 +28,23 @@ describe('parseExtractedFacts', () => {
     expect(parseExtractedFacts({ custody: { currentArrangement: 42 } }).ok).toBe(false);
   });
 
+  it('rejects unrelated JSON objects instead of treating them as no facts', () => {
+    expect(parseExtractedFacts({ error: 'model returned an error' })).toEqual({ ok: false });
+  });
+
+  it('rejects wrapped fact payloads instead of silently completing empty', () => {
+    expect(
+      parseExtractedFacts({ facts: { custody: { currentArrangement: 'multisig' } } })
+    ).toEqual({ ok: false });
+  });
+
+  it('drops empty fact groups after validation', () => {
+    expect(parseExtractedFacts({ custody: {}, planning: { goals: [] } })).toEqual({
+      ok: true,
+      facts: {},
+    });
+  });
+
   it('drops placeholder values echoed from shape examples', () => {
     const result = parseExtractedFacts({
       custody: {

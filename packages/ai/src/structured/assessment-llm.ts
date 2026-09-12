@@ -13,6 +13,7 @@ import { ProviderError } from '../provider/provider-error';
 const ASSESSMENT_SYSTEM_PROMPT = [
   'Extract client assessment facts from the transcript.',
   'Return only a JSON object. Copy words from the transcript; never invent facts.',
+  'Do not wrap the object in a facts or data property.',
   'Omit any field you have no evidence for. Never use placeholder values.',
   'Groups (all optional):',
   'custody: currentArrangement (text), assetsDiscussed (list of texts), concerns (list of texts).',
