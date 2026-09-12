@@ -1,6 +1,6 @@
 # Orange Concierge - Sovereign Client Operations Copilot
 
-Orange Concierge is a self-hosted AI copilot that helps Bitcoin consultants turn client notes and meeting transcripts into structured client profiles, risk signals, evidence-backed recommendations, follow-up questions, and review-ready action plans, while rejecting wallet seeds, private keys, passwords, recovery codes, and similar secrets before they can be stored or sent to an AI model.
+Orange Concierge is a self-hosted AI copilot that helps Bitcoin consultants turn client notes and meeting transcripts into structured client profiles, risk signals, evidence-backed recommendations, follow-up questions, and review-ready action plans, while rejecting wallet seeds, private keys, API keys, recovery codes, and similar secrets before they can be sent to an AI model.
 
 ## Stack
 
@@ -11,37 +11,50 @@ Orange Concierge is a self-hosted AI copilot that helps Bitcoin consultants turn
 - Docker Compose
 - Nginx
 
-## Run With Docker
+## Run Locally With Ollama
 
-```bash
-cp .env.example .env
-docker compose up -d
-curl http://localhost/api/health
+- Copy the sample env to your .env file
+
+```
+bash
+cp .env.development.example .env
 ```
 
-The app is available through Nginx at `http://localhost`. Docker starts local Ollama by default, pulls `AI_MODEL` (`llama3.2` by default) with a one-shot `ollama-pull` service, and blocks `web` startup until the pull succeeds.
-
-Set `AI_MODEL` in `.env` before `docker compose up -d` if you want a different Ollama model.
-
-## Run With Gemini Cloud
+- And run the following commands.
 
 ```bash
-cp .env.example .env
-# Set AI_API_KEY in .env
-docker compose -f docker-compose.yml -f docker-compose.cloud.yml up -d
-curl http://localhost/api/health
-```
 
-The explicit `-f` command skips `docker-compose.override.yml`, so cloud mode does not start Ollama or wait for `ollama-pull`.
-
-## Run Locally
-
-```bash
 pnpm install
+docker compose up -d db ollama ollama-pull
+pnpm db:migrate
+pnpm db:seed
 pnpm dev
 ```
 
-The local development server runs at `http://localhost:3000`.
+- Then Open: http://localhost:3000.
+
+## Run Locally With Gemini Cloud
+
+- Copy the sample env to you .env file and run pnpm install
+
+```bash
+cp .env.development.example .env
+pnpm install
+```
+
+- Edit your .env file:
+  AI_PROVIDER=gemini
+  AI_MODEL=gemini-1.5-flash
+  AI_API_KEY=your-gemini-api-key
+  AI_BASE_URL=https://generativelanguage.googleapis.com/v1beta
+- Then run only Postgres:
+  ```
+   docker compose up -d db
+   pnpm db:migrate
+   pnpm db:seed
+   pnpm dev
+  ```
+- And Open: http://localhost:3000
 
 ## Useful Commands
 

@@ -44,6 +44,16 @@ export function ClientInteractionsSection({
     });
   }, [rows, tab, query]);
 
+  const toggleOpen = () => {
+    setOpen((value) => !value);
+  };
+
+  const handleSubmitted = () => {
+    setOpen(false);
+    setQuery('');
+    setTab('received');
+  };
+
   return (
     <section className="grid min-w-0 gap-4">
       <div className="overflow-hidden rounded-sm border border-border bg-surface">
@@ -52,7 +62,7 @@ export function ClientInteractionsSection({
             <h2 className="text-lg font-semibold tracking-[-0.01em]">Interactions</h2>
             <span className="text-sm text-muted-foreground tabular-nums">{rows.length}</span>
           </div>
-          <Button size="sm" onClick={() => setOpen((value) => !value)}>
+          <Button size="sm" onClick={toggleOpen}>
             {open ? (
               <Minus aria-hidden="true" className="h-4 w-4" />
             ) : (
@@ -77,7 +87,9 @@ export function ClientInteractionsSection({
         />
       </div>
 
-      {open ? <SubmitInteractionForm clients={[]} fixedClient={client} /> : null}
+      {open ? (
+        <SubmitInteractionForm clients={[]} fixedClient={client} onSubmitted={handleSubmitted} />
+      ) : null}
 
       <InteractionList
         status={interactions.status}

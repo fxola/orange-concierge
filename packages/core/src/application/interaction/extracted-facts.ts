@@ -49,6 +49,50 @@ export type ParseExtractedFactsResult =
   | Readonly<{ ok: true; facts: ExtractedFacts }>
   | Readonly<{ ok: false }>;
 
+const TOP_LEVEL_FACT_KEYS = ['custody', 'cybersecurity', 'planning'] as const;
+
+const FACT_FIELD_KEYS = {
+  custody: ['currentArrangement', 'assetsDiscussed', 'concerns'],
+  cybersecurity: ['controls', 'risks', 'incidentHistory'],
+  planning: ['goals', 'constraints', 'nextSteps'],
+} satisfies Record<(typeof TOP_LEVEL_FACT_KEYS)[number], readonly string[]>;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function hasOwn(record: Record<string, unknown>, key: string): boolean {
+  return Object.prototype.hasOwnProperty.call(record, key);
+}
+
+function hasRecognizedFactShape(raw: unknown): boolean {
+  if (!isRecord(raw)) {
+    return false;
+  }
+
+  const topLevelKeys = Object.keys(raw);
+  if (topLevelKeys.length === 0) {
+    return true;
+  }
+
+  return TOP_LEVEL_FACT_KEYS.some((groupKey) => {
+    if (!hasOwn(raw, groupKey)) {
+      return false;
+    }
+
+    const group = raw[groupKey];
+    if (!isRecord(group)) {
+      return true;
+    }
+
+    if (Object.keys(group).length === 0) {
+      return true;
+    }
+
+    return FACT_FIELD_KEYS[groupKey].some((fieldKey) => hasOwn(group, fieldKey));
+  });
+}
+
 /**
  * Placeholder values small models echo from shape examples instead of
  * extracting real facts. Treated as absent.
@@ -100,12 +144,22 @@ function dropEmpties(value: unknown): unknown {
   return value;
 }
 
+function dropEmptyFactGroups(facts: ExtractedFacts): ExtractedFacts {
+  return Object.fromEntries(
+    Object.entries(facts).filter(([, group]) => Object.keys(group ?? {}).length > 0)
+  ) as ExtractedFacts;
+}
+
 export function parseExtractedFacts(raw: unknown): ParseExtractedFactsResult {
+  if (!hasRecognizedFactShape(raw)) {
+    return { ok: false };
+  }
+
   const result = extractedFactsSchema.safeParse(dropEmpties(raw) ?? {});
 
   if (!result.success) {
     return { ok: false };
   }
 
-  return { ok: true, facts: result.data };
+  return { ok: true, facts: dropEmptyFactGroups(result.data) };
 }

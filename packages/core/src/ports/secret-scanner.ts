@@ -1,7 +1,6 @@
 export type SecretFindingType =
   | 'seed_phrase'
   | 'private_key'
-  | 'password'
   | 'api_key'
   | 'recovery_code';
 

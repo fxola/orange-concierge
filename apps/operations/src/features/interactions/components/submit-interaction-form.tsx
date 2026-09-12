@@ -14,9 +14,11 @@ import { ClientOption } from '../view-models/submit-interaction';
 export function SubmitInteractionForm({
   clients,
   fixedClient,
+  onSubmitted,
 }: {
   clients: readonly ClientOption[];
   fixedClient?: ClientOption;
+  onSubmitted?: () => void;
 }) {
   const router = useRouter();
   const [clientId, setClientId] = useState(fixedClient?.id ?? clients[0]?.id ?? '');
@@ -43,6 +45,7 @@ export function SubmitInteractionForm({
       if (viewModel.status === 'ok') {
         setTranscript('');
         toast.success('Interaction received. Queued for analysis.');
+        onSubmitted?.();
         router.refresh();
         return;
       }

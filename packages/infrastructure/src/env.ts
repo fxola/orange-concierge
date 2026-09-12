@@ -25,7 +25,7 @@ export const env = createEnv({
     BETTER_AUTH_TRUSTED_ORIGINS: z.string().optional(),
     TRUSTED_ORIGINS: z.string().optional(),
 
-    AI_PROVIDER: z.string().default('ollama'),
+    AI_PROVIDER: z.enum(['ollama', 'gemini']).default('ollama'),
     AI_MODEL: z.string().optional(),
     AI_BASE_URL: z.string().optional(),
     AI_API_KEY: z.string().optional(),
