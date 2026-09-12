@@ -114,12 +114,15 @@ describeFeature(feature, ({ Scenario }) => {
 
     And('typed assessment facts are returned', () => {
       if (!result.isSuccess()) expect.fail('Expected analysis success');
-      expect(result.getValue()).toEqual({
-        interaction: expect.objectContaining({
+      const value = result.getValue();
+      expect(value.interaction).toEqual(
+        expect.objectContaining({
           id: world.interaction().id,
           status: 'analysis_completed',
-        }),
-        extractedFacts: {
+        })
+      );
+      expect(value.extractedFacts).toEqual(
+        expect.objectContaining({
           custody: {
             currentArrangement: 'Client holds bitcoin on Coinbase.',
             concerns: ['Wants to move funds off exchange'],
@@ -130,8 +133,23 @@ describeFeature(feature, ({ Scenario }) => {
           planning: {
             goals: ['Learn safe self-custody'],
           },
-        },
-      });
+        })
+      );
+      const evidence = value.extractedFacts?.evidence ?? [];
+      expect(evidence).toHaveLength(4);
+      for (const entry of evidence) {
+        expect(entry.quote.length).toBeGreaterThan(0);
+        expect(world.interaction().transcript.indexOf(entry.quote)).toBe(entry.startOffset);
+        expect(entry.endOffset).toBe(entry.startOffset + entry.quote.length);
+      }
+      expect(evidence.map((entry) => entry.factPath).sort()).toEqual(
+        [
+          'custody.concerns[0]',
+          'custody.currentArrangement',
+          'cybersecurity.controls[0]',
+          'planning.goals[0]',
+        ].sort()
+      );
     });
 
     And('the analysis audit events do not include transcript content', () => {

@@ -26,6 +26,40 @@ export class RecordingStructuredLLM implements StructuredLLM {
       return Result.failure<ExtractedFacts, ExtractAssessmentFailureReason>(reason);
     }
 
+    const evidenceTemplates = [
+      {
+        factPath: 'custody.currentArrangement',
+        quote: 'holding about 0.5 BTC on Coinbase',
+      },
+      {
+        factPath: 'custody.concerns[0]',
+        quote: 'wanting to move your bitcoin off the exchange',
+      },
+      {
+        factPath: 'cybersecurity.controls[0]',
+        quote: 'set up a hardware wallet',
+      },
+      {
+        factPath: 'planning.goals[0]',
+        quote: 'learn how to do self-custody properly',
+      },
+    ];
+
+    const evidence = evidenceTemplates.flatMap((template) => {
+      const startOffset = input.transcript.indexOf(template.quote);
+      if (startOffset < 0) {
+        return [];
+      }
+      return [
+        {
+          factPath: template.factPath,
+          quote: template.quote,
+          startOffset,
+          endOffset: startOffset + template.quote.length,
+        },
+      ];
+    });
+
     return Result.success<ExtractedFacts, ExtractAssessmentFailureReason>({
       custody: {
         currentArrangement: 'Client holds bitcoin on Coinbase.',
@@ -37,6 +71,7 @@ export class RecordingStructuredLLM implements StructuredLLM {
       planning: {
         goals: ['Learn safe self-custody'],
       },
+      ...(evidence.length > 0 ? { evidence } : {}),
     });
   }
 }

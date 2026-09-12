@@ -48,7 +48,11 @@ export type {
   SubmitInteractionInput,
   SubmitInteractionResult,
 } from './application/interaction/types';
-export type { ExtractedFacts, ParseExtractedFactsResult } from './application/interaction/extracted-facts';
+export type {
+  EvidenceReference,
+  ExtractedFacts,
+  ParseExtractedFactsResult,
+} from './application/interaction/extracted-facts';
 export type {
   GetClientDependencies,
   GetClientError,
