@@ -1,4 +1,5 @@
 export { AnalyzeInteraction } from './application/interaction/analyze-interaction';
+export { GetInteraction } from './application/interaction/get-interaction';
 export { ListInteractions } from './application/interaction/list-interactions';
 export { SubmitInteraction } from './application/interaction/submit-interaction';
 export { ListClients } from './application/client/list-clients';
@@ -40,6 +41,10 @@ export type {
   AnalyzeInteractionInput,
   AnalyzeInteractionResult,
   AnalyzeInteractionSuccess,
+  GetInteractionDependencies,
+  GetInteractionError,
+  GetInteractionInput,
+  GetInteractionResult,
   ListInteractionsDependencies,
   ListInteractionsError,
   ListInteractionsInput,

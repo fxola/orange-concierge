@@ -49,6 +49,23 @@ export type AnalyzeInteractionSuccess = Readonly<{
 
 export type AnalyzeInteractionResult = Result<AnalyzeInteractionSuccess, AnalyzeInteractionError>;
 
+export type GetInteractionInput = Readonly<{
+  actor: Actor;
+  clientId: string;
+  interactionId: string;
+}>;
+
+export type GetInteractionDependencies = Readonly<{
+  interactionsRepo: InteractionRepository;
+}>;
+
+export type GetInteractionError =
+  | UnauthorizedViewClientsError
+  | InvalidClientIdError
+  | InteractionNotFoundError;
+
+export type GetInteractionResult = Result<Interaction, GetInteractionError>;
+
 export type ListInteractionsInput = Readonly<{
   actor: Actor;
   clientId: string;

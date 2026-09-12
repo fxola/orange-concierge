@@ -4,6 +4,7 @@ import type {
   ExtractedFacts,
   Interaction,
   InteractionStatus,
+  GetInteractionResult,
   ListInteractionsResult,
   ReadinessScore,
 } from '@orange-concierge/core';
@@ -19,6 +20,7 @@ const STATUS_LABELS: Record<InteractionStatus, string> = {
 
 export type InteractionRow = Readonly<{
   id: string;
+  clientId: string;
   status: InteractionStatus;
   statusLabel: string;
   createdAtLabel: string;
@@ -32,11 +34,17 @@ export type ClientInteractionsViewModel =
   | Readonly<{ status: 'empty' }>
   | Readonly<{ status: 'unavailable' }>;
 
+export type InteractionDetailViewModel =
+  | Readonly<{ status: 'ok'; row: InteractionRow }>
+  | Readonly<{ status: 'notFound' }>
+  | Readonly<{ status: 'unavailable' }>;
+
 function toInteractionRow(interaction: Interaction): InteractionRow {
   const { extractedFacts } = interaction;
 
   return {
     id: interaction.id,
+    clientId: interaction.clientId,
     status: interaction.status,
     statusLabel: STATUS_LABELS[interaction.status],
     createdAtLabel: formatDateLabel(interaction.createdAt),
@@ -45,6 +53,22 @@ function toInteractionRow(interaction: Interaction): InteractionRow {
       ? { extractedFacts, readinessScore: calculateReadinessScore(extractedFacts) }
       : {}),
   };
+}
+
+export function toInteractionDetailViewModel(
+  result: GetInteractionResult
+): InteractionDetailViewModel {
+  if (result.isFailure()) {
+    const code = result.getError().code;
+
+    if (code === 'interaction_not_found' || code === 'invalid_client_id') {
+      return { status: 'notFound' };
+    }
+
+    return { status: 'unavailable' };
+  }
+
+  return { status: 'ok', row: toInteractionRow(result.getValue()) };
 }
 
 export function toClientInteractionsViewModel(
