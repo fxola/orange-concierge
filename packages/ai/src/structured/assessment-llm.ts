@@ -19,6 +19,10 @@ const ASSESSMENT_SYSTEM_PROMPT = [
   'custody: currentArrangement (text), assetsDiscussed (list of texts), concerns (list of texts).',
   'cybersecurity: controls (list of texts), risks (list of texts), incidentHistory (text).',
   'planning: goals (list of texts), constraints (list of texts), nextSteps (list of texts).',
+  'Also return evidence: an array of { factPath, quote }.',
+  'factPath uses group.field for text, like custody.currentArrangement, or group.field[index] for lists, like custody.concerns[0].',
+  'quote must be an exact substring copied from the transcript, 1-500 chars.',
+  'Give one evidence entry for each text fact and each list item you return.',
   'If the transcript has no relevant facts, return {}.',
 ].join(' ');
 
@@ -26,7 +30,7 @@ function buildAssessmentUserPrompt(input: StructuredLLMInput): string {
   return `Interaction ID: ${input.interactionId}\n\nTranscript:\n${input.transcript}`;
 }
 
-function parseAssessmentContent(content: string): ExtractAssessmentResult {
+function parseAssessmentContent(content: string, transcript: string): ExtractAssessmentResult {
   let rawFacts: unknown;
   try {
     rawFacts = JSON.parse(content);
@@ -34,7 +38,7 @@ function parseAssessmentContent(content: string): ExtractAssessmentResult {
     return Result.failure<ExtractedFacts, ExtractAssessmentFailureReason>('invalid_response');
   }
 
-  const parsedFacts = parseExtractedFacts(rawFacts);
+  const parsedFacts = parseExtractedFacts(rawFacts, transcript);
   if (!parsedFacts.ok) {
     return Result.failure<ExtractedFacts, ExtractAssessmentFailureReason>('invalid_response');
   }
@@ -59,6 +63,6 @@ export class AssessmentLLM implements StructuredLLM {
       return Result.failure<ExtractedFacts, ExtractAssessmentFailureReason>('request_failed');
     }
 
-    return parseAssessmentContent(content);
+    return parseAssessmentContent(content, input.transcript);
   }
 }

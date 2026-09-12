@@ -77,4 +77,73 @@ describe('parseExtractedFacts', () => {
       facts: { custody: { concerns: ['losing a key'] } },
     });
   });
+
+  it('resolves evidence offsets from exact transcript quotes', () => {
+    const transcript = 'Client holds 0.5 BTC on Coinbase and worries about exchange risk.';
+    const result = parseExtractedFacts(
+      {
+        custody: {
+          currentArrangement: 'Client holds bitcoin on Coinbase.',
+          concerns: ['Exchange risk'],
+        },
+        evidence: [
+          { factPath: 'custody.currentArrangement', quote: '0.5 BTC on Coinbase' },
+          { factPath: 'custody.concerns[0]', quote: 'exchange risk' },
+        ],
+      },
+      transcript
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.facts.evidence).toHaveLength(2);
+    expect(result.facts.evidence?.[0]).toEqual({
+      factPath: 'custody.currentArrangement',
+      quote: '0.5 BTC on Coinbase',
+      startOffset: transcript.indexOf('0.5 BTC on Coinbase'),
+      endOffset: transcript.indexOf('0.5 BTC on Coinbase') + '0.5 BTC on Coinbase'.length,
+    });
+  });
+
+  it('keeps facts but drops evidence quotes missing from the transcript', () => {
+    const result = parseExtractedFacts(
+      {
+        custody: { currentArrangement: 'multisig' },
+        evidence: [{ factPath: 'custody.currentArrangement', quote: 'not in transcript' }],
+      },
+      'Client uses multisig.'
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      facts: { custody: { currentArrangement: 'multisig' } },
+    });
+  });
+
+  it('rejects non-array evidence payloads', () => {
+    expect(
+      parseExtractedFacts(
+        {
+          custody: { currentArrangement: 'multisig' },
+          evidence: '0.5 BTC on Coinbase',
+        },
+        'Client holds 0.5 BTC on Coinbase.'
+      ).ok
+    ).toBe(false);
+  });
+
+  it('drops evidence with unknown fact paths', () => {
+    const result = parseExtractedFacts(
+      {
+        custody: { currentArrangement: 'multisig' },
+        evidence: [{ factPath: 'custody.unknownField', quote: 'multisig' }],
+      },
+      'Client uses multisig.'
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      facts: { custody: { currentArrangement: 'multisig' } },
+    });
+  });
 });

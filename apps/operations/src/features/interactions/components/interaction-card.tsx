@@ -101,7 +101,11 @@ export function InteractionCard({ row }: Readonly<{ row: InteractionRow }>) {
           ) : null}
 
           {row.status === 'analysis_completed' ? (
-            <ExtractedFactsView facts={row.extractedFacts ?? {}} />
+            <ExtractedFactsView
+              facts={row.extractedFacts ?? {}}
+              transcript={row.transcript}
+              readinessScore={row.readinessScore}
+            />
           ) : null}
 
           {row.status === 'received' ? (
