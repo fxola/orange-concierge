@@ -4,6 +4,8 @@ import type {
   GetClientResult,
   AnalyzeInteractionInput,
   AnalyzeInteractionResult,
+  GetInteractionInput,
+  GetInteractionResult,
   ListClientsInput,
   ListClientsResult,
   ListInteractionsInput,
@@ -17,6 +19,8 @@ export type {
   GetClientResult,
   AnalyzeInteractionInput,
   AnalyzeInteractionResult,
+  GetInteractionInput,
+  GetInteractionResult,
   ListClientsInput,
   ListClientsResult,
   ListInteractionsInput,
@@ -29,6 +33,7 @@ export type Application = Readonly<{
   interaction: {
     submit: (input: SubmitInteractionInput) => Promise<SubmitInteractionResult>;
     analyze: (input: AnalyzeInteractionInput) => Promise<AnalyzeInteractionResult>;
+    getOne: (input: GetInteractionInput) => Promise<GetInteractionResult>;
     list: (input: ListInteractionsInput) => Promise<ListInteractionsResult>;
   };
   clients: {

@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { createStructuredLLM, type AIConfig } from '@orange-concierge/ai';
 import {
   AnalyzeInteraction,
+  GetInteraction,
   GetClient,
   ListClients,
   ListInteractions,
@@ -82,10 +83,12 @@ const buildInteraction = (
     clientRepository,
     interactionsRepo: interactionRepository,
   });
+  const getInteractionUseCase = new GetInteraction({ interactionsRepo: interactionRepository });
 
   return {
     submit: (input) => submitInteractionUseCase.execute(input),
     analyze: (input) => analyzeInteractionUseCase.execute(input),
+    getOne: (input) => getInteractionUseCase.execute(input),
     list: (input) => listInteractionsUseCase.execute(input),
   };
 };
