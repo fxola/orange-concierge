@@ -7,9 +7,13 @@ export {
   clients,
   interactionStatus,
   interactions,
+  KNOWLEDGE_EMBEDDING_DIMENSIONS,
+  knowledgeChunks,
+  knowledgeSources,
   session,
   user,
   verification,
 } from './schema';
 export type { AuditMetadataJson } from './schema';
+export { createDatabaseFromUrl } from './connection';
 export type { OrangeConciergeDB, OrangeConciergeSchema, PostgresClient } from './connection';

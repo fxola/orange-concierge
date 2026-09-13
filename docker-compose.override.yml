@@ -18,13 +18,14 @@ services:
       timeout: 5s
       retries: 12
 
-  # One-shot model bootstrap. Web starts only after the configured model exists.
+  # One-shot model bootstrap. Web starts only after the chat and embedding models exist.
   ollama-pull:
     image: ollama/ollama:latest
     restart: "no"
     environment:
       OLLAMA_HOST: http://ollama:11434
-    command: ["pull", "${AI_MODEL:-llama3.2}"]
+    entrypoint: ["/bin/sh", "-c"]
+    command: "ollama pull ${AI_MODEL:-llama3.2} && ollama pull nomic-embed-text"
     depends_on:
       ollama:
         condition: service_healthy

@@ -14,7 +14,8 @@
     "test": "vitest run --passWithNoTests",
     "generate": "drizzle-kit generate",
     "migrate": "tsx src/database/migrate.ts",
-    "seed": "tsx src/database/seed/cli.ts"
+    "seed": "tsx src/database/seed/cli.ts",
+    "knowledge:index": "tsx src/knowledge/index-cli.ts"
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "^1.7.2",
