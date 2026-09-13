@@ -19,6 +19,7 @@
     "db:generate": "pnpm --filter @orange-concierge/infrastructure generate",
     "db:migrate": "pnpm --filter @orange-concierge/infrastructure migrate",
     "db:seed": "pnpm --filter @orange-concierge/infrastructure seed",
+    "knowledge:index": "pnpm --filter @orange-concierge/infrastructure knowledge:index",
     "docker:up": "docker compose up -d",
     "eval": "pnpm --filter @orange-concierge/ai eval"
   },
