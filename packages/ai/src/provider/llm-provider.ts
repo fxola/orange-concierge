@@ -1,6 +1,8 @@
-export type HTTPResponse = Pick<Response, 'ok' | 'json'>;
+import type { ProviderFetch, ProviderHttpResponse } from './http';
 
-export type LLMProviderFetch = (url: string, init: RequestInit) => Promise<HTTPResponse>;
+export type HTTPResponse = ProviderHttpResponse;
+
+export type LLMProviderFetch = ProviderFetch;
 
 export type StructuredGenerationRequest = Readonly<{
   systemPrompt: string;

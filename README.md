@@ -15,23 +15,24 @@ Orange Concierge is a self-hosted AI copilot that helps Bitcoin consultants turn
 
 - Copy the sample env to your .env file
 
-```
-bash
+```bash
 cp .env.development.example .env
 ```
 
 - And run the following commands.
 
 ```bash
-
 pnpm install
 docker compose up -d db ollama ollama-pull
 pnpm db:migrate
 pnpm db:seed
+pnpm knowledge:index
 pnpm dev
 ```
 
 - Then Open: http://localhost:3000.
+
+`ollama-pull` fetches the configured chat model plus `nomic-embed-text` for `pnpm knowledge:index`.
 
 ## Run Locally With Gemini Cloud
 
@@ -43,18 +44,27 @@ pnpm install
 ```
 
 - Edit your .env file:
-  AI_PROVIDER=gemini
-  AI_MODEL=gemini-1.5-flash
-  AI_API_KEY=your-gemini-api-key
-  AI_BASE_URL=https://generativelanguage.googleapis.com/v1beta
+
+```bash
+AI_PROVIDER=gemini
+AI_MODEL=gemini-1.5-flash
+AI_API_KEY=your-gemini-api-key
+AI_BASE_URL=https://generativelanguage.googleapis.com/v1beta
+```
+
 - Then run only Postgres:
-  ```
-   docker compose up -d db
-   pnpm db:migrate
-   pnpm db:seed
-   pnpm dev
-  ```
+
+```bash
+docker compose up -d db
+pnpm db:migrate
+pnpm db:seed
+pnpm knowledge:index
+pnpm dev
+```
+
 - And Open: http://localhost:3000
+
+Gemini extraction uses `AI_MODEL`; knowledge indexing uses `text-embedding-004`.
 
 ## Useful Commands
 
@@ -62,4 +72,5 @@ pnpm install
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm knowledge:index
 ```

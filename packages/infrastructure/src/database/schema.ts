@@ -2,6 +2,7 @@ import type { ExtractedFacts } from '@orange-concierge/core';
 import {
   boolean,
   index,
+  integer,
   jsonb,
   pgEnum,
   pgTable,
@@ -9,6 +10,7 @@ import {
   timestamp,
   uniqueIndex,
   uuid,
+  vector,
 } from 'drizzle-orm/pg-core';
 
 export type AuditMetadataJson = Readonly<Record<string, string | number | boolean | null>>;
@@ -64,6 +66,40 @@ export const auditEvents = pgTable('audit_events', {
   occurredAt: timestamp('occurred_at', { mode: 'date', withTimezone: true }).notNull(),
   metadata: jsonb('metadata').$type<AuditMetadataJson | null>(),
 });
+
+export const KNOWLEDGE_EMBEDDING_DIMENSIONS = 768;
+
+export const knowledgeSources = pgTable('knowledge_sources', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  path: text('path').notNull().unique(),
+  contentHash: text('content_hash').notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date', withTimezone: true }).notNull(),
+});
+
+export const knowledgeChunks = pgTable(
+  'knowledge_chunks',
+  {
+    id: text('id').primaryKey(),
+    sourceId: text('source_id')
+      .notNull()
+      .references(() => knowledgeSources.id, { onDelete: 'cascade' }),
+    sourceTitle: text('source_title').notNull(),
+    sourcePath: text('source_path').notNull(),
+    heading: text('heading'),
+    chunkIndex: integer('chunk_index').notNull(),
+    content: text('content').notNull(),
+    contentHash: text('content_hash').notNull(),
+    embedding: vector('embedding', { dimensions: KNOWLEDGE_EMBEDDING_DIMENSIONS }).notNull(),
+    embeddingModel: text('embedding_model').notNull(),
+    embeddingDimensions: integer('embedding_dimensions').notNull(),
+    updatedAt: timestamp('updated_at', { mode: 'date', withTimezone: true }).notNull(),
+  },
+  (table) => [
+    index('knowledge_chunks_source_id_idx').on(table.sourceId),
+    uniqueIndex('knowledge_chunks_source_chunk_unique').on(table.sourceId, table.chunkIndex),
+  ]
+);
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
