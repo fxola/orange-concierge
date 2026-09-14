@@ -81,6 +81,22 @@ export class InvalidPaginationError extends Error {
   }
 }
 
+export class InvalidKnowledgeSearchQueryError extends Error {
+  readonly code = 'invalid_knowledge_search_query';
+  constructor() {
+    super('Knowledge search query must not be blank');
+    this.name = 'InvalidKnowledgeSearchQueryError';
+  }
+}
+
+export class InvalidKnowledgeSearchLimitError extends Error {
+  readonly code = 'invalid_knowledge_search_limit';
+  constructor() {
+    super('Knowledge search limit must be between 1 and 20');
+    this.name = 'InvalidKnowledgeSearchLimitError';
+  }
+}
+
 export class UnauthorizedViewClientsError extends Error {
   readonly code = 'unauthorized_view';
   constructor(role: Actor['role']) {

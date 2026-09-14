@@ -6,10 +6,14 @@ import {
 import { parseClientId } from '../client/client-id';
 import { Result } from '../result';
 import { canViewInteractions } from './policy';
-import type { GetInteractionDependencies, GetInteractionInput, GetInteractionResult } from './types';
+import type {
+  GetInteractionDependencies,
+  GetInteractionInput,
+  GetInteractionResult,
+} from './types';
 
 export class GetInteraction {
-  constructor(private readonly dependencies: GetInteractionDependencies) {}
+  constructor(private readonly deps: GetInteractionDependencies) {}
 
   async execute(input: GetInteractionInput): Promise<GetInteractionResult> {
     const { actor, clientId, interactionId } = input;
@@ -23,7 +27,7 @@ export class GetInteraction {
       return Result.failure(new InvalidClientIdError());
     }
 
-    const interaction = await this.dependencies.interactionsRepo.findById(interactionId);
+    const interaction = await this.deps.interactionsRepo.findById(interactionId);
     if (!interaction || interaction.clientId !== parsedClientId.clientId) {
       return Result.failure(new InteractionNotFoundError(interactionId));
     }

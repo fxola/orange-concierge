@@ -2,6 +2,7 @@ export { AnalyzeInteraction } from './application/interaction/analyze-interactio
 export { GetInteraction } from './application/interaction/get-interaction';
 export { ListInteractions } from './application/interaction/list-interactions';
 export { SubmitInteraction } from './application/interaction/submit-interaction';
+export { SearchKnowledge } from './application/knowledge/search-knowledge';
 export { ListClients } from './application/client/list-clients';
 export { GetClient } from './application/client/get-client';
 export {
@@ -17,7 +18,10 @@ export {
   canSubmitInteractions,
   canViewInteractions,
 } from './application/interaction/policy';
-export { extractedFactsSchema, parseExtractedFacts } from './application/interaction/extracted-facts';
+export {
+  extractedFactsSchema,
+  parseExtractedFacts,
+} from './application/interaction/extracted-facts';
 export { calculateReadinessScore } from './domain/readiness-score';
 export { Result } from './application/result';
 
@@ -25,6 +29,8 @@ export {
   BlankTranscriptError,
   ClientNotFoundError,
   InvalidClientIdError,
+  InvalidKnowledgeSearchLimitError,
+  InvalidKnowledgeSearchQueryError,
   InvalidPaginationError,
   UnauthorizedViewClientsError,
   InteractionAnalysisFailedError,
@@ -69,6 +75,13 @@ export type {
   ListClientsInput,
   ListClientsResult,
 } from './application/client/types';
+export type {
+  SearchKnowledgeDependencies,
+  SearchKnowledgeError,
+  SearchKnowledgeInput,
+  SearchKnowledgeResult,
+  SearchKnowledgeSuccess,
+} from './application/knowledge/types';
 export type { Actor, ActorRole } from './domain/actor';
 export { isActorRole } from './domain/actor';
 export type { Client } from './domain/client';
@@ -85,6 +98,11 @@ export type {
   AuditResourceType,
 } from './ports/audit';
 export type { InteractionRepository } from './ports/interaction-repository';
+export type {
+  KnowledgeRetriever,
+  KnowledgeSearchHit,
+  KnowledgeSearchRequest,
+} from './ports/knowledge-search';
 export type { ClientRepository } from './ports/client-repository';
 export type {
   TransactionManager,
