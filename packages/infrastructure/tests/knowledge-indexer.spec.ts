@@ -8,7 +8,7 @@ import { indexKnowledgeCorpus } from '../src/knowledge/indexer.js';
 import {
   InMemoryKnowledgeEmbedder,
   inMemoryKnowledgeIndexRepository,
-} from '../src/knowledge/adapters/in-memory-adapters.js';
+} from '../src/adapters/knowledge/in-memory-adapters';
 
 describe('indexKnowledgeCorpus', () => {
   it('reads the seeded Markdown corpus into stable chunks', async () => {

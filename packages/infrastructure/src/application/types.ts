@@ -10,6 +10,8 @@ import type {
   ListClientsResult,
   ListInteractionsInput,
   ListInteractionsResult,
+  SearchKnowledgeInput,
+  SearchKnowledgeResult,
   SubmitInteractionInput,
   SubmitInteractionResult,
 } from '@orange-concierge/core';
@@ -25,6 +27,8 @@ export type {
   ListClientsResult,
   ListInteractionsInput,
   ListInteractionsResult,
+  SearchKnowledgeInput,
+  SearchKnowledgeResult,
 };
 export type { SubmitInteractionInput, SubmitInteractionResult };
 
@@ -39,5 +43,8 @@ export type Application = Readonly<{
   clients: {
     getAll: (input: ListClientsInput) => Promise<ListClientsResult>;
     getOne: (input: GetClientInput) => Promise<GetClientResult>;
+  };
+  knowledge: {
+    search: (input: SearchKnowledgeInput) => Promise<SearchKnowledgeResult>;
   };
 }>;

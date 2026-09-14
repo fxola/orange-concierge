@@ -7,6 +7,7 @@ import {
   GetClient,
   ListClients,
   ListInteractions,
+  SearchKnowledge,
   SubmitInteraction,
 } from '@orange-concierge/core';
 import { PatternSecretScanner } from '@orange-concierge/security';
@@ -19,6 +20,8 @@ import { createDatabaseFromUrl, OrangeConciergeDB } from '../database/connection
 import { config, type BackendConfig } from './config';
 import type { Application } from './types';
 import { DrizzleClientRepository } from '../adapters/client/drizzle-client-repository';
+import { DrizzleKnowledgeSearch } from '../adapters/knowledge/drizzle-knowledge-search';
+import { createKnowledgeEmbedder } from '../knowledge/embedder-factory';
 
 type ApplicationRuntime = Readonly<{
   application: Application;
@@ -41,11 +44,13 @@ const createApplicationRuntime = (runtimeConfig: BackendConfig): ApplicationRunt
   const auth = createAuth({ db, baseURL, secret, trustedOrigins });
   const interaction = buildInteraction(db, transactionManager, clientRepository, runtimeConfig.ai);
   const clients = buildClients(clientRepository);
+  const knowledge = buildKnowledge(db, runtimeConfig.ai);
 
   const application: Application = {
     auth,
     interaction,
     clients,
+    knowledge,
   };
 
   return {
@@ -99,6 +104,15 @@ const buildClients = (clientRepository: DrizzleClientRepository): Application['c
   return {
     getAll: (input) => listClientsUseCase.execute(input),
     getOne: (input) => getClientUseCase.execute(input),
+  };
+};
+
+const buildKnowledge = (db: OrangeConciergeDB, aiConfig: AIConfig): Application['knowledge'] => {
+  const KnowledgeRetriever = new DrizzleKnowledgeSearch(db, createKnowledgeEmbedder(aiConfig));
+  const searchKnowledgeUseCase = new SearchKnowledge({ KnowledgeRetriever });
+
+  return {
+    search: (input) => searchKnowledgeUseCase.execute(input),
   };
 };
 

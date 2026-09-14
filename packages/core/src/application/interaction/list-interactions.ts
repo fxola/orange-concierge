@@ -14,7 +14,7 @@ import type {
 } from './types';
 
 export class ListInteractions {
-  constructor(private readonly dependencies: ListInteractionsDependencies) {}
+  constructor(private readonly deps: ListInteractionsDependencies) {}
 
   async execute(input: ListInteractionsInput): Promise<ListInteractionsResult> {
     const { actor, clientId, limit, offset } = input;
@@ -33,7 +33,7 @@ export class ListInteractions {
       return Result.failure(new InvalidPaginationError());
     }
 
-    const { clientRepository, interactionsRepo } = this.dependencies;
+    const { clientRepository, interactionsRepo } = this.deps;
 
     const clientExists = await clientRepository.exists(parsedClientId.clientId);
     if (!clientExists) {
