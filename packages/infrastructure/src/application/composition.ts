@@ -1,8 +1,13 @@
 import { randomUUID } from 'node:crypto';
 
-import { createStructuredLLM, type AIConfig } from '@orange-concierge/ai';
+import {
+  createRecommendationDrafter,
+  createStructuredLLM,
+  type AIConfig,
+} from '@orange-concierge/ai';
 import {
   AnalyzeInteraction,
+  GenerateRecommendations,
   GetInteraction,
   GetClient,
   ListClients,
@@ -45,12 +50,14 @@ const createApplicationRuntime = (runtimeConfig: BackendConfig): ApplicationRunt
   const interaction = buildInteraction(db, transactionManager, clientRepository, runtimeConfig.ai);
   const clients = buildClients(clientRepository);
   const knowledge = buildKnowledge(db, runtimeConfig.ai);
+  const recommendations = buildRecommendations(db, runtimeConfig.ai);
 
   const application: Application = {
     auth,
     interaction,
     clients,
     knowledge,
+    recommendations,
   };
 
   return {
@@ -113,6 +120,24 @@ const buildKnowledge = (db: OrangeConciergeDB, aiConfig: AIConfig): Application[
 
   return {
     search: (input) => searchKnowledgeUseCase.execute(input),
+  };
+};
+
+const buildRecommendations = (
+  db: OrangeConciergeDB,
+  aiConfig: AIConfig
+): Application['recommendations'] => {
+  const interactionsRepo = new DrizzleInteractionRepository(db);
+  const KnowledgeRetriever = new DrizzleKnowledgeSearch(db, createKnowledgeEmbedder(aiConfig));
+  const recommendationDrafter = createRecommendationDrafter(aiConfig);
+  const generateRecommendationsUseCase = new GenerateRecommendations({
+    interactionsRepo,
+    KnowledgeRetriever,
+    recommendationDrafter,
+  });
+
+  return {
+    generate: (input) => generateRecommendationsUseCase.execute(input),
   };
 };
 

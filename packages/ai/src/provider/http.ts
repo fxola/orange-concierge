@@ -53,6 +53,31 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
 
+export function readRequiredString(value: unknown): string | null {
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+export function readStringArray(value: unknown): string[] | null {
+  if (!Array.isArray(value)) {
+    return null;
+  }
+
+  const strings: string[] = [];
+  for (const item of value) {
+    const stringItem = readRequiredString(item);
+    if (!stringItem) {
+      return null;
+    }
+    strings.push(stringItem);
+  }
+
+  return strings;
+}
 export async function postProviderJson(input: PostProviderJsonInput): Promise<unknown> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), input.timeoutMs);
@@ -103,7 +128,8 @@ function createProviderJsonError(
   input: PostProviderJsonInput,
   errorInput: ProviderJsonErrorInput
 ): Error {
-  const error = input.createError?.(errorInput) ?? new Error(errorInput.message, { cause: errorInput.cause });
+  const error =
+    input.createError?.(errorInput) ?? new Error(errorInput.message, { cause: errorInput.cause });
   providerJsonErrors.add(error);
   return error;
 }

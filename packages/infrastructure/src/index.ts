@@ -3,6 +3,8 @@ export type {
   Application,
   AnalyzeInteractionInput,
   AnalyzeInteractionResult,
+  GenerateRecommendationsInput,
+  GenerateRecommendationsResult,
   ListInteractionsInput,
   ListInteractionsResult,
   SubmitInteractionInput,
