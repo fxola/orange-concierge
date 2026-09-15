@@ -1,4 +1,5 @@
 export {
+  createRecommendationDrafter,
   createStructuredLLM,
   type AIConfig,
 } from './factory';
@@ -25,3 +26,7 @@ export {
 export {
   AssessmentLLM,
 } from './structured/assessment-llm';
+
+export {
+  RecommendationLLM,
+} from './structured/recommendation-llm';

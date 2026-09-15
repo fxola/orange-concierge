@@ -8,7 +8,7 @@ import {
   type KnowledgeSearchHit,
   type SearchKnowledgeResult,
 } from '../../src';
-import { InMemoryKnowledgeSearch } from '../support/in-memory-adapters/inMemoryKnowledgeSearch';
+import { InMemoryKnowledgeRetriever } from '../support/in-memory-adapters/inMemoryKnowledgeRetriever';
 
 const feature = await loadFeature('tests/features/search-knowledge.feature');
 
@@ -25,11 +25,11 @@ const expectedHit: KnowledgeSearchHit = {
 
 describeFeature(feature, ({ Scenario }) => {
   Scenario('Retrieve ranked guidance with source context', ({ Given, When, Then }) => {
-    let KnowledgeRetriever: InMemoryKnowledgeSearch;
+    let KnowledgeRetriever: InMemoryKnowledgeRetriever;
     let result: SearchKnowledgeResult;
     let searchSpy: ReturnType<typeof vi.spyOn>;
     Given('internal custody guidance has been indexed', () => {
-      KnowledgeRetriever = new InMemoryKnowledgeSearch([expectedHit]);
+      KnowledgeRetriever = new InMemoryKnowledgeRetriever([], [expectedHit]);
       searchSpy = vi.spyOn(KnowledgeRetriever, 'search');
     });
 
@@ -53,12 +53,12 @@ describeFeature(feature, ({ Scenario }) => {
   Scenario(
     'Reject blank search query without touching the retriever',
     ({ Given, When, Then, And }) => {
-      let KnowledgeRetriever: InMemoryKnowledgeSearch;
+      let KnowledgeRetriever: InMemoryKnowledgeRetriever;
       let result: SearchKnowledgeResult;
       let searchSpy: ReturnType<typeof vi.spyOn>;
 
       Given('internal custody guidance has been indexed', () => {
-        KnowledgeRetriever = new InMemoryKnowledgeSearch([expectedHit]);
+        KnowledgeRetriever = new InMemoryKnowledgeRetriever([], [expectedHit]);
         searchSpy = vi.spyOn(KnowledgeRetriever, 'search');
       });
 
@@ -83,12 +83,12 @@ describeFeature(feature, ({ Scenario }) => {
   Scenario(
     'Reject invalid result limit without touching the retriever',
     ({ Given, When, Then, And }) => {
-      let KnowledgeRetriever: InMemoryKnowledgeSearch;
+      let KnowledgeRetriever: InMemoryKnowledgeRetriever;
       let result: SearchKnowledgeResult;
       let searchSpy: ReturnType<typeof vi.spyOn>;
 
       Given('internal custody guidance has been indexed', () => {
-        KnowledgeRetriever = new InMemoryKnowledgeSearch([expectedHit]);
+        KnowledgeRetriever = new InMemoryKnowledgeRetriever([], [expectedHit]);
         searchSpy = vi.spyOn(KnowledgeRetriever, 'search');
       });
 
