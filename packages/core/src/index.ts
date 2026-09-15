@@ -3,6 +3,7 @@ export { GetInteraction } from './application/interaction/get-interaction';
 export { ListInteractions } from './application/interaction/list-interactions';
 export { SubmitInteraction } from './application/interaction/submit-interaction';
 export { SearchKnowledge } from './application/knowledge/search-knowledge';
+export { GenerateRecommendations } from './application/recommendation/generate-recommendations';
 export { ListClients } from './application/client/list-clients';
 export { GetClient } from './application/client/get-client';
 export {
@@ -82,6 +83,14 @@ export type {
   SearchKnowledgeResult,
   SearchKnowledgeSuccess,
 } from './application/knowledge/types';
+export type {
+  GenerateRecommendationsDependencies,
+  GenerateRecommendationsError,
+  GenerateRecommendationsInput,
+  GenerateRecommendationsResult,
+  GenerateRecommendationsSuccess,
+  GroundedRecommendation,
+} from './application/recommendation/types';
 export type { Actor, ActorRole } from './domain/actor';
 export { isActorRole } from './domain/actor';
 export type { Client } from './domain/client';
@@ -102,7 +111,15 @@ export type {
   KnowledgeRetriever,
   KnowledgeSearchHit,
   KnowledgeSearchRequest,
-} from './ports/knowledge-search';
+} from './ports/knowledge-retriever';
+export type {
+  DraftRecommendation,
+  RecommendationDrafter,
+  RecommendationDraftingFailureReason,
+  RecommendationDraftingInput,
+  RecommendationDraftingResult,
+  RecommendationPriority,
+} from './ports/recommendation-drafter';
 export type { ClientRepository } from './ports/client-repository';
 export type {
   TransactionManager,

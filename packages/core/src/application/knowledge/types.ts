@@ -1,4 +1,4 @@
-import type { KnowledgeRetriever, KnowledgeSearchHit } from '../../ports/knowledge-search';
+import type { KnowledgeRetriever, KnowledgeSearchHit } from '../../ports/knowledge-retriever';
 import type {
   InvalidKnowledgeSearchLimitError,
   InvalidKnowledgeSearchQueryError,
@@ -18,6 +18,8 @@ export type SearchKnowledgeSuccess = Readonly<{
   results: readonly KnowledgeSearchHit[];
 }>;
 
-export type SearchKnowledgeError = InvalidKnowledgeSearchQueryError | InvalidKnowledgeSearchLimitError;
+export type SearchKnowledgeError =
+  | InvalidKnowledgeSearchQueryError
+  | InvalidKnowledgeSearchLimitError;
 
 export type SearchKnowledgeResult = Result<SearchKnowledgeSuccess, SearchKnowledgeError>;
