@@ -8,7 +8,7 @@ import {
   type SubmitRecommendationForReviewResult,
 } from '../../../src';
 import { RecordingAudit } from '../in-memory-adapters/inMemoryAuditPort';
-import { InMemoryRecommendationReviewTransactionManager } from '../in-memory-adapters/inMemoryRecommendationReviewTransactionManager';
+import { InMemoryRecommendationReviewTransactionManager } from '../in-memory-adapters/inMemoryRecommendationTransactionManager';
 import { InMemoryRecommendationRepository } from '../in-memory-adapters/inMemoryRecommendationRepository';
 
 type ReviewableRecommendation = Recommendation &

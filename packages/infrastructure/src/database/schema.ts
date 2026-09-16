@@ -1,4 +1,4 @@
-import type { ExtractedFacts } from '@orange-concierge/core';
+import type { EvidenceReference, ExtractedFacts, KnowledgeSearchHit } from '@orange-concierge/core';
 import {
   boolean,
   index,
@@ -38,6 +38,15 @@ export const auditResourceType = pgEnum('audit_resource_type', [
   'recommendation',
 ]);
 
+export const recommendationStatus = pgEnum('recommendation_status', [
+  'draft',
+  'pending_review',
+  'approved',
+  'rejected',
+]);
+
+export const recommendationPriority = pgEnum('recommendation_priority', ['low', 'medium', 'high']);
+
 export const clients = pgTable('clients', {
   id: text('id').primaryKey(),
   displayName: text('display_name').notNull(),
@@ -54,6 +63,32 @@ export const interactions = pgTable('interactions', {
   transcript: text('transcript').notNull(),
   extractedFacts: jsonb('extracted_facts').$type<ExtractedFacts>(),
   createdAt: timestamp('created_at', { mode: 'date', withTimezone: true }).notNull(),
+});
+
+export const recommendations = pgTable('recommendations', {
+  id: text('id').primaryKey(),
+  clientId: text('client_id')
+    .notNull()
+    .references(() => clients.id),
+  interactionId: text('interaction_id')
+    .notNull()
+    .references(() => interactions.id),
+  status: recommendationStatus('status').notNull(),
+  title: text('title').notNull(),
+  rationale: text('rationale').notNull(),
+  summary: text('summary'),
+  priority: recommendationPriority('priority'),
+  clientEvidence: jsonb('client_evidence').$type<EvidenceReference[]>(),
+  knowledgeCitations: jsonb('knowledge_citations').$type<KnowledgeSearchHit[]>(),
+  createdAt: timestamp('created_at', {
+    mode: 'date',
+    withTimezone: true,
+  }).notNull(),
+  reviewerId: text('reviewer_id'),
+  reviewedAt: timestamp('reviewed_at', {
+    mode: 'date',
+    withTimezone: true,
+  }),
 });
 
 export const auditEvents = pgTable('audit_events', {

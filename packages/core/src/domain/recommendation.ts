@@ -1,8 +1,8 @@
-export type RecommendationStatus =
-  | 'draft'
-  | 'pending_review'
-  | 'approved'
-  | 'rejected';
+import type { EvidenceReference } from '../application/interaction/extracted-facts';
+import type { KnowledgeSearchHit } from '../ports/knowledge-retriever';
+import type { RecommendationPriority } from '../ports/recommendation-drafter';
+
+export type RecommendationStatus = 'draft' | 'pending_review' | 'approved' | 'rejected';
 
 export type Recommendation = Readonly<{
   id: string;
@@ -11,6 +11,10 @@ export type Recommendation = Readonly<{
   status: RecommendationStatus;
   title: string;
   rationale: string;
+  summary: string;
+  priority: RecommendationPriority;
+  clientEvidence?: readonly EvidenceReference[];
+  knowledgeCitations?: readonly KnowledgeSearchHit[];
   createdAt: Date;
   reviewerId?: string;
   reviewedAt?: Date;

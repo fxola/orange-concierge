@@ -15,12 +15,11 @@ export interface InteractionTransactionalPorts {
   audit: AuditPort;
 }
 
-export interface RecommendationReviewTransactionalPorts {
+export interface RecommendationTransactionalPorts {
   recommendations: TransactionalWriter<Recommendation>;
   audit: AuditPort;
 }
 
 export type InteractionTransactionManager = TransactionManager<InteractionTransactionalPorts>;
 
-export type RecommendationReviewTransactionManager =
-  TransactionManager<RecommendationReviewTransactionalPorts>;
+export type RecommendationTransactionManager = TransactionManager<RecommendationTransactionalPorts>;

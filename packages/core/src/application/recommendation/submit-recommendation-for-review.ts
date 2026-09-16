@@ -18,15 +18,14 @@ export class SubmitRecommendationForReview {
   async execute(
     input: SubmitRecommendationForReviewInput
   ): Promise<SubmitRecommendationForReviewResult> {
-    if (!canSubmitRecommendationsForReview(input.actor)) {
-      return Result.failure(new UnauthorizedSubmitRecommendationForReviewError(input.actor.role));
+    const { actor, recommendationId } = input;
+    if (!canSubmitRecommendationsForReview(actor)) {
+      return Result.failure(new UnauthorizedSubmitRecommendationForReviewError(actor.role));
     }
 
-    const recommendation = await this.deps.recommendationRepository.findById(
-      input.recommendationId
-    );
+    const recommendation = await this.deps.recommendationRepository.findById(recommendationId);
     if (!recommendation) {
-      return Result.failure(new RecommendationNotFoundError(input.recommendationId));
+      return Result.failure(new RecommendationNotFoundError(recommendationId));
     }
 
     if (recommendation.status !== 'draft') {

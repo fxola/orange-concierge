@@ -1,14 +1,13 @@
-import type {
-  AuditEvent,
-  RecommendationReviewTransactionManager,
-  RecommendationReviewTransactionalPorts,
-  TransactionalWriter,
-} from '../../../src';
+import type { AuditEvent, TransactionalWriter } from '../../../src';
 import type { Recommendation } from '../../../src/domain/recommendation';
+import {
+  RecommendationTransactionalPorts,
+  RecommendationTransactionManager,
+} from '../../../src/ports/transaction-manager';
 import type { RecordingAudit } from './inMemoryAuditPort';
 import type { InMemoryRecommendationRepository } from './inMemoryRecommendationRepository';
 
-export class InMemoryRecommendationReviewTransactionManager implements RecommendationReviewTransactionManager {
+export class InMemoryRecommendationReviewTransactionManager implements RecommendationTransactionManager {
   private failTransactionalAuditNext = false;
 
   constructor(
@@ -20,7 +19,7 @@ export class InMemoryRecommendationReviewTransactionManager implements Recommend
     this.failTransactionalAuditNext = true;
   }
 
-  async execute<T>(work: (tx: RecommendationReviewTransactionalPorts) => Promise<T>): Promise<T> {
+  async execute<T>(work: (tx: RecommendationTransactionalPorts) => Promise<T>): Promise<T> {
     const recommendationSnapshot = this.recommendationRepository.snapshot();
     const auditSnapshot = this.audit.snapshot();
 
@@ -28,7 +27,7 @@ export class InMemoryRecommendationReviewTransactionManager implements Recommend
       save: (recommendation: Recommendation) => this.recommendationRepository.save(recommendation),
     };
 
-    const tx: RecommendationReviewTransactionalPorts = {
+    const tx: RecommendationTransactionalPorts = {
       recommendations,
       audit: {
         record: async (event: AuditEvent) => {

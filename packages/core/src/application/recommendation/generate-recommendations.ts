@@ -1,4 +1,5 @@
 import { calculateReadinessScore } from '../../domain/readiness-score';
+import { Recommendation } from '../../domain/recommendation';
 import {
   InteractionAnalysisFailedError,
   InteractionNotFoundError,
@@ -7,7 +8,7 @@ import {
 import { buildKnowledgeQuery } from '../knowledge/build-knowledge-query';
 import { Result } from '../result';
 import { groundRecommendations } from './ground-recommendations';
-import type {
+import {
   GenerateRecommendationsDependencies,
   GenerateRecommendationsInput,
   GenerateRecommendationsResult,
@@ -29,7 +30,7 @@ export class GenerateRecommendations {
     const facts = interaction.extractedFacts;
     const clientEvidence = facts.evidence ?? [];
     const readinessScore = calculateReadinessScore(facts);
-    const knowledge = await this.deps.KnowledgeRetriever.search({
+    const knowledge = await this.deps.knowledgeRetriever.search({
       query: buildKnowledgeQuery(facts),
       limit: 3,
     });
@@ -45,10 +46,33 @@ export class GenerateRecommendations {
       return Result.failure(new RecommendationDraftingFailedError(draftResult.getError()));
     }
 
-    const recommendations = groundRecommendations({
+    const grounded = groundRecommendations({
       drafts: draftResult.getValue(),
       clientEvidence,
       knowledge,
+    });
+
+    if (grounded.length === 0) {
+      return Result.success({ recommendations: [] });
+    }
+
+    const now = this.deps.now();
+    const recommendations = grounded.map((item) => ({
+      id: this.deps.newRecommendationId(),
+      ...item,
+    }));
+
+    await this.deps.transactionManager.execute(async (tx) => {
+      for (const recommendation of recommendations) {
+        await tx.recommendations.save({
+          ...recommendation,
+          clientId: interaction.clientId,
+          interactionId: interaction.id,
+          status: 'draft',
+          rationale: recommendation.summary,
+          createdAt: now,
+        });
+      }
     });
 
     return Result.success({ recommendations });

@@ -14,7 +14,7 @@ import type {
 import type { InteractionRepository } from '../../ports/interaction-repository';
 import type { KnowledgeRetriever, KnowledgeSearchHit } from '../../ports/knowledge-retriever';
 import type { RecommendationRepository } from '../../ports/recommendation-repository';
-import type { RecommendationReviewTransactionManager } from '../../ports/transaction-manager';
+import type { RecommendationTransactionManager } from '../../ports/transaction-manager';
 import type {
   RecommendationDrafter,
   RecommendationPriority,
@@ -28,8 +28,11 @@ export type GenerateRecommendationsInput = Readonly<{
 
 export type GenerateRecommendationsDependencies = Readonly<{
   interactionsRepo: InteractionRepository;
-  KnowledgeRetriever: KnowledgeRetriever;
+  knowledgeRetriever: KnowledgeRetriever;
   recommendationDrafter: RecommendationDrafter;
+  transactionManager: RecommendationTransactionManager;
+  newRecommendationId: () => string;
+  now: () => Date;
 }>;
 
 export type GroundedRecommendation = Readonly<{
@@ -83,7 +86,7 @@ export type ReviewRecommendationInput = Readonly<{
 
 export type ReviewRecommendationDependencies = Readonly<{
   recommendationRepository: RecommendationRepository;
-  transactionManager: RecommendationReviewTransactionManager;
+  transactionManager: RecommendationTransactionManager;
   now: () => Date;
 }>;
 

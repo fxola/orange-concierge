@@ -20,6 +20,7 @@ import { PatternSecretScanner } from '@orange-concierge/security';
 import { DrizzleAuditPort } from '../adapters/audit/drizzle-audit-port';
 import { DrizzleTransactionManager } from '../adapters/interaction/drizzle-transaction-manager';
 import { DrizzleInteractionRepository } from '../adapters/interaction/drizzle-interaction-repository';
+import { DrizzleRecommendationTransactionManager } from '../adapters/recommendation/drizzle-recommendation-transaction-manager';
 import { createAuth } from '../auth';
 import { createDatabaseFromUrl, OrangeConciergeDB } from '../database/connection';
 import { config, type BackendConfig } from './config';
@@ -128,12 +129,16 @@ const buildRecommendations = (
   aiConfig: AIConfig
 ): Application['recommendations'] => {
   const interactionsRepo = new DrizzleInteractionRepository(db);
-  const KnowledgeRetriever = new DrizzleKnowledgeSearch(db, createKnowledgeEmbedder(aiConfig));
+  const knowledgeRetriever = new DrizzleKnowledgeSearch(db, createKnowledgeEmbedder(aiConfig));
   const recommendationDrafter = createRecommendationDrafter(aiConfig);
+  const transactionManager = new DrizzleRecommendationTransactionManager(db);
   const generateRecommendationsUseCase = new GenerateRecommendations({
     interactionsRepo,
-    KnowledgeRetriever,
+    knowledgeRetriever,
     recommendationDrafter,
+    transactionManager,
+    newRecommendationId: randomUUID,
+    now: () => new Date(),
   });
 
   return {

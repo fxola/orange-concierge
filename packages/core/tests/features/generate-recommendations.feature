@@ -8,6 +8,14 @@ Feature: Generate recommendations
     Then knowledge is retrieved before recommendations are drafted
     And the grounded recommendation is returned with client evidence and knowledge citations
 
+  Scenario: Persist grounded recommendations as draft records
+    Given an analyzed interaction has extracted facts with transcript evidence
+    And relevant internal guidance is retrieved
+    And the recommendation drafter returns a cited recommendation
+    When recommendations are generated for the interaction
+    Then a draft recommendation is saved with client evidence and knowledge citations
+    And the generated recommendation response includes the persisted recommendation id
+
   Scenario: Drop recommendation without known knowledge citation
     Given an analyzed interaction has extracted facts with transcript evidence
     And relevant internal guidance is retrieved

@@ -41,13 +41,13 @@ export class ReviewRecommendation {
       reviewedAt,
     };
     const auditEvent: AuditEvent = {
-      actor: input.actor,
+      actor,
       action: 'recommendation_reviewed',
       resource: { type: 'recommendation', id: recommendation.id },
       occurredAt: reviewedAt,
       metadata: {
         previousStatus,
-        newStatus: input.decision,
+        newStatus: decision,
         interactionId: recommendation.interactionId,
         clientId: recommendation.clientId,
       },

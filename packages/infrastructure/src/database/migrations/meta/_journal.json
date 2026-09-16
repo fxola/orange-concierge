@@ -29,6 +29,13 @@
       "when": 1789335491361,
       "tag": "0003_add_knowledge_index_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789559629763,
+      "tag": "0004_add_recommendations_table",
+      "breakpoints": true
     }
   ]
 }

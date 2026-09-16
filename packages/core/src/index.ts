@@ -146,8 +146,8 @@ export type { ClientRepository } from './ports/client-repository';
 export type {
   InteractionTransactionManager,
   InteractionTransactionalPorts,
-  RecommendationReviewTransactionManager,
-  RecommendationReviewTransactionalPorts,
+  RecommendationTransactionManager,
+  RecommendationTransactionalPorts,
   TransactionManager,
   TransactionalWriter,
 } from './ports/transaction-manager';
