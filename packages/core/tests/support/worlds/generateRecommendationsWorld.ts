@@ -126,6 +126,10 @@ export function generateRecommendationsWorld() {
       ]);
     },
 
+    givenRecommendationDrafterRequestFails() {
+      recommendationDrafter = new InMemoryRecommendationDrafter(operations, [], 'request_failed');
+    },
+
     async generateRecommendations() {
       result = await new GenerateRecommendations({
         interactionsRepo: required(interactionsRepo, 'interactionsRepo'),

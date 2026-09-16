@@ -108,4 +108,33 @@ describeFeature(feature, ({ Scenario }) => {
       });
     }
   );
+
+  Scenario('Fail when recommendation drafting fails', ({ Given, And, When, Then }) => {
+    const world = generateRecommendationsWorld();
+    let result: GenerateRecommendationsResult;
+
+    Given('an analyzed interaction has extracted facts with transcript evidence', () => {
+      world.givenAnalyzedInteractionWithEvidence();
+    });
+
+    And('relevant internal guidance is retrieved', () => {
+      world.givenRelevantInternalGuidanceIsRetrieved();
+    });
+
+    And('the recommendation drafter request fails', () => {
+      world.givenRecommendationDrafterRequestFails();
+    });
+
+    When('recommendations are generated for the interaction', async () => {
+      result = await world.generateRecommendations();
+    });
+
+    Then('recommendation drafting failure is returned', () => {
+      expect(result.isFailure()).toBe(true);
+      expect(result.getError()).toMatchObject({
+        code: 'recommendation_drafting_failed',
+        reason: 'request_failed',
+      });
+    });
+  });
 });

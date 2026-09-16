@@ -1,4 +1,5 @@
 import { Actor } from '../domain/actor';
+import type { RecommendationDraftingFailureReason } from '../ports/recommendation-drafter';
 
 export class UnauthorizedAnalyzeInteractionError extends Error {
   readonly code = 'unauthorized_analyze';
@@ -29,6 +30,17 @@ export class InteractionAnalysisFailedError extends Error {
   constructor() {
     super('Interaction analysis failed');
     this.name = 'InteractionAnalysisFailedError';
+  }
+}
+
+export class RecommendationDraftingFailedError extends Error {
+  readonly code = 'recommendation_drafting_failed';
+  readonly reason: RecommendationDraftingFailureReason;
+
+  constructor(reason: RecommendationDraftingFailureReason) {
+    super(`Recommendation drafting failed: ${reason}`);
+    this.name = 'RecommendationDraftingFailedError';
+    this.reason = reason;
   }
 }
 

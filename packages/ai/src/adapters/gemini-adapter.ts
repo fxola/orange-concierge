@@ -45,6 +45,7 @@ export class GeminiAdapter extends BaseHttpAdapter {
       generationConfig: {
         temperature: 0,
         responseMimeType: 'application/json',
+        ...(input.maxOutputTokens ? { maxOutputTokens: input.maxOutputTokens } : {}),
       },
     };
   }

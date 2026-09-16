@@ -1,11 +1,9 @@
 import type { ClientDetailViewModel } from '@/features/clients/view-models/clients';
 import type { InteractionDetailViewModel } from '../view-models/interactions';
-import {
-  InteractionDetailBackLink,
-  InteractionDetailHeader,
-} from '../components/interaction-detail/interaction-detail-header';
-import { InteractionDetailSections } from '../components/interaction-detail/interaction-detail-sections';
+import { InteractionDetailHeader } from '../components/interaction-detail/interaction-detail-header';
 import { InteractionDetailUnavailable } from '../components/interaction-detail/interaction-detail-unavailable';
+import { InteractionDetailTabs } from '../components/interaction-detail/interaction-detail-tabs';
+import Link from 'next/link';
 
 export function InteractionDetailPage({
   clientVm,
@@ -27,9 +25,14 @@ export function InteractionDetailPage({
 
   return (
     <div className="mx-auto w-full max-w-5xl">
-      <InteractionDetailBackLink clientId={client.id} displayName={client.displayName} />
+      <Link
+        href={`/clients/${client.id}`}
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <span aria-hidden="true">←</span> Back to {client.displayName}
+      </Link>
       <InteractionDetailHeader row={row} />
-      <InteractionDetailSections row={row} />
+      <InteractionDetailTabs row={row} />
     </div>
   );
 }

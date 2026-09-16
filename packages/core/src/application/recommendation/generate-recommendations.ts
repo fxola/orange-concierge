@@ -1,5 +1,9 @@
 import { calculateReadinessScore } from '../../domain/readiness-score';
-import { InteractionAnalysisFailedError, InteractionNotFoundError } from '../../errors';
+import {
+  InteractionAnalysisFailedError,
+  InteractionNotFoundError,
+  RecommendationDraftingFailedError,
+} from '../../errors';
 import { buildKnowledgeQuery } from '../knowledge/build-knowledge-query';
 import { Result } from '../result';
 import { groundRecommendations } from './ground-recommendations';
@@ -27,7 +31,7 @@ export class GenerateRecommendations {
     const readinessScore = calculateReadinessScore(facts);
     const knowledge = await this.deps.KnowledgeRetriever.search({
       query: buildKnowledgeQuery(facts),
-      limit: 5,
+      limit: 3,
     });
     const draftResult = await this.deps.recommendationDrafter.draftRecommendations({
       interactionId: interaction.id,
@@ -38,7 +42,7 @@ export class GenerateRecommendations {
     });
 
     if (draftResult.isFailure()) {
-      return Result.failure(new InteractionAnalysisFailedError());
+      return Result.failure(new RecommendationDraftingFailedError(draftResult.getError()));
     }
 
     const recommendations = groundRecommendations({

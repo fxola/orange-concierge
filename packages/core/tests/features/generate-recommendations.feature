@@ -21,3 +21,10 @@ Feature: Generate recommendations
     And the recommendation drafter returns a recommendation citing unknown client evidence
     When recommendations are generated for the interaction
     Then no grounded recommendations are returned
+
+  Scenario: Fail when recommendation drafting fails
+    Given an analyzed interaction has extracted facts with transcript evidence
+    And relevant internal guidance is retrieved
+    And the recommendation drafter request fails
+    When recommendations are generated for the interaction
+    Then recommendation drafting failure is returned

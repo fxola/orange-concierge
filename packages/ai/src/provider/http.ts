@@ -2,7 +2,7 @@ export type ProviderHttpResponse = Pick<Response, 'ok' | 'json'>;
 
 export type ProviderFetch = (url: string, init: RequestInit) => Promise<ProviderHttpResponse>;
 
-export const DEFAULT_PROVIDER_TIMEOUT_MS = 30_000;
+export const DEFAULT_PROVIDER_TIMEOUT_MS = 300_000;
 
 export type ProviderJsonFailureKind = 'request_failed' | 'invalid_response';
 

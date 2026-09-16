@@ -1,6 +1,10 @@
 import type { Actor } from '../../domain/actor';
 import type { EvidenceReference } from '../interaction/extracted-facts';
-import type { InteractionAnalysisFailedError, InteractionNotFoundError } from '../../errors';
+import type {
+  InteractionAnalysisFailedError,
+  InteractionNotFoundError,
+  RecommendationDraftingFailedError,
+} from '../../errors';
 import type { InteractionRepository } from '../../ports/interaction-repository';
 import type { KnowledgeRetriever, KnowledgeSearchHit } from '../../ports/knowledge-retriever';
 import type {
@@ -34,7 +38,8 @@ export type GenerateRecommendationsSuccess = Readonly<{
 
 export type GenerateRecommendationsError =
   | InteractionNotFoundError
-  | InteractionAnalysisFailedError;
+  | InteractionAnalysisFailedError
+  | RecommendationDraftingFailedError;
 
 export type GenerateRecommendationsResult = Result<
   GenerateRecommendationsSuccess,

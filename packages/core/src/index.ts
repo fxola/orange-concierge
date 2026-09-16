@@ -36,6 +36,7 @@ export {
   UnauthorizedViewClientsError,
   InteractionAnalysisFailedError,
   InteractionNotFoundError,
+  RecommendationDraftingFailedError,
   InteractionSubmissionFailedError,
   InvalidInteractionStateError,
   UnauthorizedAnalyzeInteractionError,
