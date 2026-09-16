@@ -6,15 +6,9 @@ export { SearchKnowledge } from './application/knowledge/search-knowledge';
 export { GenerateRecommendations } from './application/recommendation/generate-recommendations';
 export { ReviewRecommendation } from './application/recommendation/review-recommendation';
 export { SubmitRecommendationForReview } from './application/recommendation/submit-recommendation-for-review';
+export { ListRecommendations } from './application/recommendation/list-recommendations';
 export { ListClients } from './application/client/list-clients';
 export { GetClient } from './application/client/get-client';
-export {
-  MAX_LIST_LIMIT,
-  clientIdSchema,
-  paginationSchema,
-  parseClientId,
-  parsePagination,
-} from './application/client/client-id';
 export { canViewClients } from './application/client/policy';
 export {
   canAnalyzeInteractions,
@@ -36,9 +30,11 @@ export {
   BlankTranscriptError,
   ClientNotFoundError,
   InvalidClientIdError,
+  InvalidInteractionIdError,
   InvalidKnowledgeSearchLimitError,
   InvalidKnowledgeSearchQueryError,
   InvalidPaginationError,
+  InvalidRecommendationIdError,
   UnauthorizedViewClientsError,
   InteractionAnalysisFailedError,
   InteractionNotFoundError,
@@ -102,6 +98,9 @@ export type {
   GenerateRecommendationsResult,
   GenerateRecommendationsSuccess,
   GroundedRecommendation,
+  ListRecommendationsDependencies,
+  ListRecommendationsInput,
+  ListRecommendationsResult,
   ReviewRecommendationDecision,
   ReviewRecommendationDependencies,
   ReviewRecommendationError,

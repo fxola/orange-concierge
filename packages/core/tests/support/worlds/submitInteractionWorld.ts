@@ -43,7 +43,7 @@ export function submitInteractionWorld() {
   const submitInteraction = new SubmitInteraction({
     transactionManager,
     clientRepository,
-    newInteractionId: () => 'interaction-1',
+    newInteractionId: () => 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
     now: () => fixedDate,
   });
 

@@ -4,6 +4,30 @@ import { withRequestActor } from '@/server/auth-guard';
 
 type RouteContext = Readonly<{ params: Promise<Readonly<{ id: string }>> }>;
 
+export const GET = withRequestActor(async (request, actor, context: RouteContext) => {
+  const { id } = await context.params;
+  const url = new URL(request.url);
+  const includeSuperseded = url.searchParams.get('includeSuperseded') === 'true';
+  const result = await getApplication().recommendations.list({
+    actor,
+    interactionId: id,
+    includeSuperseded,
+  });
+
+  if (result.isFailure()) {
+    const code = result.getError().code;
+    if (code === 'invalid_interaction_id') {
+      return Response.json({ error: code }, { status: 400 });
+    }
+    if (code === 'interaction_not_found') {
+      return Response.json({ error: code }, { status: 404 });
+    }
+    return Response.json({ error: code }, { status: 500 });
+  }
+
+  return Response.json({ recommendations: result.getValue() }, { status: 200 });
+});
+
 export const POST = withRequestActor(async (_request, actor, context: RouteContext) => {
   const { id } = await context.params;
 
@@ -13,6 +37,10 @@ export const POST = withRequestActor(async (_request, actor, context: RouteConte
     const code = result.getError().code;
     if (code === 'interaction_not_found') {
       return Response.json({ error: code }, { status: 404 });
+    }
+
+    if (code === 'invalid_interaction_id') {
+      return Response.json({ error: code }, { status: 400 });
     }
 
     if (code === 'recommendation_drafting_failed') {

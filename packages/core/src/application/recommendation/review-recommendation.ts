@@ -1,5 +1,6 @@
 import type { AuditEvent } from '../../ports/audit';
 import {
+  InvalidRecommendationIdError,
   InvalidRecommendationTransitionError,
   RecommendationNotFoundError,
   RecommendationReviewFailedError,
@@ -12,7 +13,7 @@ import type {
   ReviewRecommendationInput,
   ReviewRecommendationResult,
 } from './types';
-import type { Recommendation } from '../../domain/recommendation';
+import { parseRecommendationId, type Recommendation } from '../../domain/recommendation';
 
 export class ReviewRecommendation {
   constructor(private readonly deps: ReviewRecommendationDependencies) {}
@@ -23,9 +24,19 @@ export class ReviewRecommendation {
       return Result.failure(new UnauthorizedReviewRecommendationError(actor.role));
     }
 
-    const recommendation = await this.deps.recommendationRepository.findById(recommendationId);
+    const parsedRecommendationId = parseRecommendationId(recommendationId);
+    if (!parsedRecommendationId.ok) {
+      return Result.failure(new InvalidRecommendationIdError());
+    }
+
+    const recommendation = await this.deps.recommendationRepository.findById(
+      parsedRecommendationId.recommendationId
+    );
+
     if (!recommendation) {
-      return Result.failure(new RecommendationNotFoundError(recommendationId));
+      return Result.failure(
+        new RecommendationNotFoundError(parsedRecommendationId.recommendationId)
+      );
     }
 
     const previousStatus = recommendation.status;

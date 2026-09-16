@@ -1,9 +1,11 @@
+import { parseClientId } from '../../domain/client';
+import { parseInteractionId } from '../../domain/interaction';
 import {
   InteractionNotFoundError,
   InvalidClientIdError,
+  InvalidInteractionIdError,
   UnauthorizedViewClientsError,
 } from '../../errors';
-import { parseClientId } from '../client/client-id';
 import { Result } from '../result';
 import { canViewInteractions } from './policy';
 import type {
@@ -27,7 +29,14 @@ export class GetInteraction {
       return Result.failure(new InvalidClientIdError());
     }
 
-    const interaction = await this.deps.interactionsRepo.findById(interactionId);
+    const parsedInteractionId = parseInteractionId(interactionId);
+    if (!parsedInteractionId.ok) {
+      return Result.failure(new InvalidInteractionIdError());
+    }
+
+    const interaction = await this.deps.interactionsRepo.findById(
+      parsedInteractionId.interactionId
+    );
     if (!interaction || interaction.clientId !== parsedClientId.clientId) {
       return Result.failure(new InteractionNotFoundError(interactionId));
     }

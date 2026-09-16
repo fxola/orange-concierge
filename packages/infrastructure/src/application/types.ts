@@ -12,6 +12,8 @@ import type {
   ListInteractionsResult,
   GenerateRecommendationsInput,
   GenerateRecommendationsResult,
+  ListRecommendationsInput,
+  ListRecommendationsResult,
   SearchKnowledgeInput,
   SearchKnowledgeResult,
   SubmitInteractionInput,
@@ -31,6 +33,8 @@ export type {
   ListInteractionsResult,
   GenerateRecommendationsInput,
   GenerateRecommendationsResult,
+  ListRecommendationsInput,
+  ListRecommendationsResult,
   SearchKnowledgeInput,
   SearchKnowledgeResult,
 };
@@ -53,5 +57,6 @@ export type Application = Readonly<{
   };
   recommendations: {
     generate: (input: GenerateRecommendationsInput) => Promise<GenerateRecommendationsResult>;
+    list: (input: ListRecommendationsInput) => Promise<ListRecommendationsResult>;
   };
 }>;

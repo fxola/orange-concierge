@@ -1,9 +1,9 @@
 import { BookOpen, Quote } from 'lucide-react';
-import type { GroundedRecommendation } from '@orange-concierge/core';
+import type { GroundedRecommendation, Recommendation } from '@orange-concierge/core';
 
-export function EvidenceList({
-  recommendation,
-}: Readonly<{ recommendation: GroundedRecommendation }>) {
+type CardRecommendation = Recommendation | GroundedRecommendation;
+
+export function EvidenceList({ recommendation }: Readonly<{ recommendation: CardRecommendation }>) {
   return (
     <div className="grid gap-2">
       <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-warning">
@@ -11,7 +11,7 @@ export function EvidenceList({
         Client evidence
       </div>
       <div className="grid gap-2">
-        {recommendation.clientEvidence.map((evidence) => (
+        {(recommendation.clientEvidence ?? []).map((evidence) => (
           <figure
             key={`${recommendation.title}-${evidence.factPath}`}
             className="rounded-sm border border-warning/30 bg-warning-surface px-3 py-2.5"
@@ -31,7 +31,7 @@ export function EvidenceList({
 
 export function KnowledgeList({
   recommendation,
-}: Readonly<{ recommendation: GroundedRecommendation }>) {
+}: Readonly<{ recommendation: CardRecommendation }>) {
   return (
     <div className="grid gap-2">
       <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-info">
@@ -39,7 +39,7 @@ export function KnowledgeList({
         Knowledge citations
       </div>
       <div className="grid gap-2">
-        {recommendation.knowledgeCitations.map((citation) => (
+        {(recommendation.knowledgeCitations ?? []).map((citation) => (
           <article
             key={`${recommendation.title}-${citation.chunkId}`}
             className="rounded-sm border border-info/30 bg-info-surface px-3 py-2.5"
@@ -56,7 +56,7 @@ export function KnowledgeList({
               {citation.heading ? `${citation.heading} · ` : ''}
               {citation.sourcePath}
             </p>
-            <p className="mt-2 line-clamp-3 text-sm leading-6 text-foreground/85">
+            <p className="mt-2 line-clamp-4 text-sm leading-6 text-foreground/85">
               {citation.content}
             </p>
             <p className="mt-2 font-mono text-[11px] leading-4 text-subtle-foreground">

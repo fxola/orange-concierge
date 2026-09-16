@@ -20,6 +20,10 @@ export function toGenerateRecommendationsErrorViewModel(
     return error('That interaction no longer exists.', false);
   }
 
+  if (failure.code === 'invalid_interaction_id') {
+    return error('That interaction ID is invalid.', false);
+  }
+
   if (failure.code === 'interaction_analysis_failed') {
     return error('Recommendations need completed analysis before they can be generated.', false);
   }

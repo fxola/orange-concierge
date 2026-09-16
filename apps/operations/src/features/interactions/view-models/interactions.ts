@@ -61,7 +61,11 @@ export function toInteractionDetailViewModel(
   if (result.isFailure()) {
     const code = result.getError().code;
 
-    if (code === 'interaction_not_found' || code === 'invalid_client_id') {
+    if (
+      code === 'interaction_not_found' ||
+      code === 'invalid_client_id' ||
+      code === 'invalid_interaction_id'
+    ) {
       return { status: 'notFound' };
     }
 

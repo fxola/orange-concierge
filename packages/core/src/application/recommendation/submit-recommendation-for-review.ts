@@ -1,5 +1,6 @@
-import { Recommendation } from '../../domain/recommendation';
+import { parseRecommendationId, Recommendation } from '../../domain/recommendation';
 import {
+  InvalidRecommendationIdError,
   InvalidRecommendationTransitionError,
   RecommendationNotFoundError,
   UnauthorizedSubmitRecommendationForReviewError,
@@ -23,9 +24,18 @@ export class SubmitRecommendationForReview {
       return Result.failure(new UnauthorizedSubmitRecommendationForReviewError(actor.role));
     }
 
-    const recommendation = await this.deps.recommendationRepository.findById(recommendationId);
+    const parsedRecommendationId = parseRecommendationId(recommendationId);
+    if (!parsedRecommendationId.ok) {
+      return Result.failure(new InvalidRecommendationIdError());
+    }
+
+    const recommendation = await this.deps.recommendationRepository.findById(
+      parsedRecommendationId.recommendationId
+    );
     if (!recommendation) {
-      return Result.failure(new RecommendationNotFoundError(recommendationId));
+      return Result.failure(
+        new RecommendationNotFoundError(parsedRecommendationId.recommendationId)
+      );
     }
 
     if (recommendation.status !== 'draft') {

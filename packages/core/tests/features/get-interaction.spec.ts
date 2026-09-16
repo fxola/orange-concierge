@@ -15,7 +15,7 @@ const feature = await loadFeature('tests/features/get-interaction.feature');
 
 const CLIENT_ID = '98d4ea70-45e2-4c21-8767-3bbe0ae070a7';
 const OTHER_CLIENT_ID = '3e2359ca-0b89-48b5-a1d2-d57bd3d0b4ef';
-const INTERACTION_ID = 'interaction-1';
+const INTERACTION_ID = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
 const fixedDate = new Date('2026-09-01T10:00:00.000Z');
 
 const consultant: Actor = {

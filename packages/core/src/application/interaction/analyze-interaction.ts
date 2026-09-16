@@ -1,7 +1,8 @@
-import type { Interaction } from '../../domain/interaction';
+import { parseInteractionId, type Interaction } from '../../domain/interaction';
 import {
   InteractionAnalysisFailedError,
   InteractionNotFoundError,
+  InvalidInteractionIdError,
   InvalidInteractionStateError,
   UnauthorizedAnalyzeInteractionError,
 } from '../../errors';
@@ -24,11 +25,16 @@ export class AnalyzeInteraction {
       return Result.failure(new UnauthorizedAnalyzeInteractionError(actor.role));
     }
 
+    const parsedInteractionId = parseInteractionId(interactionId);
+    if (!parsedInteractionId.ok) {
+      return Result.failure(new InvalidInteractionIdError());
+    }
+
     const { secretScanner, interactionsRepo, structuredLLM, transactionManager, now } = this.deps;
 
-    const interaction = await interactionsRepo.findById(interactionId);
+    const interaction = await interactionsRepo.findById(parsedInteractionId.interactionId);
     if (!interaction) {
-      return Result.failure(new InteractionNotFoundError(interactionId));
+      return Result.failure(new InteractionNotFoundError(parsedInteractionId.interactionId));
     }
 
     if (interaction.status !== 'received') {
@@ -43,7 +49,7 @@ export class AnalyzeInteraction {
       const blockedAuditEvent: AuditEvent = {
         actor,
         action: 'interaction_scan_blocked',
-        resource: { type: 'interaction', id: interactionId },
+        resource: { type: 'interaction', id: parsedInteractionId.interactionId },
         occurredAt: now(),
         metadata: {
           findingCount: scannedResults.findings.length,
@@ -63,7 +69,7 @@ export class AnalyzeInteraction {
     }
 
     const assessmentResult = await structuredLLM.extractClientAssessment({
-      interactionId,
+      interactionId: parsedInteractionId.interactionId,
       transcript,
     });
 
@@ -71,7 +77,7 @@ export class AnalyzeInteraction {
       await this.recordIndependentAudit({
         actor,
         action: 'interaction_analysis_failed',
-        resource: { type: 'interaction', id: interactionId },
+        resource: { type: 'interaction', id: parsedInteractionId.interactionId },
         occurredAt: now(),
         metadata: { failureSource: 'structured_llm', failureReason: assessmentResult.getError() },
       });
@@ -84,7 +90,7 @@ export class AnalyzeInteraction {
     await this.recordIndependentAudit({
       actor,
       action: 'interaction_scan_passed',
-      resource: { type: 'interaction', id: interactionId },
+      resource: { type: 'interaction', id: parsedInteractionId.interactionId },
       occurredAt: now(),
     });
 
@@ -96,7 +102,7 @@ export class AnalyzeInteraction {
     const completedAuditEvent: AuditEvent = {
       actor,
       action: 'interaction_analysis_completed',
-      resource: { type: 'interaction', id: interactionId },
+      resource: { type: 'interaction', id: parsedInteractionId.interactionId },
       occurredAt: now(),
     };
 

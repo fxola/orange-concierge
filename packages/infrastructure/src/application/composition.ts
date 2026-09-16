@@ -12,6 +12,7 @@ import {
   GetClient,
   ListClients,
   ListInteractions,
+  ListRecommendations,
   SearchKnowledge,
   SubmitInteraction,
 } from '@orange-concierge/core';
@@ -20,6 +21,7 @@ import { PatternSecretScanner } from '@orange-concierge/security';
 import { DrizzleAuditPort } from '../adapters/audit/drizzle-audit-port';
 import { DrizzleTransactionManager } from '../adapters/interaction/drizzle-transaction-manager';
 import { DrizzleInteractionRepository } from '../adapters/interaction/drizzle-interaction-repository';
+import { DrizzleRecommendationRepository } from '../adapters/recommendation/drizzle-recommendation-repository';
 import { DrizzleRecommendationTransactionManager } from '../adapters/recommendation/drizzle-recommendation-transaction-manager';
 import { createAuth } from '../auth';
 import { createDatabaseFromUrl, OrangeConciergeDB } from '../database/connection';
@@ -131,6 +133,7 @@ const buildRecommendations = (
   const interactionsRepo = new DrizzleInteractionRepository(db);
   const knowledgeRetriever = new DrizzleKnowledgeSearch(db, createKnowledgeEmbedder(aiConfig));
   const recommendationDrafter = createRecommendationDrafter(aiConfig);
+  const recommendationRepository = new DrizzleRecommendationRepository(db);
   const transactionManager = new DrizzleRecommendationTransactionManager(db);
   const generateRecommendationsUseCase = new GenerateRecommendations({
     interactionsRepo,
@@ -140,9 +143,14 @@ const buildRecommendations = (
     newRecommendationId: randomUUID,
     now: () => new Date(),
   });
+  const listRecommendationsUseCase = new ListRecommendations({
+    recommendationRepository,
+    interactionRepository: interactionsRepo,
+  });
 
   return {
     generate: (input) => generateRecommendationsUseCase.execute(input),
+    list: (input) => listRecommendationsUseCase.execute(input),
   };
 };
 

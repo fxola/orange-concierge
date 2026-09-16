@@ -4,9 +4,9 @@ import {
   UnauthorizedViewClientsError,
 } from '../../errors';
 import { canViewClients } from './policy';
-import { parseClientId } from './client-id';
 import { Result } from '../result';
 import type { GetClientDependencies, GetClientInput, GetClientResult } from './types';
+import { parseClientId } from '../../domain/client';
 
 export class GetClient {
   constructor(private readonly deps: GetClientDependencies) {}

@@ -19,7 +19,7 @@ export function listInteractionsWorld() {
   const interactionsRepo = new InMemoryInteractionRepository(null);
   interactionsRepo.interactions.push(
     {
-      id: 'interaction-1',
+      id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
       clientId: CLIENT_ID,
       submittedBy: 'consultant-1',
       status: 'received',
@@ -27,7 +27,7 @@ export function listInteractionsWorld() {
       createdAt: fixedDate,
     },
     {
-      id: 'interaction-2',
+      id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbc',
       clientId: OTHER_CLIENT_ID,
       submittedBy: 'consultant-1',
       status: 'received',
@@ -35,7 +35,7 @@ export function listInteractionsWorld() {
       createdAt: fixedDate,
     },
     {
-      id: 'interaction-3',
+      id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbd',
       clientId: CLIENT_ID,
       submittedBy: 'consultant-1',
       status: 'received',
@@ -60,7 +60,7 @@ export function listInteractionsWorld() {
     },
 
     clientInteractionIds() {
-      return ['interaction-1', 'interaction-3'];
+      return ['bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbd'];
     },
 
     listInteractions() {

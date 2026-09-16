@@ -126,6 +126,22 @@ export class InvalidClientIdError extends Error {
   }
 }
 
+export class InvalidInteractionIdError extends Error {
+  readonly code = 'invalid_interaction_id';
+  constructor() {
+    super('Interaction id must be a valid UUID');
+    this.name = 'InvalidInteractionIdError';
+  }
+}
+
+export class InvalidRecommendationIdError extends Error {
+  readonly code = 'invalid_recommendation_id';
+  constructor() {
+    super('Recommendation id must be a valid UUID');
+    this.name = 'InvalidRecommendationIdError';
+  }
+}
+
 export class InvalidPaginationError extends Error {
   readonly code = 'invalid_pagination';
   constructor() {
