@@ -2,15 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import type { EvidenceReference, ExtractedFacts, ReadinessScore } from '@orange-concierge/core';
-import { AssessmentSummary, EmptyFacts } from './extracted-facts/assessment-summary';
-import { EvidenceDialog } from './extracted-facts/evidence-dialog';
-import {
-  FACT_GROUPS,
-  collectFactItems,
-  hasExtractedFacts,
-  itemsForGroup,
-} from './extracted-facts/fact-model';
-import { FactGroupCard } from './extracted-facts/fact-group-card';
+import { AssessmentSummary, EmptyFacts } from './assessment-summary';
+import { EvidenceDialog } from './evidence-dialog';
+import { FACT_GROUPS, collectFactItems, hasExtractedFacts, itemsForGroup } from './fact-model';
+import { FactGroupCard } from './fact-group-card';
 
 export function ExtractedFactsView({
   facts,
@@ -43,7 +38,11 @@ export function ExtractedFactsView({
 
   return (
     <div className="rounded-sm border border-border bg-surface p-4 sm:p-5">
-      <AssessmentSummary total={items.length} sourced={sourcedCount} readinessScore={readinessScore} />
+      <AssessmentSummary
+        total={items.length}
+        sourced={sourcedCount}
+        readinessScore={readinessScore}
+      />
 
       <div className="mt-4 grid gap-4">
         {FACT_GROUPS.map((group) => (

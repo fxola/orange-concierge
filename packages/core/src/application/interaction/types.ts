@@ -17,7 +17,7 @@ import type {
 import type { AuditPort } from '../../ports/audit';
 import type { ClientRepository } from '../../ports/client-repository';
 import type { InteractionRepository } from '../../ports/interaction-repository';
-import type { TransactionManager } from '../../ports/transaction-manager';
+import type { InteractionTransactionManager } from '../../ports/transaction-manager';
 import type { SecretScannerAPI } from '../../ports/secret-scanner';
 import type { StructuredLLM } from '../../ports/structured-llm';
 import type { Result } from '../result';
@@ -32,7 +32,7 @@ export type AnalyzeInteractionDependencies = Readonly<{
   secretScanner: SecretScannerAPI;
   structuredLLM: StructuredLLM;
   audit: AuditPort;
-  transactionManager: TransactionManager;
+  transactionManager: InteractionTransactionManager;
   now: () => Date;
 }>;
 
@@ -93,7 +93,7 @@ export type SubmitInteractionInput = Readonly<{
 }>;
 
 export type SubmitInteractionDependencies = Readonly<{
-  transactionManager: TransactionManager;
+  transactionManager: InteractionTransactionManager;
   clientRepository: ClientRepository;
   newInteractionId: () => string;
   now: () => Date;

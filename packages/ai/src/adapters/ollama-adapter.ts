@@ -22,7 +22,10 @@ export class OllamaAdapter extends BaseHttpAdapter {
       model: this.model,
       stream: false,
       format: 'json',
-      options: { temperature: 0 },
+      options: {
+        temperature: 0,
+        ...(input.maxOutputTokens ? { num_predict: input.maxOutputTokens } : {}),
+      },
       messages: [
         { role: 'system', content: input.systemPrompt },
         { role: 'user', content: input.userPrompt },

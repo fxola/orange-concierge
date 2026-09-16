@@ -1,8 +1,20 @@
 import type { Actor } from '../../domain/actor';
+import type { Recommendation } from '../../domain/recommendation';
 import type { EvidenceReference } from '../interaction/extracted-facts';
-import type { InteractionAnalysisFailedError, InteractionNotFoundError } from '../../errors';
+import type {
+  InteractionAnalysisFailedError,
+  InteractionNotFoundError,
+  InvalidRecommendationTransitionError,
+  RecommendationNotFoundError,
+  RecommendationDraftingFailedError,
+  RecommendationReviewFailedError,
+  UnauthorizedReviewRecommendationError,
+  UnauthorizedSubmitRecommendationForReviewError,
+} from '../../errors';
 import type { InteractionRepository } from '../../ports/interaction-repository';
 import type { KnowledgeRetriever, KnowledgeSearchHit } from '../../ports/knowledge-retriever';
+import type { RecommendationRepository } from '../../ports/recommendation-repository';
+import type { RecommendationTransactionManager } from '../../ports/transaction-manager';
 import type {
   RecommendationDrafter,
   RecommendationPriority,
@@ -16,8 +28,11 @@ export type GenerateRecommendationsInput = Readonly<{
 
 export type GenerateRecommendationsDependencies = Readonly<{
   interactionsRepo: InteractionRepository;
-  KnowledgeRetriever: KnowledgeRetriever;
+  knowledgeRetriever: KnowledgeRetriever;
   recommendationDrafter: RecommendationDrafter;
+  transactionManager: RecommendationTransactionManager;
+  newRecommendationId: () => string;
+  now: () => Date;
 }>;
 
 export type GroundedRecommendation = Readonly<{
@@ -34,9 +49,51 @@ export type GenerateRecommendationsSuccess = Readonly<{
 
 export type GenerateRecommendationsError =
   | InteractionNotFoundError
-  | InteractionAnalysisFailedError;
+  | InteractionAnalysisFailedError
+  | RecommendationDraftingFailedError;
 
 export type GenerateRecommendationsResult = Result<
   GenerateRecommendationsSuccess,
   GenerateRecommendationsError
 >;
+
+export type SubmitRecommendationForReviewInput = Readonly<{
+  actor: Actor;
+  recommendationId: string;
+}>;
+
+export type SubmitRecommendationForReviewDependencies = Readonly<{
+  recommendationRepository: RecommendationRepository;
+}>;
+
+export type SubmitRecommendationForReviewError =
+  | RecommendationNotFoundError
+  | InvalidRecommendationTransitionError
+  | UnauthorizedSubmitRecommendationForReviewError;
+
+export type SubmitRecommendationForReviewResult = Result<
+  Recommendation,
+  SubmitRecommendationForReviewError
+>;
+
+export type ReviewRecommendationDecision = 'approved' | 'rejected';
+
+export type ReviewRecommendationInput = Readonly<{
+  actor: Actor;
+  recommendationId: string;
+  decision: ReviewRecommendationDecision;
+}>;
+
+export type ReviewRecommendationDependencies = Readonly<{
+  recommendationRepository: RecommendationRepository;
+  transactionManager: RecommendationTransactionManager;
+  now: () => Date;
+}>;
+
+export type ReviewRecommendationError =
+  | RecommendationNotFoundError
+  | InvalidRecommendationTransitionError
+  | RecommendationReviewFailedError
+  | UnauthorizedReviewRecommendationError;
+
+export type ReviewRecommendationResult = Result<Recommendation, ReviewRecommendationError>;

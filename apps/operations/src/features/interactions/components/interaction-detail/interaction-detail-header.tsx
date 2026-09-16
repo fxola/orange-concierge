@@ -20,20 +20,6 @@ function ReadinessChip({ readinessScore }: Readonly<{ readinessScore?: Readiness
   );
 }
 
-export function InteractionDetailBackLink({
-  clientId,
-  displayName,
-}: Readonly<{ clientId: string; displayName: string }>) {
-  return (
-    <Link
-      href={`/clients/${clientId}`}
-      className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-    >
-      <span aria-hidden="true">←</span> Back to {displayName}
-    </Link>
-  );
-}
-
 export function InteractionDetailHeader({ row }: Readonly<{ row: InteractionRow }>) {
   return (
     <>

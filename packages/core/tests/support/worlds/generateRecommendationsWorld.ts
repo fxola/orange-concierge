@@ -10,6 +10,9 @@ import {
 import { InMemoryInteractionRepository } from '../in-memory-adapters/inMemoryInteractionRepository';
 import { InMemoryKnowledgeRetriever } from '../in-memory-adapters/inMemoryKnowledgeRetriever';
 import { InMemoryRecommendationDrafter } from '../in-memory-adapters/inMemoryRecommendationDrafter';
+import { InMemoryRecommendationRepository } from '../in-memory-adapters/inMemoryRecommendationRepository';
+import { InMemoryRecommendationReviewTransactionManager } from '../in-memory-adapters/inMemoryRecommendationTransactionManager';
+import { RecordingAudit } from '../in-memory-adapters/inMemoryAuditPort';
 
 const fixedDate = new Date('2026-09-14T10:00:00.000Z');
 
@@ -96,18 +99,25 @@ function analyzedInteraction(): Interaction {
 
 export function generateRecommendationsWorld() {
   const operations: string[] = [];
+  const recommendationRepository = new InMemoryRecommendationRepository(null);
+  const audit = new RecordingAudit();
+  const transactionManager = new InMemoryRecommendationReviewTransactionManager(
+    recommendationRepository,
+    audit
+  );
   let interactionsRepo: InMemoryInteractionRepository | undefined;
-  let KnowledgeRetriever: InMemoryKnowledgeRetriever | undefined;
+  let knowledgeRetriever: InMemoryKnowledgeRetriever | undefined;
   let recommendationDrafter: InMemoryRecommendationDrafter | undefined;
-  let result: GenerateRecommendationsResult | undefined;
+  let interaction: Interaction | undefined;
 
   return {
     givenAnalyzedInteractionWithEvidence() {
-      interactionsRepo = new InMemoryInteractionRepository(analyzedInteraction());
+      interaction = analyzedInteraction();
+      interactionsRepo = new InMemoryInteractionRepository(interaction);
     },
 
     givenRelevantInternalGuidanceIsRetrieved() {
-      KnowledgeRetriever = new InMemoryKnowledgeRetriever(operations, [knowledgeHit]);
+      knowledgeRetriever = new InMemoryKnowledgeRetriever(operations, [knowledgeHit]);
     },
 
     givenRecommendationDrafterReturnsCitedRecommendation() {
@@ -126,14 +136,19 @@ export function generateRecommendationsWorld() {
       ]);
     },
 
-    async generateRecommendations() {
-      result = await new GenerateRecommendations({
-        interactionsRepo: required(interactionsRepo, 'interactionsRepo'),
-        KnowledgeRetriever: required(KnowledgeRetriever, 'KnowledgeRetriever'),
-        recommendationDrafter: required(recommendationDrafter, 'recommendationDrafter'),
-      }).execute({ actor: consultant, interactionId: 'interaction-1' });
+    givenRecommendationDrafterRequestFails() {
+      recommendationDrafter = new InMemoryRecommendationDrafter(operations, [], 'request_failed');
+    },
 
-      return result;
+    generateRecommendations() {
+      return new GenerateRecommendations({
+        interactionsRepo: required(interactionsRepo, 'interactionsRepo'),
+        knowledgeRetriever: required(knowledgeRetriever, 'knowledgeRetriever'),
+        recommendationDrafter: required(recommendationDrafter, 'recommendationDrafter'),
+        transactionManager,
+        newRecommendationId: () => 'recommendation-1',
+        now: () => fixedDate,
+      });
     },
 
     operations() {
@@ -141,7 +156,7 @@ export function generateRecommendationsWorld() {
     },
 
     knowledgeRetriever() {
-      return required(KnowledgeRetriever, 'KnowledgeRetriever');
+      return required(knowledgeRetriever, 'knowledgeRetriever');
     },
 
     recommendationDrafter() {
@@ -156,8 +171,38 @@ export function generateRecommendationsWorld() {
       return knowledgeHit;
     },
 
-    result() {
-      return required(result, 'result');
+    consultant() {
+      return consultant;
+    },
+
+    interaction() {
+      return required(interaction, 'interaction');
+    },
+
+    recommendationRepository() {
+      return recommendationRepository;
+    },
+
+    savedRecommendations() {
+      return recommendationRepository.recommendations;
+    },
+
+    expectedPersistedDraftRecommendation() {
+      const evidence = required(analyzedInteraction().extractedFacts?.evidence, 'evidence');
+
+      return {
+        id: 'recommendation-1',
+        clientId: analyzedInteraction().clientId,
+        interactionId: analyzedInteraction().id,
+        status: 'draft',
+        title: draftRecommendation.title,
+        summary: draftRecommendation.summary,
+        rationale: draftRecommendation.summary,
+        priority: draftRecommendation.priority,
+        clientEvidence: evidence,
+        knowledgeCitations: [knowledgeHit],
+        createdAt: fixedDate,
+      };
     },
 
     expectedGroundedRecommendations(): readonly GroundedRecommendation[] {
@@ -165,6 +210,7 @@ export function generateRecommendationsWorld() {
 
       return [
         {
+          id: 'recommendation-1',
           title: draftRecommendation.title,
           summary: draftRecommendation.summary,
           priority: draftRecommendation.priority,

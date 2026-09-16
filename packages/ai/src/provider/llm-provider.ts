@@ -7,6 +7,7 @@ export type LLMProviderFetch = ProviderFetch;
 export type StructuredGenerationRequest = Readonly<{
   systemPrompt: string;
   userPrompt: string;
+  maxOutputTokens?: number;
 }>;
 
 export interface LLMProvider {

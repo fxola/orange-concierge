@@ -1,6 +1,7 @@
 import {
   DraftRecommendation,
   RecommendationDrafter,
+  RecommendationDraftingFailureReason,
   RecommendationDraftingInput,
   RecommendationDraftingResult,
   Result,
@@ -11,7 +12,8 @@ export class InMemoryRecommendationDrafter implements RecommendationDrafter {
 
   constructor(
     private readonly operations: string[],
-    private readonly drafts: readonly DraftRecommendation[]
+    private readonly drafts: readonly DraftRecommendation[],
+    private readonly failureReason?: RecommendationDraftingFailureReason
   ) {}
 
   async draftRecommendations(
@@ -19,6 +21,11 @@ export class InMemoryRecommendationDrafter implements RecommendationDrafter {
   ): Promise<RecommendationDraftingResult> {
     this.operations.push('draft');
     this.inputs.push(input);
+
+    if (this.failureReason) {
+      return Result.failure(this.failureReason);
+    }
+
     return Result.success(this.drafts);
   }
 }

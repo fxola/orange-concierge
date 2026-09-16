@@ -28,7 +28,7 @@ services:
       AUTH_SECRET: ${AUTH_SECRET:-change-me}
       AI_PROVIDER: ${AI_PROVIDER:-ollama}
       AI_MODEL: ${AI_MODEL:-llama3.2}
-      AI_TIMEOUT_MS: ${AI_TIMEOUT_MS:-30000}
+      AI_TIMEOUT_MS: ${AI_TIMEOUT_MS:-300000}
       AI_BASE_URL: ${AI_BASE_URL:-http://ollama:11434}
     depends_on:
       db:

@@ -1,4 +1,5 @@
 import { Actor } from '../domain/actor';
+import type { RecommendationDraftingFailureReason } from '../ports/recommendation-drafter';
 
 export class UnauthorizedAnalyzeInteractionError extends Error {
   readonly code = 'unauthorized_analyze';
@@ -29,6 +30,58 @@ export class InteractionAnalysisFailedError extends Error {
   constructor() {
     super('Interaction analysis failed');
     this.name = 'InteractionAnalysisFailedError';
+  }
+}
+
+export class RecommendationDraftingFailedError extends Error {
+  readonly code = 'recommendation_drafting_failed';
+  readonly reason: RecommendationDraftingFailureReason;
+
+  constructor(reason: RecommendationDraftingFailureReason) {
+    super(`Recommendation drafting failed: ${reason}`);
+    this.name = 'RecommendationDraftingFailedError';
+    this.reason = reason;
+  }
+}
+
+export class RecommendationReviewFailedError extends Error {
+  readonly code = 'recommendation_review_failed';
+  constructor(cause?: unknown) {
+    super('Recommendation review failed');
+    this.name = 'RecommendationReviewFailedError';
+    this.cause = cause as Error | undefined;
+  }
+}
+
+export class RecommendationNotFoundError extends Error {
+  readonly code = 'recommendation_not_found';
+  constructor(id: string) {
+    super(`Recommendation:${id} not found`);
+    this.name = 'RecommendationNotFoundError';
+  }
+}
+
+export class InvalidRecommendationTransitionError extends Error {
+  readonly code = 'invalid_recommendation_transition';
+  constructor(from: string, to: string) {
+    super(`Recommendation cannot transition from ${from} to ${to}`);
+    this.name = 'InvalidRecommendationTransitionError';
+  }
+}
+
+export class UnauthorizedReviewRecommendationError extends Error {
+  readonly code = 'unauthorized_recommendation_review';
+  constructor(role: Actor['role']) {
+    super(`Actor role ${role} cannot review recommendations`);
+    this.name = 'UnauthorizedReviewRecommendationError';
+  }
+}
+
+export class UnauthorizedSubmitRecommendationForReviewError extends Error {
+  readonly code = 'unauthorized_recommendation_submit_for_review';
+  constructor(role: Actor['role']) {
+    super(`Actor role ${role} cannot submit recommendations for review`);
+    this.name = 'UnauthorizedSubmitRecommendationForReviewError';
   }
 }
 

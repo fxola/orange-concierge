@@ -23,13 +23,13 @@ export function AssessmentSummary({
         <Text variant="caption" tone="muted" className="uppercase tracking-[0.12em]">
           Extracted assessment
         </Text>
-        <h3 className="mt-1 font-display text-xl font-medium leading-7">
+        <Text variant="h3" className="mt-1 font-display text-xl font-medium leading-7">
           Facts extracted from the transcript
-        </h3>
-        <p className="mt-1 max-w-2xl text-sm leading-5 text-muted-foreground">
+        </Text>
+        <Text variant="body" className="mt-1 max-w-2xl text-sm leading-5 text-muted-foreground">
           Each row is a claim from the transcript. Click any row to inspect the exact highlighted
           quote.
-        </p>
+        </Text>
       </div>
       <ReadinessScoreCard score={readinessScore} />
     </div>
