@@ -8,6 +8,7 @@ import type {
   InteractionNotFoundError,
   InteractionSubmissionFailedError,
   InvalidClientIdError,
+  InvalidInteractionIdError,
   InvalidInteractionStateError,
   InvalidPaginationError,
   UnauthorizedAnalyzeInteractionError,
@@ -40,6 +41,7 @@ export type AnalyzeInteractionError =
   | UnauthorizedAnalyzeInteractionError
   | InteractionAnalysisFailedError
   | InteractionNotFoundError
+  | InvalidInteractionIdError
   | InvalidInteractionStateError;
 
 export type AnalyzeInteractionSuccess = Readonly<{
@@ -62,6 +64,7 @@ export type GetInteractionDependencies = Readonly<{
 export type GetInteractionError =
   | UnauthorizedViewClientsError
   | InvalidClientIdError
+  | InvalidInteractionIdError
   | InteractionNotFoundError;
 
 export type GetInteractionResult = Result<Interaction, GetInteractionError>;

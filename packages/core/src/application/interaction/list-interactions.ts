@@ -1,10 +1,10 @@
+import { parseClientId, parsePagination } from '../../domain/client';
 import {
   ClientNotFoundError,
   InvalidClientIdError,
   InvalidPaginationError,
   UnauthorizedViewClientsError,
 } from '../../errors';
-import { parseClientId, parsePagination } from '../client/client-id';
 import { Result } from '../result';
 import { canViewInteractions } from './policy';
 import type {

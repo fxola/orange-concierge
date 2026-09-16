@@ -145,6 +145,7 @@ const buildRecommendations = (
   });
   const listRecommendationsUseCase = new ListRecommendations({
     recommendationRepository,
+    interactionRepository: interactionsRepo,
   });
 
   return {

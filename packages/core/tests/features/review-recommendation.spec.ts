@@ -118,7 +118,7 @@ describeFeature(feature, ({ Scenario }) => {
       expect(event).toMatchObject({
         actor: world.reviewer(),
         action: 'recommendation_reviewed',
-        resource: { type: 'recommendation', id: 'recommendation-1' },
+        resource: { type: 'recommendation', id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc' },
         occurredAt: world.fixedReviewedAt(),
         metadata: {
           previousStatus: 'pending_review',

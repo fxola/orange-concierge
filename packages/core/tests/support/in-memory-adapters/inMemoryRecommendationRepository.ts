@@ -25,7 +25,7 @@ export class InMemoryRecommendationRepository implements RecommendationRepositor
     return this.recommendations.filter(
       (r) =>
         r.interactionId === interactionId &&
-        (!options?.includeSuperseded || r.status !== 'superseded')
+        (options?.includeSuperseded || r.status !== 'superseded')
     );
   }
 

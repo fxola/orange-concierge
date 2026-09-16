@@ -4,6 +4,8 @@ import type { EvidenceReference } from '../interaction/extracted-facts';
 import type {
   InteractionAnalysisFailedError,
   InteractionNotFoundError,
+  InvalidInteractionIdError,
+  InvalidRecommendationIdError,
   InvalidRecommendationTransitionError,
   RecommendationNotFoundError,
   RecommendationDraftingFailedError,
@@ -50,6 +52,7 @@ export type GenerateRecommendationsSuccess = Readonly<{
 
 export type GenerateRecommendationsError =
   | InteractionNotFoundError
+  | InvalidInteractionIdError
   | InteractionAnalysisFailedError
   | RecommendationDraftingFailedError;
 
@@ -69,6 +72,7 @@ export type SubmitRecommendationForReviewDependencies = Readonly<{
 
 export type SubmitRecommendationForReviewError =
   | RecommendationNotFoundError
+  | InvalidRecommendationIdError
   | InvalidRecommendationTransitionError
   | UnauthorizedSubmitRecommendationForReviewError;
 
@@ -93,6 +97,7 @@ export type ReviewRecommendationDependencies = Readonly<{
 
 export type ReviewRecommendationError =
   | RecommendationNotFoundError
+  | InvalidRecommendationIdError
   | InvalidRecommendationTransitionError
   | RecommendationReviewFailedError
   | UnauthorizedReviewRecommendationError;
@@ -107,6 +112,10 @@ export type ListRecommendationsInput = Readonly<{
 
 export type ListRecommendationsDependencies = Readonly<{
   recommendationRepository: RecommendationRepository;
+  interactionRepository: InteractionRepository;
 }>;
 
-export type ListRecommendationsResult = Result<readonly Recommendation[], never>;
+export type ListRecommendationsResult = Result<
+  readonly Recommendation[],
+  InteractionNotFoundError | InvalidInteractionIdError
+>;

@@ -14,6 +14,17 @@ export const GET = withRequestActor(async (request, actor, context: RouteContext
     includeSuperseded,
   });
 
+  if (result.isFailure()) {
+    const code = result.getError().code;
+    if (code === 'invalid_interaction_id') {
+      return Response.json({ error: code }, { status: 400 });
+    }
+    if (code === 'interaction_not_found') {
+      return Response.json({ error: code }, { status: 404 });
+    }
+    return Response.json({ error: code }, { status: 500 });
+  }
+
   return Response.json({ recommendations: result.getValue() }, { status: 200 });
 });
 
@@ -26,6 +37,10 @@ export const POST = withRequestActor(async (_request, actor, context: RouteConte
     const code = result.getError().code;
     if (code === 'interaction_not_found') {
       return Response.json({ error: code }, { status: 404 });
+    }
+
+    if (code === 'invalid_interaction_id') {
+      return Response.json({ error: code }, { status: 400 });
     }
 
     if (code === 'recommendation_drafting_failed') {

@@ -1,8 +1,8 @@
 import { InvalidPaginationError, UnauthorizedViewClientsError } from '../../errors';
 import { canViewClients } from './policy';
-import { parsePagination } from './client-id';
 import { Result } from '../result';
 import type { ListClientsDependencies, ListClientsInput, ListClientsResult } from './types';
+import { parsePagination } from '../../domain/client';
 
 export class ListClients {
   constructor(private readonly deps: ListClientsDependencies) {}

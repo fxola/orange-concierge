@@ -9,3 +9,13 @@ Feature: List recommendations
     Given an analyzed interaction has no persisted recommendations
     When recommendations are listed for the interaction
     Then no recommendations are returned
+
+  Scenario: Listing excludes superseded recommendations by default
+    Given an analyzed interaction has draft and superseded recommendations
+    When recommendations are listed for the interaction
+    Then only non-superseded recommendations are returned
+
+  Scenario: Listing includes superseded recommendations when requested
+    Given an analyzed interaction has draft and superseded recommendations
+    When recommendations are listed including superseded for the interaction
+    Then all recommendations are returned

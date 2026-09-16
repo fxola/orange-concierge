@@ -1,3 +1,4 @@
+import z from 'zod';
 import type { EvidenceReference } from '../application/interaction/extracted-facts';
 import type { KnowledgeSearchHit } from '../ports/knowledge-retriever';
 import type { RecommendationPriority } from '../ports/recommendation-drafter';
@@ -25,3 +26,15 @@ export type Recommendation = Readonly<{
   reviewerId?: string;
   reviewedAt?: Date;
 }>;
+
+export const recommendationIdSchema = z.string().trim().pipe(z.uuid());
+
+export const parseRecommendationId = (
+  raw: unknown
+): { ok: true; recommendationId: string } | { ok: false } => {
+  const result = recommendationIdSchema.safeParse(raw);
+  if (!result.success) {
+    return { ok: false };
+  }
+  return { ok: true, recommendationId: result.data };
+};

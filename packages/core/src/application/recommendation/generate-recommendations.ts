@@ -1,8 +1,10 @@
+import { parseInteractionId } from '../../domain/interaction';
 import { calculateReadinessScore } from '../../domain/readiness-score';
 import { Recommendation } from '../../domain/recommendation';
 import {
   InteractionAnalysisFailedError,
   InteractionNotFoundError,
+  InvalidInteractionIdError,
   RecommendationDraftingFailedError,
 } from '../../errors';
 import { buildKnowledgeQuery } from '../knowledge/build-knowledge-query';
@@ -18,9 +20,17 @@ export class GenerateRecommendations {
   constructor(private readonly deps: GenerateRecommendationsDependencies) {}
 
   async execute(input: GenerateRecommendationsInput): Promise<GenerateRecommendationsResult> {
-    const interaction = await this.deps.interactionsRepo.findById(input.interactionId);
+    const parsedInteractionId = parseInteractionId(input.interactionId);
+    if (!parsedInteractionId.ok) {
+      return Result.failure(new InvalidInteractionIdError());
+    }
+
+    const interaction = await this.deps.interactionsRepo.findById(
+      parsedInteractionId.interactionId
+    );
+
     if (!interaction) {
-      return Result.failure(new InteractionNotFoundError(input.interactionId));
+      return Result.failure(new InteractionNotFoundError(parsedInteractionId.interactionId));
     }
 
     if (interaction.status !== 'analysis_completed' || !interaction.extractedFacts) {

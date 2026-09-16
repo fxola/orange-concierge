@@ -27,9 +27,9 @@ const fixedReviewedAt = new Date('2026-09-16T10:00:00.000Z');
 const consultant: Actor = { id: 'consultant-1', role: 'consultant' };
 const reviewer: Actor = { id: 'reviewer-1', role: 'reviewer' };
 
-const recommendationId = 'recommendation-1';
+const recommendationId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
 const clientId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
-const interactionId = 'interaction-1';
+const interactionId = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
 
 function recommendationWithStatus(status: RecommendationStatus): ReviewableRecommendation {
   return {

@@ -30,7 +30,7 @@ const buildInteraction = (
   transcript: string,
   status: Interaction['status'] = 'received'
 ): Interaction => ({
-  id: 'interaction-1',
+  id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
   clientId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
   submittedBy: consultant.id,
   status,

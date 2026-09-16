@@ -9,13 +9,6 @@ export { SubmitRecommendationForReview } from './application/recommendation/subm
 export { ListRecommendations } from './application/recommendation/list-recommendations';
 export { ListClients } from './application/client/list-clients';
 export { GetClient } from './application/client/get-client';
-export {
-  MAX_LIST_LIMIT,
-  clientIdSchema,
-  paginationSchema,
-  parseClientId,
-  parsePagination,
-} from './application/client/client-id';
 export { canViewClients } from './application/client/policy';
 export {
   canAnalyzeInteractions,
@@ -37,9 +30,11 @@ export {
   BlankTranscriptError,
   ClientNotFoundError,
   InvalidClientIdError,
+  InvalidInteractionIdError,
   InvalidKnowledgeSearchLimitError,
   InvalidKnowledgeSearchQueryError,
   InvalidPaginationError,
+  InvalidRecommendationIdError,
   UnauthorizedViewClientsError,
   InteractionAnalysisFailedError,
   InteractionNotFoundError,

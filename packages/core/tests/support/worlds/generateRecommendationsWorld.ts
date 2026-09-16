@@ -65,7 +65,7 @@ function analyzedInteraction(): Interaction {
   const custodyConcernQuote = 'need a recovery plan first';
 
   return {
-    id: 'interaction-1',
+    id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
     clientId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
     submittedBy: consultant.id,
     status: 'analysis_completed',
@@ -146,7 +146,7 @@ export function generateRecommendationsWorld() {
         knowledgeRetriever: required(knowledgeRetriever, 'knowledgeRetriever'),
         recommendationDrafter: required(recommendationDrafter, 'recommendationDrafter'),
         transactionManager,
-        newRecommendationId: () => 'recommendation-1',
+        newRecommendationId: () => 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
         now: () => fixedDate,
       });
     },
@@ -191,7 +191,7 @@ export function generateRecommendationsWorld() {
       const evidence = required(analyzedInteraction().extractedFacts?.evidence, 'evidence');
 
       return {
-        id: 'recommendation-1',
+        id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
         clientId: analyzedInteraction().clientId,
         interactionId: analyzedInteraction().id,
         status: 'draft',
@@ -210,7 +210,7 @@ export function generateRecommendationsWorld() {
 
       return [
         {
-          id: 'recommendation-1',
+          id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
           title: draftRecommendation.title,
           summary: draftRecommendation.summary,
           priority: draftRecommendation.priority,

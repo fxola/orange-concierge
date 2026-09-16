@@ -15,6 +15,10 @@ export const POST = withRequestActor(async (request, actor, context: RouteContex
       return Response.json({ error: code }, { status: 404 });
     }
 
+    if (code === 'invalid_interaction_id') {
+      return Response.json({ error: code }, { status: 400 });
+    }
+
     if (code === 'unauthorized_analyze') {
       return Response.json({ error: 'forbidden' }, { status: 403 });
     }

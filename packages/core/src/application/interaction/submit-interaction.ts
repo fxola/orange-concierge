@@ -7,7 +7,6 @@ import {
   UnauthorizedSubmitInteractionError,
 } from '../../errors';
 import type { AuditEvent } from '../../ports/audit';
-import { parseClientId } from '../client/client-id';
 import { canSubmitInteractions } from './policy';
 import { Result } from '../result';
 import type {
@@ -15,6 +14,7 @@ import type {
   SubmitInteractionInput,
   SubmitInteractionResult,
 } from './types';
+import { parseClientId } from '../../domain/client';
 
 export class SubmitInteraction {
   constructor(private readonly deps: SubmitInteractionDependencies) {}
