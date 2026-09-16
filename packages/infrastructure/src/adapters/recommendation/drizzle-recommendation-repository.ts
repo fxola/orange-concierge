@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq, ne } from 'drizzle-orm';
 import type { Recommendation, RecommendationRepository } from '@orange-concierge/core';
 
 import { recommendations, type OrangeConciergeDB } from '../../database';
@@ -35,7 +35,9 @@ function toRow(recommendation: Recommendation): typeof recommendations.$inferIns
     summary: recommendation.summary ?? null,
     priority: recommendation.priority ?? null,
     clientEvidence: recommendation.clientEvidence ? [...recommendation.clientEvidence] : null,
-    knowledgeCitations: recommendation.knowledgeCitations ? [...recommendation.knowledgeCitations] : null,
+    knowledgeCitations: recommendation.knowledgeCitations
+      ? [...recommendation.knowledgeCitations]
+      : null,
     createdAt: recommendation.createdAt,
     supersededAt: recommendation.supersededAt ?? null,
     reviewerId: recommendation.reviewerId ?? null,
@@ -47,15 +49,28 @@ export class DrizzleRecommendationRepository implements RecommendationRepository
   constructor(private readonly db: OrangeConciergeDB) {}
 
   async findById(id: string): Promise<Recommendation | null> {
-    const [row] = await this.db.select().from(recommendations).where(eq(recommendations.id, id)).limit(1);
+    const [row] = await this.db
+      .select()
+      .from(recommendations)
+      .where(eq(recommendations.id, id))
+      .limit(1);
     return row ? toDomain(row) : null;
   }
 
-  async listByInteraction(interactionId: string): Promise<readonly Recommendation[]> {
+  async listByInteraction(
+    interactionId: string,
+    options?: Readonly<{ includeSuperseded?: boolean }>
+  ): Promise<readonly Recommendation[]> {
+    const conditions = [eq(recommendations.interactionId, interactionId)];
+
+    if (!options?.includeSuperseded) {
+      conditions.push(ne(recommendations.status, 'superseded'));
+    }
+
     const rows = await this.db
       .select()
       .from(recommendations)
-      .where(eq(recommendations.interactionId, interactionId));
+      .where(and(...conditions));
     return rows.map(toDomain);
   }
 

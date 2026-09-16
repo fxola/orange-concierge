@@ -102,6 +102,7 @@ export type ReviewRecommendationResult = Result<Recommendation, ReviewRecommenda
 export type ListRecommendationsInput = Readonly<{
   actor: Actor;
   interactionId: string;
+  includeSuperseded?: boolean;
 }>;
 
 export type ListRecommendationsDependencies = Readonly<{

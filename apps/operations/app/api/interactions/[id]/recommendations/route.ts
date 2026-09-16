@@ -4,10 +4,15 @@ import { withRequestActor } from '@/server/auth-guard';
 
 type RouteContext = Readonly<{ params: Promise<Readonly<{ id: string }>> }>;
 
-export const GET = withRequestActor(async (_request, actor, context: RouteContext) => {
+export const GET = withRequestActor(async (request, actor, context: RouteContext) => {
   const { id } = await context.params;
-
-  const result = await getApplication().recommendations.list({ actor, interactionId: id });
+  const url = new URL(request.url);
+  const includeSuperseded = url.searchParams.get('includeSuperseded') === 'true';
+  const result = await getApplication().recommendations.list({
+    actor,
+    interactionId: id,
+    includeSuperseded,
+  });
 
   return Response.json({ recommendations: result.getValue() }, { status: 200 });
 });

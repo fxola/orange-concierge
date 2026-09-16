@@ -7,14 +7,13 @@ import {
   type RecommendationsViewModel,
 } from '@/features/interactions/view-models/recommendations';
 
-export async function getRecommendations(
-  interactionId: string
-): Promise<RecommendationsViewModel> {
+export async function getRecommendations(interactionId: string): Promise<RecommendationsViewModel> {
   try {
     const actor = await requirePageActor();
     const result = await getApplication().recommendations.list({
       actor,
       interactionId,
+      includeSuperseded: false,
     });
 
     return toRecommendationsViewModel(result);

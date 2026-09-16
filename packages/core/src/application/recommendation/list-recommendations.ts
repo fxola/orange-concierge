@@ -10,7 +10,8 @@ export class ListRecommendations {
 
   async execute(input: ListRecommendationsInput): Promise<ListRecommendationsResult> {
     const recommendations = await this.deps.recommendationRepository.listByInteraction(
-      input.interactionId
+      input.interactionId,
+      { includeSuperseded: input.includeSuperseded }
     );
     return Result.success(recommendations);
   }

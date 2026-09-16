@@ -3,9 +3,7 @@ import type { GroundedRecommendation, Recommendation } from '@orange-concierge/c
 
 type CardRecommendation = Recommendation | GroundedRecommendation;
 
-export function EvidenceList({
-  recommendation,
-}: Readonly<{ recommendation: CardRecommendation }>) {
+export function EvidenceList({ recommendation }: Readonly<{ recommendation: CardRecommendation }>) {
   return (
     <div className="grid gap-2">
       <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-warning">
@@ -58,7 +56,7 @@ export function KnowledgeList({
               {citation.heading ? `${citation.heading} · ` : ''}
               {citation.sourcePath}
             </p>
-            <p className="mt-2 line-clamp-3 text-sm leading-6 text-foreground/85">
+            <p className="mt-2 line-clamp-4 text-sm leading-6 text-foreground/85">
               {citation.content}
             </p>
             <p className="mt-2 font-mono text-[11px] leading-4 text-subtle-foreground">

@@ -27,10 +27,8 @@ export function RecommendationCard({
       </div>
 
       <div className="grid gap-4 px-4 py-4">
-        <p className="max-w-3xl text-sm leading-6 text-foreground/90">
-          {recommendation.summary}
-        </p>
-        <div className="grid gap-4 lg:grid-cols-2">
+        <p className="max-w-3xl text-sm leading-6 text-foreground/90">{recommendation.summary}</p>
+        <div className="grid gap-4 lg:grid-cols-2 items-start">
           <EvidenceList recommendation={recommendation} />
           <KnowledgeList recommendation={recommendation} />
         </div>

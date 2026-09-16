@@ -18,8 +18,15 @@ export class InMemoryRecommendationRepository implements RecommendationRepositor
     return this.current?.id === id ? this.current : null;
   }
 
-  async listByInteraction(interactionId: string): Promise<readonly Recommendation[]> {
-    return this.recommendations.filter((r) => r.interactionId === interactionId);
+  async listByInteraction(
+    interactionId: string,
+    options?: Readonly<{ includeSuperseded?: boolean }>
+  ): Promise<readonly Recommendation[]> {
+    return this.recommendations.filter(
+      (r) =>
+        r.interactionId === interactionId &&
+        (!options?.includeSuperseded || r.status !== 'superseded')
+    );
   }
 
   async save(recommendation: Recommendation): Promise<void> {
