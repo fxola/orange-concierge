@@ -1,14 +1,14 @@
 import type {
-  TransactionalInteractionWriter,
-  TransactionalPorts,
-  TransactionManager,
+  InteractionTransactionManager,
+  InteractionTransactionalPorts,
+  TransactionalWriter,
 } from '../../../src/ports/transaction-manager';
 import type { AuditEvent } from '../../../src/ports/audit';
 import type { Interaction } from '../../../src/domain/interaction';
 import type { InMemoryInteractionRepository } from './inMemoryInteractionRepository';
 import type { RecordingAudit } from './inMemoryAuditPort';
 
-export class InMemoryTransactionManager implements TransactionManager {
+export class InMemoryTransactionManager implements InteractionTransactionManager {
   private failTransactionalAuditNext = false;
 
   constructor(
@@ -24,15 +24,15 @@ export class InMemoryTransactionManager implements TransactionManager {
     this.failNextTransactionalAudit();
   }
 
-  async execute<T>(work: (tx: TransactionalPorts) => Promise<T>): Promise<T> {
+  async execute<T>(work: (tx: InteractionTransactionalPorts) => Promise<T>): Promise<T> {
     const interactionSnapshot = this.interactionsRepo.snapshot();
     const auditSnapshot = this.audit.snapshot();
 
-    const interactions: TransactionalInteractionWriter = {
+    const interactions: TransactionalWriter<Interaction> = {
       save: (interaction: Interaction) => this.interactionsRepo.save(interaction),
     };
 
-    const tx: TransactionalPorts = {
+    const tx: InteractionTransactionalPorts = {
       interactions,
       audit: {
         record: async (event: AuditEvent) => {

@@ -1,19 +1,19 @@
 import type {
   AuditEvent,
   Interaction,
-  TransactionManager,
-  TransactionalPorts,
+  InteractionTransactionManager,
+  InteractionTransactionalPorts,
 } from '@orange-concierge/core';
 import { auditEvents, interactions } from '../../database';
 import type { OrangeConciergeDB } from '../../database';
 import { toInteractionRow } from './drizzle-interaction-repository';
 
-export class DrizzleTransactionManager implements TransactionManager {
+export class DrizzleTransactionManager implements InteractionTransactionManager {
   constructor(private readonly db: OrangeConciergeDB) {}
 
-  async execute<T>(commit: (tx: TransactionalPorts) => Promise<T>): Promise<T> {
+  async execute<T>(commit: (tx: InteractionTransactionalPorts) => Promise<T>): Promise<T> {
     return this.db.transaction(async (dbTx) => {
-      const tx: TransactionalPorts = {
+      const tx: InteractionTransactionalPorts = {
         interactions: {
           save: async (interaction: Interaction): Promise<void> => {
             const row = toInteractionRow(interaction);

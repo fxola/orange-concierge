@@ -12,4 +12,6 @@ export type Recommendation = Readonly<{
   title: string;
   rationale: string;
   createdAt: Date;
+  reviewerId?: string;
+  reviewedAt?: Date;
 }>;

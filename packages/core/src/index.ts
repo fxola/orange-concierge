@@ -4,6 +4,8 @@ export { ListInteractions } from './application/interaction/list-interactions';
 export { SubmitInteraction } from './application/interaction/submit-interaction';
 export { SearchKnowledge } from './application/knowledge/search-knowledge';
 export { GenerateRecommendations } from './application/recommendation/generate-recommendations';
+export { ReviewRecommendation } from './application/recommendation/review-recommendation';
+export { SubmitRecommendationForReview } from './application/recommendation/submit-recommendation-for-review';
 export { ListClients } from './application/client/list-clients';
 export { GetClient } from './application/client/get-client';
 export {
@@ -19,6 +21,10 @@ export {
   canSubmitInteractions,
   canViewInteractions,
 } from './application/interaction/policy';
+export {
+  canReviewRecommendations,
+  canSubmitRecommendationsForReview,
+} from './application/recommendation/policy';
 export {
   extractedFactsSchema,
   parseExtractedFacts,
@@ -36,7 +42,12 @@ export {
   UnauthorizedViewClientsError,
   InteractionAnalysisFailedError,
   InteractionNotFoundError,
+  InvalidRecommendationTransitionError,
+  RecommendationNotFoundError,
   RecommendationDraftingFailedError,
+  RecommendationReviewFailedError,
+  UnauthorizedReviewRecommendationError,
+  UnauthorizedSubmitRecommendationForReviewError,
   InteractionSubmissionFailedError,
   InvalidInteractionStateError,
   UnauthorizedAnalyzeInteractionError,
@@ -91,6 +102,15 @@ export type {
   GenerateRecommendationsResult,
   GenerateRecommendationsSuccess,
   GroundedRecommendation,
+  ReviewRecommendationDecision,
+  ReviewRecommendationDependencies,
+  ReviewRecommendationError,
+  ReviewRecommendationInput,
+  ReviewRecommendationResult,
+  SubmitRecommendationForReviewDependencies,
+  SubmitRecommendationForReviewError,
+  SubmitRecommendationForReviewInput,
+  SubmitRecommendationForReviewResult,
 } from './application/recommendation/types';
 export type { Actor, ActorRole } from './domain/actor';
 export { isActorRole } from './domain/actor';
@@ -108,6 +128,7 @@ export type {
   AuditResourceType,
 } from './ports/audit';
 export type { InteractionRepository } from './ports/interaction-repository';
+export type { RecommendationRepository } from './ports/recommendation-repository';
 export type {
   KnowledgeRetriever,
   KnowledgeSearchHit,
@@ -123,9 +144,12 @@ export type {
 } from './ports/recommendation-drafter';
 export type { ClientRepository } from './ports/client-repository';
 export type {
+  InteractionTransactionManager,
+  InteractionTransactionalPorts,
+  RecommendationReviewTransactionManager,
+  RecommendationReviewTransactionalPorts,
   TransactionManager,
-  TransactionalInteractionWriter,
-  TransactionalPorts,
+  TransactionalWriter,
 } from './ports/transaction-manager';
 export type {
   SecretFinding,
