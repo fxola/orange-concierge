@@ -7,15 +7,29 @@ export class InMemoryRecommendationRepository implements RecommendationRepositor
 
   constructor(recommendation: Recommendation | null) {
     this.current = recommendation;
+    if (recommendation) {
+      this.recommendations.push(recommendation);
+    }
   }
 
   async findById(id: string): Promise<Recommendation | null> {
+    const found = this.recommendations.find((r) => r.id === id);
+    if (found) return found;
     return this.current?.id === id ? this.current : null;
+  }
+
+  async listByInteraction(interactionId: string): Promise<readonly Recommendation[]> {
+    return this.recommendations.filter((r) => r.interactionId === interactionId);
   }
 
   async save(recommendation: Recommendation): Promise<void> {
     this.current = recommendation;
-    this.recommendations.push(recommendation);
+    const idx = this.recommendations.findIndex((r) => r.id === recommendation.id);
+    if (idx >= 0) {
+      this.recommendations[idx] = recommendation;
+    } else {
+      this.recommendations.push(recommendation);
+    }
   }
 
   getCurrent(): Recommendation | null {

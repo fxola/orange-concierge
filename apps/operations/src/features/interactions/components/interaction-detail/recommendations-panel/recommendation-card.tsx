@@ -1,13 +1,15 @@
-import type { GroundedRecommendation } from '@orange-concierge/core';
+import type { GroundedRecommendation, Recommendation } from '@orange-concierge/core';
 import { Badge } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
 import { EvidenceList, KnowledgeList } from './recommendation-citations';
 import { PRIORITY_LABELS, priorityTone } from './recommendation-priority';
 
+type CardRecommendation = Recommendation | GroundedRecommendation;
+
 export function RecommendationCard({
   recommendation,
   index,
-}: Readonly<{ recommendation: GroundedRecommendation; index: number }>) {
+}: Readonly<{ recommendation: CardRecommendation; index: number }>) {
   return (
     <article className="overflow-hidden rounded-md border border-border bg-surface-raised shadow-xs">
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border px-4 py-4">

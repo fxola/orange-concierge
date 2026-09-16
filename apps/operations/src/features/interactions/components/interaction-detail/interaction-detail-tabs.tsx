@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Text } from '@/components/ui/text';
 import type { InteractionRow } from '../../view-models/interactions';
+import type { RecommendationsViewModel } from '../../view-models/recommendations';
 import { AnalysisPanel } from './analysis-panel';
 import { SummaryPanel } from './summary-panel';
 import { TranscriptPanel } from './transcript-panel';
@@ -48,7 +49,11 @@ function tabsFor(row: InteractionRow): readonly DetailTab[] {
   return BASE_TABS;
 }
 
-function ActivePanel({ activeTab, row }: Readonly<{ activeTab: TabKey; row: InteractionRow }>) {
+function ActivePanel({
+  activeTab,
+  row,
+  recommendationsVm,
+}: Readonly<{ activeTab: TabKey; row: InteractionRow; recommendationsVm: RecommendationsViewModel }>) {
   if (activeTab === 'summary') {
     return <SummaryPanel row={row} />;
   }
@@ -61,10 +66,19 @@ function ActivePanel({ activeTab, row }: Readonly<{ activeTab: TabKey; row: Inte
     return <AnalysisPanel row={row} />;
   }
 
-  return <RecommendationsPanel interactionId={row.id} status={row.status} />;
+  return (
+    <RecommendationsPanel
+      interactionId={row.id}
+      status={row.status}
+      recommendationsVm={recommendationsVm}
+    />
+  );
 }
 
-export function InteractionDetailTabs({ row }: Readonly<{ row: InteractionRow }>) {
+export function InteractionDetailTabs({
+  row,
+  recommendationsVm,
+}: Readonly<{ row: InteractionRow; recommendationsVm: RecommendationsViewModel }>) {
   const tabs = tabsFor(row);
   const [activeTab, setActiveTab] = useState<TabKey>('summary');
   const activeTabMeta = tabs.find((tab) => tab.key === activeTab) ?? tabs[0];
@@ -117,7 +131,7 @@ export function InteractionDetailTabs({ row }: Readonly<{ row: InteractionRow }>
           aria-labelledby={`interaction-tab-${activeTab}`}
           className="p-4 sm:p-5"
         >
-          <ActivePanel activeTab={activeTab} row={row} />
+          <ActivePanel activeTab={activeTab} row={row} recommendationsVm={recommendationsVm} />
         </section>
       </div>
     </div>

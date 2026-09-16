@@ -36,6 +36,7 @@ export type GenerateRecommendationsDependencies = Readonly<{
 }>;
 
 export type GroundedRecommendation = Readonly<{
+  id?: string;
   title: string;
   summary: string;
   priority: RecommendationPriority;
@@ -97,3 +98,14 @@ export type ReviewRecommendationError =
   | UnauthorizedReviewRecommendationError;
 
 export type ReviewRecommendationResult = Result<Recommendation, ReviewRecommendationError>;
+
+export type ListRecommendationsInput = Readonly<{
+  actor: Actor;
+  interactionId: string;
+}>;
+
+export type ListRecommendationsDependencies = Readonly<{
+  recommendationRepository: RecommendationRepository;
+}>;
+
+export type ListRecommendationsResult = Result<readonly Recommendation[], never>;

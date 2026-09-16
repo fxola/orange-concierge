@@ -4,27 +4,33 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
-import type { GroundedRecommendation, InteractionStatus } from '@orange-concierge/core';
+import type { InteractionStatus } from '@orange-concierge/core';
 
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { generateRecommendations } from '../../../presenters/generate-recommendations';
+import type { RecommendationsViewModel } from '../../../view-models/recommendations';
 import { RecommendationCard } from './recommendation-card';
 import { Alert } from '@/components/ui/card';
 
 export function RecommendationsPanel({
   interactionId,
   status,
-}: Readonly<{ interactionId: string; status: InteractionStatus }>) {
+  recommendationsVm,
+}: Readonly<{
+  interactionId: string;
+  status: InteractionStatus;
+  recommendationsVm: RecommendationsViewModel;
+}>) {
   if (status !== 'analysis_completed') {
     return null;
   }
 
   const router = useRouter();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [recommendations, setRecommendations] = useState<readonly GroundedRecommendation[] | null>(
-    null
-  );
+
+  const recommendations =
+    recommendationsVm.status === 'ok' ? recommendationsVm.recommendations : [];
 
   const onGenerate = async () => {
     setIsGenerating(true);
@@ -33,12 +39,12 @@ export function RecommendationsPanel({
       const viewModel = await generateRecommendations(interactionId);
 
       if (viewModel.status === 'ok') {
-        setRecommendations(viewModel.recommendations);
         if (viewModel.recommendations.length === 0) {
           toast.error('No grounded recommendations returned.');
         } else {
           toast.success('Grounded recommendations generated.');
         }
+        router.refresh();
         return;
       }
 
@@ -76,22 +82,24 @@ export function RecommendationsPanel({
       </div>
 
       <div className="mt-4 grid gap-4">
-        {recommendations === null ? (
+        {recommendationsVm.status === 'empty' ? (
           <div className="rounded-sm border border-dashed border-border px-4 py-5 text-sm leading-6 text-muted-foreground">
             Generate recommendations after analysis to inspect the exact evidence and source chunks
             behind each draft.
           </div>
+        ) : recommendationsVm.status === 'unavailable' ? (
+          <Alert tone="warning" className="rounded-sm">
+            Unable to load recommendations. Please refresh the page.
+          </Alert>
         ) : recommendations.length === 0 ? (
-          <>
-            <Alert tone="warning" className="rounded-sm">
-              No recommendation passed grounding checks. The model may need more transcript evidence
-              or more relevant indexed guidance.
-            </Alert>
-          </>
+          <Alert tone="warning" className="rounded-sm">
+            No recommendation passed grounding checks. The model may need more transcript evidence
+            or more relevant indexed guidance.
+          </Alert>
         ) : (
           recommendations.map((recommendation, index) => (
             <RecommendationCard
-              key={`${recommendation.title}-${index}`}
+              key={`${recommendation.id ?? recommendation.title}-${index}`}
               recommendation={recommendation}
               index={index}
             />

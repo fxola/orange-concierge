@@ -6,6 +6,7 @@ export { SearchKnowledge } from './application/knowledge/search-knowledge';
 export { GenerateRecommendations } from './application/recommendation/generate-recommendations';
 export { ReviewRecommendation } from './application/recommendation/review-recommendation';
 export { SubmitRecommendationForReview } from './application/recommendation/submit-recommendation-for-review';
+export { ListRecommendations } from './application/recommendation/list-recommendations';
 export { ListClients } from './application/client/list-clients';
 export { GetClient } from './application/client/get-client';
 export {
@@ -102,6 +103,9 @@ export type {
   GenerateRecommendationsResult,
   GenerateRecommendationsSuccess,
   GroundedRecommendation,
+  ListRecommendationsDependencies,
+  ListRecommendationsInput,
+  ListRecommendationsResult,
   ReviewRecommendationDecision,
   ReviewRecommendationDependencies,
   ReviewRecommendationError,
