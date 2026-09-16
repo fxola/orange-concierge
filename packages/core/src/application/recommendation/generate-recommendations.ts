@@ -63,6 +63,8 @@ export class GenerateRecommendations {
     }));
 
     await this.deps.transactionManager.execute(async (tx) => {
+      await tx.recommendations.supersedeDraftsByInteractionId(interaction.id, now);
+
       for (const recommendation of recommendations) {
         await tx.recommendations.save({
           ...recommendation,

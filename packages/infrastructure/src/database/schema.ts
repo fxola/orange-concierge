@@ -40,6 +40,7 @@ export const auditResourceType = pgEnum('audit_resource_type', [
 
 export const recommendationStatus = pgEnum('recommendation_status', [
   'draft',
+  'superseded',
   'pending_review',
   'approved',
   'rejected',
@@ -84,6 +85,10 @@ export const recommendations = pgTable('recommendations', {
     mode: 'date',
     withTimezone: true,
   }).notNull(),
+  supersededAt: timestamp('superseded_at', {
+    mode: 'date',
+    withTimezone: true,
+  }),
   reviewerId: text('reviewer_id'),
   reviewedAt: timestamp('reviewed_at', {
     mode: 'date',

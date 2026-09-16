@@ -2,7 +2,12 @@ import type { EvidenceReference } from '../application/interaction/extracted-fac
 import type { KnowledgeSearchHit } from '../ports/knowledge-retriever';
 import type { RecommendationPriority } from '../ports/recommendation-drafter';
 
-export type RecommendationStatus = 'draft' | 'pending_review' | 'approved' | 'rejected';
+export type RecommendationStatus =
+  | 'draft'
+  | 'superseded'
+  | 'pending_review'
+  | 'approved'
+  | 'rejected';
 
 export type Recommendation = Readonly<{
   id: string;
@@ -16,6 +21,7 @@ export type Recommendation = Readonly<{
   clientEvidence?: readonly EvidenceReference[];
   knowledgeCitations?: readonly KnowledgeSearchHit[];
   createdAt: Date;
+  supersededAt?: Date;
   reviewerId?: string;
   reviewedAt?: Date;
 }>;

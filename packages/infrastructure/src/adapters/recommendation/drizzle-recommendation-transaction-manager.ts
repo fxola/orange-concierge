@@ -4,6 +4,7 @@ import type {
   RecommendationTransactionalPorts,
   RecommendationTransactionManager,
 } from '@orange-concierge/core';
+import { and, eq } from 'drizzle-orm';
 import { auditEvents, recommendations } from '../../database';
 import type { OrangeConciergeDB } from '../../database';
 
@@ -20,6 +21,7 @@ function toRecommendationRow(recommendation: Recommendation): typeof recommendat
     clientEvidence: recommendation.clientEvidence ? [...recommendation.clientEvidence] : null,
     knowledgeCitations: recommendation.knowledgeCitations ? [...recommendation.knowledgeCitations] : null,
     createdAt: recommendation.createdAt,
+    supersededAt: recommendation.supersededAt ?? null,
     reviewerId: recommendation.reviewerId ?? null,
     reviewedAt: recommendation.reviewedAt ?? null,
   };
@@ -38,6 +40,20 @@ export class DrizzleRecommendationTransactionManager implements RecommendationTr
               target: recommendations.id,
               set: row,
             });
+          },
+          supersedeDraftsByInteractionId: async (
+            interactionId: string,
+            supersededAt: Date
+          ): Promise<void> => {
+            await dbTx
+              .update(recommendations)
+              .set({ status: 'superseded', supersededAt })
+              .where(
+                and(
+                  eq(recommendations.interactionId, interactionId),
+                  eq(recommendations.status, 'draft')
+                )
+              );
           },
         },
         audit: {

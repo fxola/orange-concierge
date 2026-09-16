@@ -18,6 +18,7 @@ function toDomain(row: RecommendationRow): Recommendation {
     clientEvidence: row.clientEvidence ?? undefined,
     knowledgeCitations: row.knowledgeCitations ?? undefined,
     createdAt: row.createdAt,
+    supersededAt: row.supersededAt ?? undefined,
     reviewerId: row.reviewerId ?? undefined,
     reviewedAt: row.reviewedAt ?? undefined,
   };
@@ -36,6 +37,7 @@ function toRow(recommendation: Recommendation): typeof recommendations.$inferIns
     clientEvidence: recommendation.clientEvidence ? [...recommendation.clientEvidence] : null,
     knowledgeCitations: recommendation.knowledgeCitations ? [...recommendation.knowledgeCitations] : null,
     createdAt: recommendation.createdAt,
+    supersededAt: recommendation.supersededAt ?? null,
     reviewerId: recommendation.reviewerId ?? null,
     reviewedAt: recommendation.reviewedAt ?? null,
   };

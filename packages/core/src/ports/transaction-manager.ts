@@ -10,13 +10,17 @@ export interface TransactionManager<TPorts> {
   execute<T>(commit: (tx: TPorts) => Promise<T>): Promise<T>;
 }
 
+export interface TransactionalRecommendationWriter extends TransactionalWriter<Recommendation> {
+  supersedeDraftsByInteractionId(interactionId: string, supersededAt: Date): Promise<void>;
+}
+
 export interface InteractionTransactionalPorts {
   interactions: TransactionalWriter<Interaction>;
   audit: AuditPort;
 }
 
 export interface RecommendationTransactionalPorts {
-  recommendations: TransactionalWriter<Recommendation>;
+  recommendations: TransactionalRecommendationWriter;
   audit: AuditPort;
 }
 
