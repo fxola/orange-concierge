@@ -6,7 +6,8 @@ export type AuditAction =
   | 'interaction_scan_blocked'
   | 'interaction_analysis_completed'
   | 'interaction_analysis_failed'
-  | 'recommendation_reviewed';
+  | 'recommendation_reviewed'
+  | 'recommendation_edited';
 
 export type AuditResourceType = 'client' | 'interaction' | 'recommendation';
 

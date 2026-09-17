@@ -4,6 +4,7 @@ export { ListInteractions } from './application/interaction/list-interactions';
 export { SubmitInteraction } from './application/interaction/submit-interaction';
 export { SearchKnowledge } from './application/knowledge/search-knowledge';
 export { GenerateRecommendations } from './application/recommendation/generate-recommendations';
+export { EditRecommendationDraft } from './application/recommendation/edit-recommendation-draft';
 export { ReviewRecommendation } from './application/recommendation/review-recommendation';
 export { SubmitRecommendationForReview } from './application/recommendation/submit-recommendation-for-review';
 export { ListRecommendations } from './application/recommendation/list-recommendations';
@@ -16,6 +17,7 @@ export {
   canViewInteractions,
 } from './application/interaction/policy';
 export {
+  canEditRecommendationDrafts,
   canReviewRecommendations,
   canSubmitRecommendationsForReview,
 } from './application/recommendation/policy';
@@ -34,13 +36,16 @@ export {
   InvalidKnowledgeSearchLimitError,
   InvalidKnowledgeSearchQueryError,
   InvalidPaginationError,
+  InvalidRecommendationEditError,
   InvalidRecommendationIdError,
+  UnauthorizedEditRecommendationError,
   UnauthorizedViewClientsError,
   InteractionAnalysisFailedError,
   InteractionNotFoundError,
   InvalidRecommendationTransitionError,
   RecommendationNotFoundError,
   RecommendationDraftingFailedError,
+  RecommendationEditFailedError,
   RecommendationReviewFailedError,
   UnauthorizedReviewRecommendationError,
   UnauthorizedSubmitRecommendationForReviewError,
@@ -98,6 +103,11 @@ export type {
   GenerateRecommendationsResult,
   GenerateRecommendationsSuccess,
   GroundedRecommendation,
+  EditRecommendationDraftDependencies,
+  EditRecommendationDraftError,
+  EditRecommendationDraftInput,
+  EditRecommendationDraftPatch,
+  EditRecommendationDraftResult,
   ListRecommendationsDependencies,
   ListRecommendationsInput,
   ListRecommendationsResult,

@@ -7,3 +7,7 @@ export const canSubmitRecommendationsForReview = (actor: Actor): boolean => {
 export const canReviewRecommendations = (actor: Actor): boolean => {
   return actor.role === 'admin' || actor.role === 'reviewer';
 };
+
+export const canEditRecommendationDrafts = (actor: Actor): boolean => {
+  return actor.role === 'admin' || actor.role === 'consultant';
+};
