@@ -22,6 +22,13 @@ Feature: Review recommendations
     And the reviewer identity and review timestamp are recorded
     And a recommendation reviewed audit event is recorded without sensitive text
 
+  Scenario: Admin approves a pending recommendation
+    Given a pending review recommendation exists
+    When the admin approves the recommendation
+    Then the recommendation is approved
+    And the admin reviewer identity and review timestamp are recorded
+    And an admin recommendation reviewed audit event is recorded without sensitive text
+
   Scenario: Review approval rolls back when audit recording fails
     Given a pending review recommendation exists
     And transactional audit recording fails
@@ -36,6 +43,13 @@ Feature: Review recommendations
     Then the recommendation is rejected
     And the reviewer identity and review timestamp are recorded
     And a recommendation reviewed audit event is recorded without sensitive text
+
+  Scenario: Admin rejects a pending recommendation
+    Given a pending review recommendation exists
+    When the admin rejects the recommendation
+    Then the recommendation is rejected
+    And the admin reviewer identity and review timestamp are recorded
+    And an admin recommendation reviewed audit event is recorded without sensitive text
 
   Scenario: Draft recommendation cannot be approved directly
     Given a draft recommendation exists

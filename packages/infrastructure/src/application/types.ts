@@ -14,8 +14,12 @@ import type {
   GenerateRecommendationsResult,
   ListRecommendationsInput,
   ListRecommendationsResult,
+  ReviewRecommendationInput,
+  ReviewRecommendationResult,
   SearchKnowledgeInput,
   SearchKnowledgeResult,
+  SubmitRecommendationForReviewInput,
+  SubmitRecommendationForReviewResult,
   SubmitInteractionInput,
   SubmitInteractionResult,
 } from '@orange-concierge/core';
@@ -35,8 +39,12 @@ export type {
   GenerateRecommendationsResult,
   ListRecommendationsInput,
   ListRecommendationsResult,
+  ReviewRecommendationInput,
+  ReviewRecommendationResult,
   SearchKnowledgeInput,
   SearchKnowledgeResult,
+  SubmitRecommendationForReviewInput,
+  SubmitRecommendationForReviewResult,
 };
 export type { SubmitInteractionInput, SubmitInteractionResult };
 
@@ -58,5 +66,9 @@ export type Application = Readonly<{
   recommendations: {
     generate: (input: GenerateRecommendationsInput) => Promise<GenerateRecommendationsResult>;
     list: (input: ListRecommendationsInput) => Promise<ListRecommendationsResult>;
+    submitForReview: (
+      input: SubmitRecommendationForReviewInput
+    ) => Promise<SubmitRecommendationForReviewResult>;
+    review: (input: ReviewRecommendationInput) => Promise<ReviewRecommendationResult>;
   };
 }>;

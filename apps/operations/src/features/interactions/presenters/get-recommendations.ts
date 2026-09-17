@@ -16,7 +16,7 @@ export async function getRecommendations(interactionId: string): Promise<Recomme
       includeSuperseded: false,
     });
 
-    return toRecommendationsViewModel(result);
+    return toRecommendationsViewModel(result, actor);
   } catch (error) {
     if (isNextControlFlowError(error)) {
       throw error;

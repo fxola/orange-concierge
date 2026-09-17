@@ -26,6 +26,7 @@ const fixedReviewedAt = new Date('2026-09-16T10:00:00.000Z');
 
 const consultant: Actor = { id: 'consultant-1', role: 'consultant' };
 const reviewer: Actor = { id: 'reviewer-1', role: 'reviewer' };
+const admin: Actor = { id: 'admin-1', role: 'admin' };
 
 const recommendationId = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
 const clientId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
@@ -116,6 +117,10 @@ export function reviewRecommendationWorld() {
 
     reviewer() {
       return reviewer;
+    },
+
+    admin() {
+      return admin;
     },
 
     fixedReviewedAt() {

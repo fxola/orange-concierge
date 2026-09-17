@@ -20,6 +20,8 @@ const RECOMMENDATION_SYSTEM_PROMPT = [
   'priority must be one of: low, medium, high.',
   'Return at most two recommendations.',
   'Keep each title under 80 characters and each summary under 180 characters.',
+  'Write each title as a single imperative action starting with a verb (for example "Confirm...", "Move...", or "Enable...").',
+  'Write each summary as the reason in one short sentence that completes the title without repeating it, so title plus summary read as one merged "Do X because Y" statement.',
   'clientEvidence must contain exact factPath strings from the provided client evidence.',
   'knowledgeSources must contain exact chunkId strings from the retrieved knowledge.',
   'Use only the provided facts, readiness score, client evidence, and retrieved knowledge.',

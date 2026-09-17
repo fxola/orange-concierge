@@ -139,6 +139,75 @@ describeFeature(feature, ({ Scenario }) => {
     });
   });
 
+  Scenario('Admin approves a pending recommendation', ({ Given, When, Then, And }) => {
+    const world = reviewRecommendationWorld();
+    let result: ReviewRecommendationResult;
+    let auditSpy: ReturnType<typeof vi.spyOn>;
+
+    Given('a pending review recommendation exists', () => {
+      world.givenPendingReviewRecommendation();
+      auditSpy = vi.spyOn(world.audit(), 'record');
+    });
+
+    When('the admin approves the recommendation', async () => {
+      result = await world.reviewRecommendation().execute({
+        actor: world.admin(),
+        recommendationId: world.recommendation().id,
+        decision: 'approved',
+      });
+    });
+
+    Then('the recommendation is approved', () => {
+      expect(result.isSuccess()).toBe(true);
+      expect(world.recommendation().status).toBe('approved');
+    });
+
+    And('the admin reviewer identity and review timestamp are recorded', () => {
+      expect(world.recommendation().reviewerId).toBe(world.admin().id);
+      expect(world.recommendation().reviewedAt).toEqual(world.fixedReviewedAt());
+    });
+
+    And('an admin recommendation reviewed audit event is recorded without sensitive text', () => {
+      expect(auditSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          actor: world.admin(),
+          action: 'recommendation_reviewed',
+          resource: { type: 'recommendation', id: world.recommendation().id },
+          occurredAt: world.fixedReviewedAt(),
+          metadata: expect.objectContaining({
+            previousStatus: 'pending_review',
+            newStatus: 'approved',
+            interactionId: world.interactionId(),
+            clientId: world.clientId(),
+          }),
+        })
+      );
+      const [event] = world.audit().events;
+
+      expect(event).toMatchObject({
+        actor: world.admin(),
+        action: 'recommendation_reviewed',
+        resource: { type: 'recommendation', id: world.recommendation().id },
+        occurredAt: world.fixedReviewedAt(),
+        metadata: {
+          previousStatus: 'pending_review',
+          newStatus: 'approved',
+          interactionId: world.interactionId(),
+          clientId: world.clientId(),
+        },
+      });
+      expect(JSON.stringify(event?.metadata ?? {})).not.toContain(
+        world.sensitiveRecommendationText()[0]
+      );
+      expect(JSON.stringify(event?.metadata ?? {})).not.toContain(
+        world.sensitiveRecommendationText()[1]
+      );
+      expect(JSON.stringify(event?.metadata ?? {})).not.toContain(
+        world.sensitiveRecommendationText()[2]
+      );
+    });
+  });
+
   Scenario(
     'Review approval rolls back when audit recording fails',
     ({ Given, And, When, Then }) => {
@@ -227,6 +296,75 @@ describeFeature(feature, ({ Scenario }) => {
 
       expect(event).toMatchObject({
         actor: world.reviewer(),
+        action: 'recommendation_reviewed',
+        resource: { type: 'recommendation', id: world.recommendation().id },
+        occurredAt: world.fixedReviewedAt(),
+        metadata: {
+          previousStatus: 'pending_review',
+          newStatus: 'rejected',
+          interactionId: world.interactionId(),
+          clientId: world.clientId(),
+        },
+      });
+      expect(JSON.stringify(event?.metadata ?? {})).not.toContain(
+        world.sensitiveRecommendationText()[0]
+      );
+      expect(JSON.stringify(event?.metadata ?? {})).not.toContain(
+        world.sensitiveRecommendationText()[1]
+      );
+      expect(JSON.stringify(event?.metadata ?? {})).not.toContain(
+        world.sensitiveRecommendationText()[2]
+      );
+    });
+  });
+
+  Scenario('Admin rejects a pending recommendation', ({ Given, When, Then, And }) => {
+    const world = reviewRecommendationWorld();
+    let result: ReviewRecommendationResult;
+    let auditSpy: ReturnType<typeof vi.spyOn>;
+
+    Given('a pending review recommendation exists', () => {
+      world.givenPendingReviewRecommendation();
+      auditSpy = vi.spyOn(world.audit(), 'record');
+    });
+
+    When('the admin rejects the recommendation', async () => {
+      result = await world.reviewRecommendation().execute({
+        actor: world.admin(),
+        recommendationId: world.recommendation().id,
+        decision: 'rejected',
+      });
+    });
+
+    Then('the recommendation is rejected', () => {
+      expect(result.isSuccess()).toBe(true);
+      expect(world.recommendation().status).toBe('rejected');
+    });
+
+    And('the admin reviewer identity and review timestamp are recorded', () => {
+      expect(world.recommendation().reviewerId).toBe(world.admin().id);
+      expect(world.recommendation().reviewedAt).toEqual(world.fixedReviewedAt());
+    });
+
+    And('an admin recommendation reviewed audit event is recorded without sensitive text', () => {
+      expect(auditSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          actor: world.admin(),
+          action: 'recommendation_reviewed',
+          resource: { type: 'recommendation', id: world.recommendation().id },
+          occurredAt: world.fixedReviewedAt(),
+          metadata: expect.objectContaining({
+            previousStatus: 'pending_review',
+            newStatus: 'rejected',
+            interactionId: world.interactionId(),
+            clientId: world.clientId(),
+          }),
+        })
+      );
+      const [event] = world.audit().events;
+
+      expect(event).toMatchObject({
+        actor: world.admin(),
         action: 'recommendation_reviewed',
         resource: { type: 'recommendation', id: world.recommendation().id },
         occurredAt: world.fixedReviewedAt(),
