@@ -13,7 +13,9 @@ import {
   ListClients,
   ListInteractions,
   ListRecommendations,
+  ReviewRecommendation,
   SearchKnowledge,
+  SubmitRecommendationForReview,
   SubmitInteraction,
 } from '@orange-concierge/core';
 import { PatternSecretScanner } from '@orange-concierge/security';
@@ -47,10 +49,9 @@ const createApplicationRuntime = (runtimeConfig: BackendConfig): ApplicationRunt
   const trustedOrigins = runtimeConfig.auth.trustedOrigins;
 
   const clientRepository = new DrizzleClientRepository(db);
-  const transactionManager = new DrizzleTransactionManager(db);
 
   const auth = createAuth({ db, baseURL, secret, trustedOrigins });
-  const interaction = buildInteraction(db, transactionManager, clientRepository, runtimeConfig.ai);
+  const interaction = buildInteraction(db, clientRepository, runtimeConfig.ai);
   const clients = buildClients(clientRepository);
   const knowledge = buildKnowledge(db, runtimeConfig.ai);
   const recommendations = buildRecommendations(db, runtimeConfig.ai);
@@ -71,10 +72,11 @@ const createApplicationRuntime = (runtimeConfig: BackendConfig): ApplicationRunt
 
 const buildInteraction = (
   db: OrangeConciergeDB,
-  transactionManager: DrizzleTransactionManager,
   clientRepository: DrizzleClientRepository,
   aiConfig: AIConfig
 ): Application['interaction'] => {
+  const transactionManager = new DrizzleTransactionManager(db);
+
   const submitInteractionUseCase = new SubmitInteraction({
     transactionManager,
     clientRepository,
@@ -86,6 +88,7 @@ const buildInteraction = (
   const interactionRepository = new DrizzleInteractionRepository(db);
   const secretScanner = new PatternSecretScanner();
   const structuredLLM = createStructuredLLM(aiConfig);
+
   const analyzeInteractionUseCase = new AnalyzeInteraction({
     interactionsRepo: interactionRepository,
     secretScanner,
@@ -94,10 +97,12 @@ const buildInteraction = (
     transactionManager,
     now: () => new Date(),
   });
+
   const listInteractionsUseCase = new ListInteractions({
     clientRepository,
     interactionsRepo: interactionRepository,
   });
+
   const getInteractionUseCase = new GetInteraction({ interactionsRepo: interactionRepository });
 
   return {
@@ -148,9 +153,21 @@ const buildRecommendations = (
     interactionRepository: interactionsRepo,
   });
 
+  const submitRecommendationForReviewUseCase = new SubmitRecommendationForReview({
+    recommendationRepository,
+  });
+
+  const reviewRecommendationUseCase = new ReviewRecommendation({
+    recommendationRepository,
+    transactionManager,
+    now: () => new Date(),
+  });
+
   return {
     generate: (input) => generateRecommendationsUseCase.execute(input),
     list: (input) => listRecommendationsUseCase.execute(input),
+    submitForReview: (input) => submitRecommendationForReviewUseCase.execute(input),
+    review: (input) => reviewRecommendationUseCase.execute(input),
   };
 };
 

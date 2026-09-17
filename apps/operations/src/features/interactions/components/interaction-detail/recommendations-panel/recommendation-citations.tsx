@@ -1,70 +1,55 @@
-import { BookOpen, Quote } from 'lucide-react';
 import type { GroundedRecommendation, Recommendation } from '@orange-concierge/core';
 
 type CardRecommendation = Recommendation | GroundedRecommendation;
 
-export function EvidenceList({ recommendation }: Readonly<{ recommendation: CardRecommendation }>) {
-  return (
-    <div className="grid gap-2">
-      <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-warning">
-        <Quote aria-hidden="true" className="h-3.5 w-3.5" />
-        Client evidence
-      </div>
-      <div className="grid gap-2">
-        {(recommendation.clientEvidence ?? []).map((evidence) => (
-          <figure
-            key={`${recommendation.title}-${evidence.factPath}`}
-            className="rounded-sm border border-warning/30 bg-warning-surface px-3 py-2.5"
-          >
-            <figcaption className="text-[11px] font-semibold text-warning">
-              {evidence.factPath}
-            </figcaption>
-            <blockquote className="mt-1 font-display text-sm leading-6 text-foreground">
-              "{evidence.quote}"
-            </blockquote>
-          </figure>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-export function KnowledgeList({
+export function RecommendationProof({
   recommendation,
 }: Readonly<{ recommendation: CardRecommendation }>) {
+  const evidence = recommendation.clientEvidence ?? [];
+  const citations = recommendation.knowledgeCitations ?? [];
+  const summary = `${evidence.length} ${evidence.length === 1 ? 'quote' : 'quotes'} • ${citations.length} ${citations.length === 1 ? 'guide' : 'guides'}`;
+
   return (
-    <div className="grid gap-2">
-      <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-info">
-        <BookOpen aria-hidden="true" className="h-3.5 w-3.5" />
-        Knowledge citations
-      </div>
-      <div className="grid gap-2">
-        {(recommendation.knowledgeCitations ?? []).map((citation) => (
-          <article
-            key={`${recommendation.title}-${citation.chunkId}`}
-            className="rounded-sm border border-info/30 bg-info-surface px-3 py-2.5"
-          >
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-sm font-semibold leading-5 text-foreground">
+    <details className="group rounded-sm border border-border bg-background/40 px-3 py-2">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm leading-6 text-muted-foreground transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden">
+        <span className="tabular-nums">{summary}</span>
+        <span className="text-xs font-semibold text-muted-foreground group-open:hidden">
+          Show details
+        </span>
+        <span className="hidden text-xs font-semibold text-muted-foreground group-open:inline">
+          Hide
+        </span>
+      </summary>
+      <div className="grid gap-3 pb-1 pt-3">
+        <div className="grid gap-2">
+          {evidence.map((item) => (
+            <blockquote
+              key={`${recommendation.title}-${item.factPath}`}
+              title={`Source: ${item.factPath}`}
+              className="cursor-help border-l-2 border-border px-3 text-sm leading-6 text-muted-foreground"
+            >
+              “{item.quote}”
+            </blockquote>
+          ))}
+        </div>
+        <div className="grid gap-1">
+          {citations.map((citation) => (
+            <div
+              key={`${recommendation.title}-${citation.chunkId}`}
+              title={`Source: ${citation.sourcePath} • ${citation.chunkId}`}
+              className="flex cursor-help items-baseline justify-between gap-3"
+            >
+              <p className="min-w-0 truncate text-xs leading-5 text-muted-foreground">
                 {citation.sourceTitle}
+                {citation.heading ? ` — ${citation.heading}` : ''}
               </p>
-              <span className="rounded-full bg-background/70 px-2 py-0.5 text-[11px] font-semibold text-info tabular-nums">
+              <span className="shrink-0 text-[11px] font-semibold text-muted-foreground tabular-nums">
                 {Math.round(citation.score * 100)}% match
               </span>
             </div>
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">
-              {citation.heading ? `${citation.heading} · ` : ''}
-              {citation.sourcePath}
-            </p>
-            <p className="mt-2 line-clamp-4 text-sm leading-6 text-foreground/85">
-              {citation.content}
-            </p>
-            <p className="mt-2 font-mono text-[11px] leading-4 text-subtle-foreground">
-              {citation.chunkId}
-            </p>
-          </article>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
+    </details>
   );
 }

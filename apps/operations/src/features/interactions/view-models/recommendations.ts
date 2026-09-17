@@ -1,14 +1,24 @@
 import 'server-only';
 
-import type { ListRecommendationsResult, Recommendation } from '@orange-concierge/core';
+import type { Actor, ListRecommendationsResult, Recommendation } from '@orange-concierge/core';
+import {
+  canReviewRecommendations,
+  canSubmitRecommendationsForReview,
+} from '@orange-concierge/core';
 
 export type RecommendationsViewModel =
-  | Readonly<{ status: 'ok'; recommendations: readonly Recommendation[] }>
+  | Readonly<{
+      status: 'ok';
+      recommendations: readonly Recommendation[];
+      canReview: boolean;
+      canSubmitForReview: boolean;
+    }>
   | Readonly<{ status: 'empty' }>
   | Readonly<{ status: 'unavailable' }>;
 
 export function toRecommendationsViewModel(
-  result: ListRecommendationsResult
+  result: ListRecommendationsResult,
+  actor: Actor
 ): RecommendationsViewModel {
   if (result.isFailure()) {
     return { status: 'unavailable' };
@@ -19,5 +29,10 @@ export function toRecommendationsViewModel(
     return { status: 'empty' };
   }
 
-  return { status: 'ok', recommendations };
+  return {
+    status: 'ok',
+    recommendations,
+    canReview: canReviewRecommendations(actor),
+    canSubmitForReview: canSubmitRecommendationsForReview(actor),
+  };
 }

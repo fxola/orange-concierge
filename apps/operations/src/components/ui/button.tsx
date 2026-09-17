@@ -1,6 +1,13 @@
 import type { ButtonHTMLAttributes } from 'react';
 
-type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'sidebar';
+type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'outline'
+  | 'ghost'
+  | 'danger'
+  | 'destructive'
+  | 'sidebar';
 type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
@@ -15,6 +22,8 @@ const VARIANTS: Record<ButtonVariant, string> = {
   outline: 'border border-border-strong bg-transparent text-foreground hover:bg-surface-muted',
   ghost: 'bg-transparent text-foreground hover:bg-surface-muted',
   danger: 'bg-danger text-white',
+  destructive:
+    'border border-danger/50 bg-transparent text-danger hover:bg-danger-surface active:bg-danger-surface',
   // Fixed navy shell (identical in both themes): light iconography on dark.
   sidebar: 'bg-transparent text-[#f7f4ed]/60 hover:bg-white/10 hover:text-white',
 };
