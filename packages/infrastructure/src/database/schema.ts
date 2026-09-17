@@ -30,6 +30,7 @@ export const auditAction = pgEnum('audit_action', [
   'interaction_analysis_completed',
   'interaction_analysis_failed',
   'recommendation_reviewed',
+  'recommendation_edited',
 ]);
 
 export const auditResourceType = pgEnum('audit_resource_type', [

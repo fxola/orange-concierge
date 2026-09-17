@@ -85,6 +85,31 @@ export class UnauthorizedSubmitRecommendationForReviewError extends Error {
   }
 }
 
+export class UnauthorizedEditRecommendationError extends Error {
+  readonly code = 'unauthorized_recommendation_edit';
+  constructor(role: Actor['role']) {
+    super(`Actor role ${role} cannot edit recommendation drafts`);
+    this.name = 'UnauthorizedEditRecommendationError';
+  }
+}
+
+export class InvalidRecommendationEditError extends Error {
+  readonly code = 'invalid_recommendation_edit';
+  constructor(reason: string) {
+    super(`Recommendation edit is invalid: ${reason}`);
+    this.name = 'InvalidRecommendationEditError';
+  }
+}
+
+export class RecommendationEditFailedError extends Error {
+  readonly code = 'recommendation_edit_failed';
+  constructor(cause?: unknown) {
+    super('Recommendation edit failed');
+    this.name = 'RecommendationEditFailedError';
+    this.cause = cause as Error | undefined;
+  }
+}
+
 export class BlankTranscriptError extends Error {
   readonly code = 'blank_transcript';
   constructor() {

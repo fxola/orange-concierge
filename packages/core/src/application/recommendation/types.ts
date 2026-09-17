@@ -5,11 +5,14 @@ import type {
   InteractionAnalysisFailedError,
   InteractionNotFoundError,
   InvalidInteractionIdError,
+  InvalidRecommendationEditError,
   InvalidRecommendationIdError,
   InvalidRecommendationTransitionError,
+  RecommendationEditFailedError,
   RecommendationNotFoundError,
   RecommendationDraftingFailedError,
   RecommendationReviewFailedError,
+  UnauthorizedEditRecommendationError,
   UnauthorizedReviewRecommendationError,
   UnauthorizedSubmitRecommendationForReviewError,
 } from '../../errors';
@@ -103,6 +106,34 @@ export type ReviewRecommendationError =
   | UnauthorizedReviewRecommendationError;
 
 export type ReviewRecommendationResult = Result<Recommendation, ReviewRecommendationError>;
+
+export type EditRecommendationDraftPatch = Readonly<{
+  title?: string;
+  summary?: string;
+  priority?: RecommendationPriority;
+}>;
+
+export type EditRecommendationDraftInput = Readonly<{
+  actor: Actor;
+  recommendationId: string;
+  patch: EditRecommendationDraftPatch;
+}>;
+
+export type EditRecommendationDraftDependencies = Readonly<{
+  recommendationRepository: RecommendationRepository;
+  transactionManager: RecommendationTransactionManager;
+  now: () => Date;
+}>;
+
+export type EditRecommendationDraftError =
+  | RecommendationNotFoundError
+  | InvalidRecommendationIdError
+  | InvalidRecommendationTransitionError
+  | InvalidRecommendationEditError
+  | RecommendationEditFailedError
+  | UnauthorizedEditRecommendationError;
+
+export type EditRecommendationDraftResult = Result<Recommendation, EditRecommendationDraftError>;
 
 export type ListRecommendationsInput = Readonly<{
   actor: Actor;

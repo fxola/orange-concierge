@@ -4,6 +4,8 @@ import type {
   GetClientResult,
   AnalyzeInteractionInput,
   AnalyzeInteractionResult,
+  EditRecommendationDraftInput,
+  EditRecommendationDraftResult,
   GetInteractionInput,
   GetInteractionResult,
   ListClientsInput,
@@ -29,6 +31,8 @@ export type {
   GetClientResult,
   AnalyzeInteractionInput,
   AnalyzeInteractionResult,
+  EditRecommendationDraftInput,
+  EditRecommendationDraftResult,
   GetInteractionInput,
   GetInteractionResult,
   ListClientsInput,
@@ -70,5 +74,6 @@ export type Application = Readonly<{
       input: SubmitRecommendationForReviewInput
     ) => Promise<SubmitRecommendationForReviewResult>;
     review: (input: ReviewRecommendationInput) => Promise<ReviewRecommendationResult>;
+    editDraft: (input: EditRecommendationDraftInput) => Promise<EditRecommendationDraftResult>;
   };
 }>;

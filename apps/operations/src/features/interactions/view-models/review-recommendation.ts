@@ -20,7 +20,8 @@ export function toRecommendationActionErrorViewModel(
   if (
     failure.status === 403 ||
     failure.code === 'unauthorized_recommendation_submit_for_review' ||
-    failure.code === 'unauthorized_recommendation_review'
+    failure.code === 'unauthorized_recommendation_review' ||
+    failure.code === 'unauthorized_recommendation_edit'
   ) {
     return error('Your role cannot perform that recommendation action.', false);
   }
@@ -43,6 +44,14 @@ export function toRecommendationActionErrorViewModel(
 
   if (failure.code === 'recommendation_review_failed') {
     return error('Review failed while recording the audit trail. Try again.', false);
+  }
+
+  if (failure.code === 'invalid_recommendation_edit') {
+    return error('Check your edits: title and summary must be non-empty, and priority low, medium, or high.', false);
+  }
+
+  if (failure.code === 'recommendation_edit_failed') {
+    return error('Edit failed while saving the draft. Try again.', false);
   }
 
   return error('Something went wrong while updating the recommendation. Try again.', false);

@@ -2,6 +2,7 @@ import 'server-only';
 
 import type { Actor, ListRecommendationsResult, Recommendation } from '@orange-concierge/core';
 import {
+  canEditRecommendationDrafts,
   canReviewRecommendations,
   canSubmitRecommendationsForReview,
 } from '@orange-concierge/core';
@@ -12,6 +13,7 @@ export type RecommendationsViewModel =
       recommendations: readonly Recommendation[];
       canReview: boolean;
       canSubmitForReview: boolean;
+      canEdit: boolean;
     }>
   | Readonly<{ status: 'empty' }>
   | Readonly<{ status: 'unavailable' }>;
@@ -34,5 +36,6 @@ export function toRecommendationsViewModel(
     recommendations,
     canReview: canReviewRecommendations(actor),
     canSubmitForReview: canSubmitRecommendationsForReview(actor),
+    canEdit: canEditRecommendationDrafts(actor),
   };
 }
