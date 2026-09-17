@@ -7,6 +7,7 @@ import {
 } from '@orange-concierge/ai';
 import {
   AnalyzeInteraction,
+  EditRecommendationDraft,
   GenerateRecommendations,
   GetInteraction,
   GetClient,
@@ -163,11 +164,18 @@ const buildRecommendations = (
     now: () => new Date(),
   });
 
+  const editRecommendationDraftUseCase = new EditRecommendationDraft({
+    recommendationRepository,
+    transactionManager,
+    now: () => new Date(),
+  });
+
   return {
     generate: (input) => generateRecommendationsUseCase.execute(input),
     list: (input) => listRecommendationsUseCase.execute(input),
     submitForReview: (input) => submitRecommendationForReviewUseCase.execute(input),
     review: (input) => reviewRecommendationUseCase.execute(input),
+    editDraft: (input) => editRecommendationDraftUseCase.execute(input),
   };
 };
 

@@ -4,11 +4,16 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
-import type { InteractionStatus, ReviewRecommendationDecision } from '@orange-concierge/core';
+import type {
+  EditRecommendationDraftPatch,
+  InteractionStatus,
+  ReviewRecommendationDecision,
+} from '@orange-concierge/core';
 
 import { Button } from '@/components/ui/button';
 import { generateRecommendations } from '../../../presenters/generate-recommendations';
 import {
+  editRecommendationDraft,
   reviewRecommendation,
   submitRecommendationForReview,
 } from '../../../presenters/review-recommendation';
@@ -37,6 +42,7 @@ export function RecommendationsPanel({
   const canReview = recommendationsVm.status === 'ok' ? recommendationsVm.canReview : false;
   const canSubmitForReview =
     recommendationsVm.status === 'ok' ? recommendationsVm.canSubmitForReview : false;
+  const canEdit = recommendationsVm.status === 'ok' ? recommendationsVm.canEdit : false;
 
   const onGenerate = async () => {
     setIsGenerating(true);
@@ -104,6 +110,28 @@ export function RecommendationsPanel({
     toast.error(viewModel.message);
   };
 
+  const onEdit = async (
+    recommendationId: string,
+    patch: EditRecommendationDraftPatch
+  ): Promise<boolean> => {
+    const viewModel = await editRecommendationDraft(recommendationId, patch);
+
+    if (viewModel.status === 'ok') {
+      toast.success('Draft updated.');
+      router.refresh();
+      return true;
+    }
+
+    if (viewModel.unauthorized) {
+      router.push('/login');
+      router.refresh();
+      return false;
+    }
+
+    toast.error(viewModel.message);
+    return false;
+  };
+
   return (
     <div className="rounded-sm border border-border bg-surface p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -142,8 +170,10 @@ export function RecommendationsPanel({
               total={recommendations.length}
               canReview={canReview}
               canSubmitForReview={canSubmitForReview}
+              canEdit={canEdit}
               onSubmitForReview={onSubmitForReview}
               onReview={onReview}
+              onEdit={onEdit}
             />
           ))
         )}

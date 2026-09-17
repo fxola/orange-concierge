@@ -1,4 +1,8 @@
-import type { Recommendation, ReviewRecommendationDecision } from '@orange-concierge/core';
+import type {
+  EditRecommendationDraftPatch,
+  Recommendation,
+  ReviewRecommendationDecision,
+} from '@orange-concierge/core';
 
 import { ApiError, api } from '@/lib/api-client';
 import {
@@ -35,6 +39,24 @@ export async function reviewRecommendation(
     const response = await api.post<RecommendationActionResponse>(
       `/api/recommendations/${recommendationId}/review`,
       { decision }
+    );
+    return { status: 'ok', recommendation: response.recommendation };
+  } catch (error) {
+    if (error instanceof ApiError) {
+      return toRecommendationActionErrorViewModel(error);
+    }
+    throw error;
+  }
+}
+
+export async function editRecommendationDraft(
+  recommendationId: string,
+  patch: EditRecommendationDraftPatch
+): Promise<RecommendationActionViewModel> {
+  try {
+    const response = await api.patch<RecommendationActionResponse>(
+      `/api/recommendations/${recommendationId}`,
+      patch
     );
     return { status: 'ok', recommendation: response.recommendation };
   } catch (error) {
