@@ -55,7 +55,7 @@ function ScoreHelp({ score }: Readonly<{ score: ReadinessScore }>) {
       <span
         id={tooltipId}
         role="tooltip"
-        className="pointer-events-none absolute right-0 top-9 z-20 w-72 rounded-sm border border-border bg-surface-raised p-3 text-left text-xs leading-5 text-muted-foreground opacity-0 shadow-md transition-[opacity,transform] duration-150 ease-cubic group-hover/help:translate-y-0 group-hover/help:opacity-100 group-focus-within/help:translate-y-0 group-focus-within/help:opacity-100 sm:w-80"
+        className="pointer-events-none absolute right-0 top-9 z-20 w-72 max-w-[calc(100vw-3rem)] rounded-sm border border-border bg-surface-raised p-3 text-left text-xs leading-5 text-muted-foreground opacity-0 shadow-md transition-[opacity,transform] duration-150 ease-cubic group-hover/help:translate-y-0 group-hover/help:opacity-100 group-focus-within/help:translate-y-0 group-focus-within/help:opacity-100 sm:w-80"
       >
         <span className="block font-semibold text-foreground">What this score means</span>
         <span className="mt-1 block">

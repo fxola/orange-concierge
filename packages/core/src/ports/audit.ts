@@ -1,15 +1,5 @@
 import type { Actor } from '../domain/actor';
-
-export type AuditAction =
-  | 'interaction_submitted'
-  | 'interaction_scan_passed'
-  | 'interaction_scan_blocked'
-  | 'interaction_analysis_completed'
-  | 'interaction_analysis_failed'
-  | 'recommendation_reviewed'
-  | 'recommendation_edited';
-
-export type AuditResourceType = 'client' | 'interaction' | 'recommendation';
+import { AuditAction, AuditEventFilter, AuditEventPage, AuditResourceType } from '../domain/audit';
 
 export type AuditResource = Readonly<{
   type: AuditResourceType;
@@ -30,4 +20,5 @@ export type AuditEvent = Readonly<{
 
 export interface AuditPort {
   record(event: AuditEvent): Promise<void>;
+  list(filter: AuditEventFilter): Promise<AuditEventPage>;
 }

@@ -85,6 +85,22 @@ export class UnauthorizedSubmitRecommendationForReviewError extends Error {
   }
 }
 
+export class UnauthorizedViewAuditError extends Error {
+  readonly code = 'unauthorized_audit_view';
+  constructor(role: Actor['role']) {
+    super(`Actor role ${role} cannot view the audit trail`);
+    this.name = 'UnauthorizedViewAuditError';
+  }
+}
+
+export class InvalidAuditFilterError extends Error {
+  readonly code = 'invalid_audit_filter';
+  constructor(reason: string) {
+    super(`Audit filter is invalid: ${reason}`);
+    this.name = 'InvalidAuditFilterError';
+  }
+}
+
 export class UnauthorizedEditRecommendationError extends Error {
   readonly code = 'unauthorized_recommendation_edit';
   constructor(role: Actor['role']) {

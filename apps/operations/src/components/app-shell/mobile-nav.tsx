@@ -3,7 +3,10 @@
 import { useEffect, useState } from 'react';
 import { Sidebar } from './sidebar';
 
-export function MobileNav({ onClose }: Readonly<{ onClose: () => void }>) {
+export function MobileNav({
+  onClose,
+  userRole,
+}: Readonly<{ onClose: () => void; userRole?: string }>) {
   const [entered, setEntered] = useState(false);
 
   useEffect(() => {
@@ -33,7 +36,7 @@ export function MobileNav({ onClose }: Readonly<{ onClose: () => void }>) {
           entered ? 'translate-x-0' : '-translate-x-full',
         ].join(' ')}
       >
-        <Sidebar collapsed={false} onNavigate={onClose} />
+        <Sidebar collapsed={false} onNavigate={onClose} userRole={userRole} />
       </div>
     </div>
   );

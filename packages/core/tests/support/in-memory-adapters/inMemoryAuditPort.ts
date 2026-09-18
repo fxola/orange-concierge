@@ -1,4 +1,5 @@
 import type { AuditEvent, AuditPort } from '../../../src/ports/audit.js';
+import type { AuditEventFilter, AuditEventPage } from '../../../src/domain/audit.js';
 
 export class RecordingAudit implements AuditPort {
   events: AuditEvent[] = [];
@@ -23,6 +24,20 @@ export class RecordingAudit implements AuditPort {
     }
 
     this.events.push(event);
+  }
+
+  async list(filter: AuditEventFilter): Promise<AuditEventPage> {
+    const { action, resourceType, offset, limit } = filter;
+    const matching = this.events
+      .filter((event) => {
+        const matchesAction = action === undefined || event.action === action;
+        const matchesResourceType =
+          resourceType === undefined || event.resource.type === filter.resourceType;
+
+        return matchesAction && matchesResourceType;
+      })
+      .sort((a, b) => b.occurredAt.getTime() - a.occurredAt.getTime());
+    return { events: matching.slice(offset, offset + limit), total: matching.length };
   }
 
   snapshot(): AuditEvent[] {

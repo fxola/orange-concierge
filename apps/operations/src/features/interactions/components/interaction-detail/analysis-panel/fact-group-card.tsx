@@ -6,7 +6,7 @@ import type { EvidenceHandlers, FactGroupKey, FactItem } from './types';
 function FactValue({ value }: Readonly<{ value: string }>) {
   if (value.length <= 44 && !value.includes('\n')) {
     return (
-      <span className="inline-flex max-w-full rounded-full bg-surface-muted px-2.5 py-1 text-xs font-semibold text-foreground">
+      <span className="inline-flex max-w-full break-words rounded-full bg-surface-muted px-2.5 py-1 text-xs font-semibold text-foreground">
         {value}
       </span>
     );
@@ -54,7 +54,7 @@ function FactRow({ item, onEvidenceOpen }: Readonly<{ item: FactItem }> & Eviden
           {isSourced ? 'Source' : 'No source'}
         </span>
         {isSourced ? (
-          <span className="h-4 text-[11px] font-medium text-muted-foreground opacity-0 transition-opacity duration-150 ease-cubic group-hover/source:opacity-100 group-focus-visible/source:opacity-100">
+          <span className="h-4 text-[11px] font-medium text-muted-foreground transition-opacity duration-150 ease-cubic group-hover/source:opacity-100 group-focus-visible/source:opacity-100 max-sm:opacity-100 sm:opacity-0">
             Click to view proof
           </span>
         ) : null}

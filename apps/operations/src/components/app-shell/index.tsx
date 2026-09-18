@@ -52,9 +52,14 @@ export function AppShell({
   return (
     <div className="flex min-h-dvh">
       <div className="sticky top-0 hidden h-dvh shrink-0 md:block">
-        <Sidebar collapsed={collapsed} onToggleCollapse={toggleCollapse} showCollapseToggle />
+        <Sidebar
+          collapsed={collapsed}
+          onToggleCollapse={toggleCollapse}
+          showCollapseToggle
+          userRole={userRole}
+        />
       </div>
-      {menuOpen ? <MobileNav onClose={() => setMenuOpen(false)} /> : null}
+      {menuOpen ? <MobileNav onClose={() => setMenuOpen(false)} userRole={userRole} /> : null}
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar userId={userEmail} userRole={userRole} onMenuClick={() => setMenuOpen(true)} />
         <div className="w-full flex-1 px-4 py-6 sm:px-8 sm:py-8">{children}</div>

@@ -24,6 +24,8 @@ import type {
   SubmitRecommendationForReviewResult,
   SubmitInteractionInput,
   SubmitInteractionResult,
+  ListAuditEventsInput,
+  ListAuditEventsResult,
 } from '@orange-concierge/core';
 
 export type {
@@ -75,5 +77,8 @@ export type Application = Readonly<{
     ) => Promise<SubmitRecommendationForReviewResult>;
     review: (input: ReviewRecommendationInput) => Promise<ReviewRecommendationResult>;
     editDraft: (input: EditRecommendationDraftInput) => Promise<EditRecommendationDraftResult>;
+  };
+  audit: {
+    list: (input: ListAuditEventsInput) => Promise<ListAuditEventsResult>;
   };
 }>;

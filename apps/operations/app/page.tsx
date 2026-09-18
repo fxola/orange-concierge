@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation';
+
 import { getCurrentActor, isNextControlFlowError } from '@/server/actor';
 import { getSidebarCollapsed } from '@/server/sidebar';
 import { AppShell } from '@/components/app-shell';
@@ -15,6 +17,10 @@ export default async function Home() {
     // Show the signed out home page instead of throwing into a boundary.
     return [null, false] as const;
   });
+
+  if (actor) {
+    redirect('/clients');
+  }
 
   return (
     <AppShell userEmail={actor?.id} userRole={actor?.role} sidebarCollapsed={sidebarCollapsed}>

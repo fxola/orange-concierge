@@ -3,6 +3,7 @@ export { GetInteraction } from './application/interaction/get-interaction';
 export { ListInteractions } from './application/interaction/list-interactions';
 export { SubmitInteraction } from './application/interaction/submit-interaction';
 export { SearchKnowledge } from './application/knowledge/search-knowledge';
+export { ListAuditEvents } from './application/audit/list-audit-events';
 export { GenerateRecommendations } from './application/recommendation/generate-recommendations';
 export { EditRecommendationDraft } from './application/recommendation/edit-recommendation-draft';
 export { ReviewRecommendation } from './application/recommendation/review-recommendation';
@@ -11,6 +12,7 @@ export { ListRecommendations } from './application/recommendation/list-recommend
 export { ListClients } from './application/client/list-clients';
 export { GetClient } from './application/client/get-client';
 export { canViewClients } from './application/client/policy';
+export { canViewAuditTrail } from './application/audit/policy';
 export {
   canAnalyzeInteractions,
   canSubmitInteractions,
@@ -33,6 +35,7 @@ export {
   ClientNotFoundError,
   InvalidClientIdError,
   InvalidInteractionIdError,
+  InvalidAuditFilterError,
   InvalidKnowledgeSearchLimitError,
   InvalidKnowledgeSearchQueryError,
   InvalidPaginationError,
@@ -53,6 +56,7 @@ export {
   InvalidInteractionStateError,
   UnauthorizedAnalyzeInteractionError,
   UnauthorizedSubmitInteractionError,
+  UnauthorizedViewAuditError,
   UnauthorizedError,
 } from './errors';
 export type {
@@ -97,6 +101,12 @@ export type {
   SearchKnowledgeSuccess,
 } from './application/knowledge/types';
 export type {
+  ListAuditEventsDependencies,
+  ListAuditEventsError,
+  ListAuditEventsInput,
+  ListAuditEventsResult,
+} from './application/audit/types';
+export type {
   GenerateRecommendationsDependencies,
   GenerateRecommendationsError,
   GenerateRecommendationsInput,
@@ -128,14 +138,19 @@ export type { Interaction, InteractionStatus } from './domain/interaction';
 export type { ReadinessLevel, ReadinessScore, ReadinessScoreBand } from './domain/readiness-score';
 export type { Recommendation, RecommendationStatus } from './domain/recommendation';
 export type {
-  AuditAction,
   AuditEvent,
   AuditMetadata,
   AuditMetadataValue,
   AuditPort,
   AuditResource,
-  AuditResourceType,
 } from './ports/audit';
+export { auditActions, auditResourceTypes, parseAuditEventFilter } from './domain/audit';
+export type {
+  AuditAction,
+  AuditEventFilter,
+  AuditEventPage,
+  AuditResourceType,
+} from './domain/audit';
 export type { InteractionRepository } from './ports/interaction-repository';
 export type { RecommendationRepository } from './ports/recommendation-repository';
 export type {
