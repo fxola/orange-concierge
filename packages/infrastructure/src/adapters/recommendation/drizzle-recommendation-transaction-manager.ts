@@ -1,5 +1,6 @@
 import type {
   AuditEvent,
+  AuditEventFilter,
   Recommendation,
   RecommendationTransactionalPorts,
   RecommendationTransactionManager,
@@ -7,6 +8,7 @@ import type {
 import { and, eq } from 'drizzle-orm';
 import { auditEvents, recommendations } from '../../database';
 import type { OrangeConciergeDB } from '../../database';
+import { listAuditEvents } from '../audit/audit-queries';
 
 function toRecommendationRow(recommendation: Recommendation): typeof recommendations.$inferInsert {
   return {
@@ -67,6 +69,9 @@ export class DrizzleRecommendationTransactionManager implements RecommendationTr
               occurredAt: event.occurredAt,
               metadata: event.metadata ?? null,
             });
+          },
+          list: async (filter: AuditEventFilter): Promise<readonly AuditEvent[]> => {
+            return listAuditEvents(dbTx, filter);
           },
         },
       };

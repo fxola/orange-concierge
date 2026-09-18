@@ -1,11 +1,13 @@
 import type {
   AuditEvent,
+  AuditEventFilter,
   Interaction,
   InteractionTransactionManager,
   InteractionTransactionalPorts,
 } from '@orange-concierge/core';
 import { auditEvents, interactions } from '../../database';
 import type { OrangeConciergeDB } from '../../database';
+import { listAuditEvents } from '../audit/audit-queries';
 import { toInteractionRow } from './drizzle-interaction-repository';
 
 export class DrizzleTransactionManager implements InteractionTransactionManager {
@@ -35,6 +37,9 @@ export class DrizzleTransactionManager implements InteractionTransactionManager 
               occurredAt: event.occurredAt,
               metadata: event.metadata ?? null,
             });
+          },
+          list: async (filter: AuditEventFilter): Promise<readonly AuditEvent[]> => {
+            return listAuditEvents(dbTx, filter);
           },
         },
       };

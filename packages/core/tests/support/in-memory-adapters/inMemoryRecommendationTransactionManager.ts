@@ -1,4 +1,5 @@
 import type { AuditEvent } from '../../../src';
+import type { AuditEventFilter } from '../../../src/domain/audit';
 import type { Recommendation } from '../../../src/domain/recommendation';
 import {
   RecommendationTransactionalPorts,
@@ -48,6 +49,7 @@ export class InMemoryRecommendationReviewTransactionManager implements Recommend
           }
           return this.audit.record(event);
         },
+        list: (filter: AuditEventFilter) => this.audit.list(filter),
       },
     };
 

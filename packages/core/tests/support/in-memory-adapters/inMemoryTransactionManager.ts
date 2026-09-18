@@ -4,6 +4,7 @@ import type {
   TransactionalWriter,
 } from '../../../src/ports/transaction-manager';
 import type { AuditEvent } from '../../../src/ports/audit';
+import type { AuditEventFilter } from '../../../src/domain/audit';
 import type { Interaction } from '../../../src/domain/interaction';
 import type { InMemoryInteractionRepository } from './inMemoryInteractionRepository';
 import type { RecordingAudit } from './inMemoryAuditPort';
@@ -42,6 +43,7 @@ export class InMemoryTransactionManager implements InteractionTransactionManager
           }
           return this.audit.record(event);
         },
+        list: (filter: AuditEventFilter) => this.audit.list(filter),
       },
     };
 

@@ -1,5 +1,6 @@
-import type { AuditEvent, AuditPort } from '@orange-concierge/core';
+import type { AuditEvent, AuditEventFilter, AuditPort } from '@orange-concierge/core';
 import { auditEvents, type OrangeConciergeDB } from '../../database';
+import { listAuditEvents } from './audit-queries';
 
 export class DrizzleAuditPort implements AuditPort {
   constructor(private readonly db: OrangeConciergeDB) {}
@@ -14,5 +15,9 @@ export class DrizzleAuditPort implements AuditPort {
       occurredAt: event.occurredAt,
       metadata: event.metadata ?? null,
     });
+  }
+
+  async list(filter: AuditEventFilter): Promise<readonly AuditEvent[]> {
+    return listAuditEvents(this.db, filter);
   }
 }

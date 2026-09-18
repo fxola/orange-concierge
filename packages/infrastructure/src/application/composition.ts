@@ -18,6 +18,8 @@ import {
   SearchKnowledge,
   SubmitRecommendationForReview,
   SubmitInteraction,
+  ListAuditEvents,
+  AuditPort,
 } from '@orange-concierge/core';
 import { PatternSecretScanner } from '@orange-concierge/security';
 
@@ -33,6 +35,7 @@ import type { Application } from './types';
 import { DrizzleClientRepository } from '../adapters/client/drizzle-client-repository';
 import { DrizzleKnowledgeSearch } from '../adapters/knowledge/drizzle-knowledge-search';
 import { createKnowledgeEmbedder } from '../knowledge/embedder-factory';
+import { input } from 'zod';
 
 type ApplicationRuntime = Readonly<{
   application: Application;
@@ -50,12 +53,14 @@ const createApplicationRuntime = (runtimeConfig: BackendConfig): ApplicationRunt
   const trustedOrigins = runtimeConfig.auth.trustedOrigins;
 
   const clientRepository = new DrizzleClientRepository(db);
+  const auditPort = new DrizzleAuditPort(db);
 
   const auth = createAuth({ db, baseURL, secret, trustedOrigins });
-  const interaction = buildInteraction(db, clientRepository, runtimeConfig.ai);
+  const interaction = buildInteraction(db, clientRepository, auditPort, runtimeConfig.ai);
   const clients = buildClients(clientRepository);
   const knowledge = buildKnowledge(db, runtimeConfig.ai);
   const recommendations = buildRecommendations(db, runtimeConfig.ai);
+  const audit = buildAuditEvents(auditPort);
 
   const application: Application = {
     auth,
@@ -63,6 +68,7 @@ const createApplicationRuntime = (runtimeConfig: BackendConfig): ApplicationRunt
     clients,
     knowledge,
     recommendations,
+    audit,
   };
 
   return {
@@ -74,6 +80,7 @@ const createApplicationRuntime = (runtimeConfig: BackendConfig): ApplicationRunt
 const buildInteraction = (
   db: OrangeConciergeDB,
   clientRepository: DrizzleClientRepository,
+  audit: AuditPort,
   aiConfig: AIConfig
 ): Application['interaction'] => {
   const transactionManager = new DrizzleTransactionManager(db);
@@ -85,7 +92,6 @@ const buildInteraction = (
     now: () => new Date(),
   });
 
-  const audit = new DrizzleAuditPort(db);
   const interactionRepository = new DrizzleInteractionRepository(db);
   const secretScanner = new PatternSecretScanner();
   const structuredLLM = createStructuredLLM(aiConfig);
@@ -176,6 +182,13 @@ const buildRecommendations = (
     submitForReview: (input) => submitRecommendationForReviewUseCase.execute(input),
     review: (input) => reviewRecommendationUseCase.execute(input),
     editDraft: (input) => editRecommendationDraftUseCase.execute(input),
+  };
+};
+
+const buildAuditEvents = (audit: AuditPort): Application['audit'] => {
+  const auditUseCase = new ListAuditEvents({ audit });
+  return {
+    list: (input) => auditUseCase.execute(input),
   };
 };
 
