@@ -145,7 +145,12 @@ export type {
   AuditResource,
 } from './ports/audit';
 export { auditActions, auditResourceTypes, parseAuditEventFilter } from './domain/audit';
-export type { AuditAction, AuditEventFilter, AuditResourceType } from './domain/audit';
+export type {
+  AuditAction,
+  AuditEventFilter,
+  AuditEventPage,
+  AuditResourceType,
+} from './domain/audit';
 export type { InteractionRepository } from './ports/interaction-repository';
 export type { RecommendationRepository } from './ports/recommendation-repository';
 export type {

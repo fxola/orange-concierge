@@ -24,6 +24,11 @@ Feature: View audit events
     When the reviewer views audit events filtered by recommendation reviewed
     Then only the recommendation reviewed event is returned
 
+  Scenario: Total counts all matching events across pages
+    Given interaction submitted, reviewed, and edited audit events exist
+    When the reviewer views audit events with a two event page
+    Then two events are returned with a total of three
+
   Scenario: Invalid pagination fails
     Given interaction submitted, reviewed, and edited audit events exist
     When the reviewer views audit events with invalid pagination

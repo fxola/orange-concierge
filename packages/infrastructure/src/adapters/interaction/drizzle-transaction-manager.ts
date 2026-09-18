@@ -1,6 +1,7 @@
 import type {
   AuditEvent,
   AuditEventFilter,
+  AuditEventPage,
   Interaction,
   InteractionTransactionManager,
   InteractionTransactionalPorts,
@@ -38,7 +39,7 @@ export class DrizzleTransactionManager implements InteractionTransactionManager 
               metadata: event.metadata ?? null,
             });
           },
-          list: async (filter: AuditEventFilter): Promise<readonly AuditEvent[]> => {
+          list: async (filter: AuditEventFilter): Promise<AuditEventPage> => {
             return listAuditEvents(dbTx, filter);
           },
         },

@@ -1,6 +1,7 @@
 import z from 'zod';
 import { InvalidAuditFilterError, InvalidPaginationError } from '../errors';
 import { Result } from '../application/result';
+import type { AuditEvent } from '../ports/audit';
 
 const MAX_LIST_LIMIT = 100;
 
@@ -23,6 +24,11 @@ export type AuditEventFilter = Readonly<{
   resourceType?: AuditResourceType;
   limit: number;
   offset: number;
+}>;
+
+export type AuditEventPage = Readonly<{
+  events: readonly AuditEvent[];
+  total: number;
 }>;
 
 const auditEventFilterSchema = z

@@ -11,11 +11,6 @@ export function PageHeader({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <Text variant="h1">{title}</Text>
-          {description ? (
-            <Text tone="muted" className="mt-1">
-              {description}
-            </Text>
-          ) : null}
         </div>
         {action}
       </div>
@@ -28,7 +23,7 @@ export function Table({
   children,
 }: Readonly<{ className?: string; children: ReactNode }>) {
   return (
-    <div className="overflow-x-auto rounded-none border border-border bg-surface">
+    <div className="overflow-x-auto rounded-sm border border-border bg-surface">
       <table
         className={[
           'w-full border-collapse text-sm',

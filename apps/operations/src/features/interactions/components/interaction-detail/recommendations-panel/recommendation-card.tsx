@@ -178,7 +178,7 @@ export function RecommendationCard({
           <RecommendationProof recommendation={recommendation} />
         </div>
         {recommendation.status === 'draft' && (canSubmitForReview || canEdit) ? (
-          <div className="mt-3 flex flex-wrap justify-end gap-2">
+          <div className="mt-3 flex flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
             {isEditing ? (
               <>
                 <Button
@@ -187,6 +187,7 @@ export function RecommendationCard({
                   size="sm"
                   onClick={() => setIsEditing(false)}
                   disabled={disabled}
+                  className="w-full sm:w-auto"
                 >
                   Cancel
                 </Button>
@@ -196,6 +197,7 @@ export function RecommendationCard({
                   size="sm"
                   onClick={runSaveEdit}
                   disabled={disabled || !hasEditChanges}
+                  className="w-full sm:w-auto"
                 >
                   {pendingAction === 'save' ? 'Saving...' : 'Save changes'}
                 </Button>
@@ -209,6 +211,7 @@ export function RecommendationCard({
                     size="sm"
                     onClick={openEditor}
                     disabled={disabled}
+                    className="w-full sm:w-auto"
                   >
                     <Pencil aria-hidden="true" className="h-3.5 w-3.5" />
                     Edit
@@ -221,6 +224,7 @@ export function RecommendationCard({
                     size="sm"
                     onClick={runSubmitForReview}
                     disabled={disabled}
+                    className="w-full sm:w-auto"
                   >
                     <Send aria-hidden="true" className="h-3.5 w-3.5" />
                     {pendingAction === 'submit' ? 'Submitting...' : 'Submit for review'}
@@ -230,13 +234,14 @@ export function RecommendationCard({
             )}
           </div>
         ) : recommendation.status === 'pending_review' && canReview ? (
-          <div className="mt-3 flex flex-wrap justify-end gap-2">
+          <div className="mt-3 flex flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
             <Button
               type="button"
               variant="secondary"
               size="md"
               onClick={() => runReview('approved')}
               disabled={disabled}
+              className="w-full sm:w-auto"
             >
               <Check aria-hidden="true" className="h-3.5 w-3.5" />
               {pendingAction === 'approve' ? 'Approving...' : 'Approve'}
@@ -247,6 +252,7 @@ export function RecommendationCard({
               size="md"
               onClick={() => runReview('rejected')}
               disabled={disabled}
+              className="w-full sm:w-auto"
             >
               <X aria-hidden="true" className="h-3.5 w-3.5" />
               {pendingAction === 'reject' ? 'Rejecting...' : 'Reject'}

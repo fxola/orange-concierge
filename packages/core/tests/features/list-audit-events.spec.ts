@@ -29,11 +29,12 @@ describeFeature(feature, ({ Scenario }) => {
     Then('audit events are returned newest-first', () => {
       expect(result.isSuccess()).toBe(true);
       if (!result.isSuccess()) expect.fail('Expected audit events');
-      expect(result.getValue().map((event) => event.action)).toEqual([
+      expect(result.getValue().events.map((event) => event.action)).toEqual([
         'recommendation_edited',
         'recommendation_reviewed',
         'interaction_submitted',
       ]);
+      expect(result.getValue().total).toBe(3);
     });
   });
 
@@ -56,7 +57,8 @@ describeFeature(feature, ({ Scenario }) => {
     Then('all three audit events are returned', () => {
       expect(result.isSuccess()).toBe(true);
       if (!result.isSuccess()) expect.fail('Expected audit events');
-      expect(result.getValue()).toHaveLength(3);
+      expect(result.getValue().events).toHaveLength(3);
+      expect(result.getValue().total).toBe(3);
     });
   });
 
@@ -109,7 +111,34 @@ describeFeature(feature, ({ Scenario }) => {
     Then('only the recommendation reviewed event is returned', () => {
       expect(result.isSuccess()).toBe(true);
       if (!result.isSuccess()) expect.fail('Expected audit events');
-      expect(result.getValue().map((event) => event.action)).toEqual(['recommendation_reviewed']);
+      expect(result.getValue().events.map((event) => event.action)).toEqual([
+        'recommendation_reviewed',
+      ]);
+      expect(result.getValue().total).toBe(1);
+    });
+  });
+
+  Scenario('Total counts all matching events across pages', ({ Given, When, Then }) => {
+    const world = listAuditEventsWorld();
+    let result: ListAuditEventsResult;
+
+    Given('interaction submitted, reviewed, and edited audit events exist', () => {
+      world.givenAuditEvents();
+    });
+
+    When('the reviewer views audit events with a two event page', async () => {
+      result = await world.listAuditEvents().execute({
+        actor: world.reviewer(),
+        limit: 2,
+        offset: 0,
+      });
+    });
+
+    Then('two events are returned with a total of three', () => {
+      expect(result.isSuccess()).toBe(true);
+      if (!result.isSuccess()) expect.fail('Expected audit events');
+      expect(result.getValue().events).toHaveLength(2);
+      expect(result.getValue().total).toBe(3);
     });
   });
 

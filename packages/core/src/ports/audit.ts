@@ -1,5 +1,5 @@
 import type { Actor } from '../domain/actor';
-import { AuditAction, AuditEventFilter, AuditResourceType } from '../domain/audit';
+import { AuditAction, AuditEventFilter, AuditEventPage, AuditResourceType } from '../domain/audit';
 
 export type AuditResource = Readonly<{
   type: AuditResourceType;
@@ -20,5 +20,5 @@ export type AuditEvent = Readonly<{
 
 export interface AuditPort {
   record(event: AuditEvent): Promise<void>;
-  list(filter: AuditEventFilter): Promise<readonly AuditEvent[]>;
+  list(filter: AuditEventFilter): Promise<AuditEventPage>;
 }

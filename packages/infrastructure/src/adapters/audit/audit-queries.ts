@@ -1,5 +1,5 @@
-import { and, desc, eq, type SQL } from 'drizzle-orm';
-import type { AuditEvent, AuditEventFilter } from '@orange-concierge/core';
+import { and, desc, eq, sql, type SQL } from 'drizzle-orm';
+import type { AuditEvent, AuditEventFilter, AuditEventPage } from '@orange-concierge/core';
 
 import { auditEvents, type OrangeConciergeDB } from '../../database';
 
@@ -17,10 +17,7 @@ function toAuditEvent(row: AuditEventRow): AuditEvent {
   };
 }
 
-export async function listAuditEvents(
-  db: AuditDatabase,
-  filter: AuditEventFilter
-): Promise<readonly AuditEvent[]> {
+function toConditions(filter: AuditEventFilter): SQL[] {
   const conditions: SQL[] = [];
 
   if (filter.action !== undefined) {
@@ -31,13 +28,29 @@ export async function listAuditEvents(
     conditions.push(eq(auditEvents.resourceType, filter.resourceType));
   }
 
-  const rows = await db
-    .select()
-    .from(auditEvents)
-    .where(conditions.length > 0 ? and(...conditions) : undefined)
-    .orderBy(desc(auditEvents.occurredAt))
-    .limit(filter.limit)
-    .offset(filter.offset);
+  return conditions;
+}
 
-  return rows.map(toAuditEvent);
+export async function listAuditEvents(
+  db: AuditDatabase,
+  filter: AuditEventFilter
+): Promise<AuditEventPage> {
+  const conditions = toConditions(filter);
+  const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+  const [rows, [{ count }]] = await Promise.all([
+    db
+      .select()
+      .from(auditEvents)
+      .where(where)
+      .orderBy(desc(auditEvents.occurredAt))
+      .limit(filter.limit)
+      .offset(filter.offset),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(auditEvents)
+      .where(where),
+  ]);
+
+  return { events: rows.map(toAuditEvent), total: Number(count) };
 }

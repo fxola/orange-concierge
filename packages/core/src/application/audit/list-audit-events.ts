@@ -22,8 +22,8 @@ export class ListAuditEvents {
       return Result.failure(parsedFilter.getError());
     }
 
-    const events = await this.deps.audit.list(parsedFilter.getValue());
+    const page = await this.deps.audit.list(parsedFilter.getValue());
 
-    return Result.success(events);
+    return Result.success(page);
   }
 }

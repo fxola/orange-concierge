@@ -1,6 +1,7 @@
 import type {
   AuditEvent,
   AuditEventFilter,
+  AuditEventPage,
   Recommendation,
   RecommendationTransactionalPorts,
   RecommendationTransactionManager,
@@ -70,7 +71,7 @@ export class DrizzleRecommendationTransactionManager implements RecommendationTr
               metadata: event.metadata ?? null,
             });
           },
-          list: async (filter: AuditEventFilter): Promise<readonly AuditEvent[]> => {
+          list: async (filter: AuditEventFilter): Promise<AuditEventPage> => {
             return listAuditEvents(dbTx, filter);
           },
         },

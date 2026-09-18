@@ -140,7 +140,13 @@ export function RecommendationsPanel({
             Recommendations{recommendations.length > 0 ? ` (${recommendations.length})` : ''}
           </h3>
         </div>
-        <Button variant="outline" size="sm" onClick={onGenerate} disabled={isGenerating}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onGenerate}
+          disabled={isGenerating}
+          className="w-full sm:w-auto"
+        >
           <Sparkles aria-hidden="true" className="h-4 w-4" />
           {isGenerating ? 'Generating...' : 'Generate'}
         </Button>

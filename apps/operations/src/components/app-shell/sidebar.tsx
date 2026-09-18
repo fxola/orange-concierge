@@ -5,7 +5,7 @@ import { ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { SignOutButton } from '@/components/sign-out-button';
 import { Button } from '@/components/ui/button';
 import { BrandMark } from './brand-mark';
-import { NAV_ITEMS } from './nav-items';
+import { NAV_ITEMS, isNavItemActive, isNavItemVisible } from './nav-items';
 import { NavLink } from './nav-link';
 
 export function Sidebar({
@@ -13,14 +13,17 @@ export function Sidebar({
   onToggleCollapse,
   onNavigate,
   showCollapseToggle,
+  userRole,
 }: Readonly<{
   collapsed: boolean;
   onToggleCollapse?: () => void;
   onNavigate?: () => void;
   showCollapseToggle?: boolean;
+  userRole?: string;
 }>) {
   const pathname = usePathname();
   const ToggleIcon = collapsed ? ChevronsRight : ChevronsLeft;
+  const visibleItems = NAV_ITEMS.filter((item) => isNavItemVisible(item, userRole));
 
   return (
     <aside
@@ -59,13 +62,13 @@ export function Sidebar({
         onClick={onNavigate}
       >
         <ul className="grid gap-1">
-          {NAV_ITEMS.map((item) => (
+          {visibleItems.map((item) => (
             <li key={item.href}>
               <NavLink
                 href={item.href}
                 label={item.label}
                 icon={item.icon}
-                active={pathname === item.href}
+                active={isNavItemActive(item, pathname)}
                 collapsed={collapsed}
               />
             </li>

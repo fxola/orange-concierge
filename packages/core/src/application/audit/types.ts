@@ -5,7 +5,8 @@ import type {
   InvalidPaginationError,
   UnauthorizedViewAuditError,
 } from '../../errors';
-import type { AuditEvent, AuditPort } from '../../ports/audit';
+import type { AuditEventPage } from '../../domain/audit';
+import type { AuditPort } from '../../ports/audit';
 import type { Result } from '../result';
 
 export type ListAuditEventsInput = Readonly<{
@@ -25,4 +26,4 @@ export type ListAuditEventsError =
   | InvalidPaginationError
   | UnauthorizedViewAuditError;
 
-export type ListAuditEventsResult = Result<readonly AuditEvent[], ListAuditEventsError>;
+export type ListAuditEventsResult = Result<AuditEventPage, ListAuditEventsError>;
