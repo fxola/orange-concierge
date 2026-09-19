@@ -4,7 +4,7 @@ const STATUS_META: Record<
   InteractionRow['status'],
   Readonly<{ label: string; dot: string; text: string }>
 > = {
-  received: { label: 'Ready', dot: 'bg-info', text: 'text-info' },
+  received: { label: 'Needs analysis', dot: 'bg-info', text: 'text-info' },
   analysis_completed: { label: 'Complete', dot: 'bg-success', text: 'text-success' },
   analysis_blocked: { label: 'Blocked', dot: 'bg-danger', text: 'text-danger' },
 };

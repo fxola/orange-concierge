@@ -4,15 +4,18 @@ import type { ExtractedFacts } from './extracted-facts';
 import type {
   BlankTranscriptError,
   ClientNotFoundError,
+  FactVerificationFailedError,
   InteractionAnalysisFailedError,
   InteractionNotFoundError,
   InteractionSubmissionFailedError,
   InvalidClientIdError,
+  InvalidFactPathError,
   InvalidInteractionIdError,
   InvalidInteractionStateError,
   InvalidPaginationError,
   UnauthorizedAnalyzeInteractionError,
   UnauthorizedSubmitInteractionError,
+  UnauthorizedVerifyFactsError,
   UnauthorizedViewClientsError,
 } from '../../errors';
 import type { AuditPort } from '../../ports/audit';
@@ -110,3 +113,33 @@ export type SubmitInteractionError =
   | ClientNotFoundError;
 
 export type SubmitInteractionResult = Result<Interaction, SubmitInteractionError>;
+
+export type VerifyInteractionFactsInput = Readonly<{
+  actor: Actor;
+  interactionId: string;
+  factPaths: readonly string[];
+}>;
+
+export type VerifyInteractionFactsDependencies = Readonly<{
+  interactionsRepo: InteractionRepository;
+  audit: AuditPort;
+  transactionManager: InteractionTransactionManager;
+  now: () => Date;
+}>;
+
+export type VerifyInteractionFactsError =
+  | UnauthorizedVerifyFactsError
+  | InvalidInteractionIdError
+  | InteractionNotFoundError
+  | InvalidInteractionStateError
+  | InvalidFactPathError
+  | FactVerificationFailedError;
+
+export type VerifyInteractionFactsSuccess = Readonly<{
+  interaction: Interaction;
+}>;
+
+export type VerifyInteractionFactsResult = Result<
+  VerifyInteractionFactsSuccess,
+  VerifyInteractionFactsError
+>;

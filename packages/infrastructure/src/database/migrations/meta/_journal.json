@@ -50,6 +50,13 @@
       "when": 1789676844716,
       "tag": "0006_add_recommendation_edited_audit_action",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789848400000,
+      "tag": "0007_add_verified_fact_paths",
+      "breakpoints": true
     }
   ]
 }

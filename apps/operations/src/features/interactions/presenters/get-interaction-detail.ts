@@ -15,7 +15,7 @@ export async function getInteractionDetail(
     const actor = await requirePageActor();
     const result = await getApplication().interaction.getOne({ actor, clientId, interactionId });
 
-    return toInteractionDetailViewModel(result);
+    return toInteractionDetailViewModel(result, actor);
   } catch (error) {
     if (isNextControlFlowError(error)) {
       throw error;

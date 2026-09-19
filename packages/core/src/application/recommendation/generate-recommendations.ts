@@ -1,4 +1,5 @@
 import { parseInteractionId } from '../../domain/interaction';
+import { calculateEvidenceCoverage } from '../interaction/extracted-facts';
 import { calculateReadinessScore } from '../../domain/readiness-score';
 import { Recommendation } from '../../domain/recommendation';
 import {
@@ -38,6 +39,11 @@ export class GenerateRecommendations {
     }
 
     const facts = interaction.extractedFacts;
+    const coverage = calculateEvidenceCoverage(facts, interaction.verifiedFactPaths ?? []);
+    if (coverage.total === 0 || coverage.isLowConfidence) {
+      return Result.success({ recommendations: [] });
+    }
+
     const clientEvidence = facts.evidence ?? [];
     const readinessScore = calculateReadinessScore(facts);
     const knowledge = await this.deps.knowledgeRetriever.search({

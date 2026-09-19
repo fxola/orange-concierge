@@ -6,6 +6,11 @@ export type ClientRow = Readonly<{
   id: string;
   displayName: string;
   createdAtLabel: string;
+  totalInteractions?: number;
+  needsAnalysis?: number;
+  completed?: number;
+  blocked?: number;
+  latestInteractionLabel?: string | null;
 }>;
 
 export type ClientListViewModel =

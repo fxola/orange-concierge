@@ -19,6 +19,7 @@ import {
   SubmitRecommendationForReview,
   SubmitInteraction,
   ListAuditEvents,
+  VerifyInteractionFacts,
   AuditPort,
 } from '@orange-concierge/core';
 import { PatternSecretScanner } from '@orange-concierge/security';
@@ -112,11 +113,19 @@ const buildInteraction = (
 
   const getInteractionUseCase = new GetInteraction({ interactionsRepo: interactionRepository });
 
+  const verifyInteractionFactsUseCase = new VerifyInteractionFacts({
+    interactionsRepo: interactionRepository,
+    audit,
+    transactionManager,
+    now: () => new Date(),
+  });
+
   return {
     submit: (input) => submitInteractionUseCase.execute(input),
     analyze: (input) => analyzeInteractionUseCase.execute(input),
     getOne: (input) => getInteractionUseCase.execute(input),
     list: (input) => listInteractionsUseCase.execute(input),
+    verifyFacts: (input) => verifyInteractionFactsUseCase.execute(input),
   };
 };
 

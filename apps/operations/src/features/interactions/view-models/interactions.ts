@@ -1,6 +1,7 @@
 import 'server-only';
 
 import type {
+  Actor,
   ExtractedFacts,
   Interaction,
   InteractionStatus,
@@ -8,7 +9,7 @@ import type {
   ListInteractionsResult,
   ReadinessScore,
 } from '@orange-concierge/core';
-import { calculateReadinessScore } from '@orange-concierge/core';
+import { calculateReadinessScore, canVerifyInteractionFacts } from '@orange-concierge/core';
 
 import { formatDateLabel } from '@/features/clients/view-models/clients';
 
@@ -27,6 +28,7 @@ export type InteractionRow = Readonly<{
   transcript: string;
   extractedFacts?: ExtractedFacts;
   readinessScore?: ReadinessScore;
+  verifiedFactPaths: readonly string[];
 }>;
 
 export type ClientInteractionsViewModel =
@@ -35,7 +37,7 @@ export type ClientInteractionsViewModel =
   | Readonly<{ status: 'unavailable' }>;
 
 export type InteractionDetailViewModel =
-  | Readonly<{ status: 'ok'; row: InteractionRow }>
+  | Readonly<{ status: 'ok'; row: InteractionRow; canVerifyFacts: boolean }>
   | Readonly<{ status: 'notFound' }>
   | Readonly<{ status: 'unavailable' }>;
 
@@ -49,6 +51,7 @@ function toInteractionRow(interaction: Interaction): InteractionRow {
     statusLabel: STATUS_LABELS[interaction.status],
     createdAtLabel: formatDateLabel(interaction.createdAt),
     transcript: interaction.transcript,
+    verifiedFactPaths: interaction.verifiedFactPaths ?? [],
     ...(extractedFacts
       ? { extractedFacts, readinessScore: calculateReadinessScore(extractedFacts) }
       : {}),
@@ -56,7 +59,8 @@ function toInteractionRow(interaction: Interaction): InteractionRow {
 }
 
 export function toInteractionDetailViewModel(
-  result: GetInteractionResult
+  result: GetInteractionResult,
+  actor: Actor
 ): InteractionDetailViewModel {
   if (result.isFailure()) {
     const code = result.getError().code;
@@ -72,7 +76,11 @@ export function toInteractionDetailViewModel(
     return { status: 'unavailable' };
   }
 
-  return { status: 'ok', row: toInteractionRow(result.getValue()) };
+  return {
+    status: 'ok',
+    row: toInteractionRow(result.getValue()),
+    canVerifyFacts: canVerifyInteractionFacts(actor),
+  };
 }
 
 export function toClientInteractionsViewModel(

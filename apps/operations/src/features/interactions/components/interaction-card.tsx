@@ -22,7 +22,7 @@ function readinessLabel(row: InteractionRow): string | null {
   }
 
   if (readiness.level === 'ready') {
-    return `Ready · ${readiness.score}/100`;
+    return `Readiness Ready · ${readiness.score}/100`;
   }
 
   if (readiness.level === 'developing') {

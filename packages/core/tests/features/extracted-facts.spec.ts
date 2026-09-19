@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseExtractedFacts } from '../../src/application/interaction/extracted-facts';
+import {
+  calculateEvidenceCoverage,
+  factPathsFor,
+  parseExtractedFacts,
+} from '../../src/application/interaction/extracted-facts';
 
 describe('parseExtractedFacts', () => {
   it('drops blank strings and empty lists from model output', () => {
@@ -33,9 +37,9 @@ describe('parseExtractedFacts', () => {
   });
 
   it('rejects wrapped fact payloads instead of silently completing empty', () => {
-    expect(
-      parseExtractedFacts({ facts: { custody: { currentArrangement: 'multisig' } } })
-    ).toEqual({ ok: false });
+    expect(parseExtractedFacts({ facts: { custody: { currentArrangement: 'multisig' } } })).toEqual(
+      { ok: false }
+    );
   });
 
   it('drops empty fact groups after validation', () => {
@@ -145,5 +149,167 @@ describe('parseExtractedFacts', () => {
       ok: true,
       facts: { custody: { currentArrangement: 'multisig' } },
     });
+  });
+
+  it('treats disabled SMS recovery as a control, not a risk or incident', () => {
+    const transcript =
+      'UX-AUDIT-2026-09-19-1320 Client asked whether their treasury policy is ready for a larger bitcoin allocation. Exchange and email accounts use hardware security keys, SMS recovery is disabled where providers permit it, and generated passwords are stored in a password manager.';
+
+    const result = parseExtractedFacts(
+      {
+        cybersecurity: {
+          controls: ['Uses hardware security keys'],
+          risks: ['SMS recovery'],
+          incidentHistory: 'disabled where providers permit it',
+        },
+      },
+      transcript
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(result.facts.cybersecurity?.risks ?? []).not.toEqual(
+      expect.arrayContaining([expect.stringMatching(/sms recovery/i)])
+    );
+    expect(result.facts.cybersecurity?.controls ?? []).toEqual(
+      expect.arrayContaining([expect.stringMatching(/sms recovery is disabled/i)])
+    );
+    expect(result.facts.cybersecurity?.incidentHistory).toBeUndefined();
+  });
+
+  it('drops policy fragments from incident history without incident keywords', () => {
+    const result = parseExtractedFacts(
+      {
+        cybersecurity: {
+          controls: ['Hardware keys'],
+          incidentHistory: 'disabled where providers permit it',
+        },
+      },
+      'Exchange accounts use hardware keys, SMS recovery is disabled where providers permit it.'
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.facts.cybersecurity?.incidentHistory).toBeUndefined();
+    expect(result.facts.cybersecurity?.controls).toEqual([
+      'Hardware keys',
+      expect.stringMatching(/sms recovery is disabled/i),
+    ]);
+  });
+});
+
+describe('calculateEvidenceCoverage', () => {
+  it('marks 1/12 coverage as low confidence', () => {
+    const coverage = calculateEvidenceCoverage({
+      custody: {
+        currentArrangement: 'multisig',
+        assetsDiscussed: ['BTC', 'treasury'],
+        concerns: ['allocation', 'readiness', 'board'],
+      },
+      cybersecurity: {
+        controls: ['hardware keys', 'password manager'],
+        risks: ['no drill'],
+        incidentHistory: 'none yet',
+      },
+      planning: {
+        goals: ['larger allocation'],
+        constraints: ['board meeting'],
+      },
+      evidence: [
+        {
+          factPath: 'custody.currentArrangement',
+          quote: 'multisig',
+          startOffset: 0,
+          endOffset: 8,
+        },
+      ],
+    });
+
+    expect(coverage.total).toBe(12);
+    expect(coverage.sourced).toBe(1);
+    expect(coverage.isLowConfidence).toBe(true);
+  });
+
+  it('enumerates every addressable fact path', () => {
+    expect(
+      factPathsFor({
+        custody: { currentArrangement: 'multisig', concerns: ['a', 'b'] },
+        cybersecurity: { controls: ['keys'], incidentHistory: 'breach in 2024' },
+        planning: { nextSteps: ['drill'] },
+      })
+    ).toEqual([
+      'custody.currentArrangement',
+      'custody.concerns[0]',
+      'custody.concerns[1]',
+      'cybersecurity.controls[0]',
+      'cybersecurity.incidentHistory',
+      'planning.nextSteps[0]',
+    ]);
+  });
+
+  it('counts human-verified facts toward coverage', () => {
+    const facts = {
+      custody: { currentArrangement: 'multisig' },
+      cybersecurity: { controls: ['hardware keys'], risks: ['no drill'] },
+      evidence: [
+        {
+          factPath: 'cybersecurity.controls[0]',
+          quote: 'hardware keys',
+          startOffset: 0,
+          endOffset: 13,
+        },
+      ],
+    };
+
+    const before = calculateEvidenceCoverage(facts);
+    expect(before.total).toBe(3);
+    expect(before.sourced).toBe(1);
+    expect(before.isLowConfidence).toBe(true);
+
+    const after = calculateEvidenceCoverage(facts, ['custody.currentArrangement']);
+    expect(after.sourced).toBe(2);
+    expect(after.ratio).toBeCloseTo(2 / 3);
+    expect(after.isLowConfidence).toBe(false);
+  });
+
+  it('ignores unknown or already-evidenced verified paths', () => {
+    const facts = {
+      custody: { currentArrangement: 'multisig' },
+      evidence: [
+        {
+          factPath: 'custody.currentArrangement',
+          quote: 'multisig',
+          startOffset: 0,
+          endOffset: 8,
+        },
+      ],
+    };
+
+    const coverage = calculateEvidenceCoverage(facts, [
+      'custody.currentArrangement',
+      'custody.madeUp',
+      'custody.currentArrangement',
+    ]);
+    expect(coverage.total).toBe(1);
+    expect(coverage.sourced).toBe(1);
+  });
+
+  it('marks fully sourced facts as confident', () => {
+    const coverage = calculateEvidenceCoverage({
+      custody: { currentArrangement: 'multisig' },
+      evidence: [
+        {
+          factPath: 'custody.currentArrangement',
+          quote: 'multisig',
+          startOffset: 0,
+          endOffset: 8,
+        },
+      ],
+    });
+
+    expect(coverage.total).toBe(1);
+    expect(coverage.sourced).toBe(1);
+    expect(coverage.isLowConfidence).toBe(false);
   });
 });

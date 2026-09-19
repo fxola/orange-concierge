@@ -1,67 +1,101 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import type { EvidenceReference, ExtractedFacts, ReadinessScore } from '@orange-concierge/core';
-import { AssessmentSummary, EmptyFacts } from './assessment-summary';
-import { EvidenceDialog } from './evidence-dialog';
-import { FACT_GROUPS, collectFactItems, hasExtractedFacts, itemsForGroup } from './fact-model';
-import { FactGroupCard } from './fact-group-card';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import {
+  calculateEvidenceCoverage,
+  type ExtractedFacts,
+  type ReadinessScore,
+} from '@orange-concierge/core';
+
+import { verifyInteractionFacts } from '../../../presenters/verify-interaction-facts';
+import {
+  collectFactItems,
+  hasExtractedFacts,
+  partitionFactItems,
+} from '../../../view-models/analysis-facts';
+import {
+  ConfirmedByConsultantSection,
+  EmptyFacts,
+  FactsWithProofSection,
+  NeedsReviewSection,
+  ReadinessBanner,
+} from './fact-sections';
 
 export function ExtractedFactsView({
+  interactionId,
   facts,
-  transcript,
+  verifiedFactPaths,
   readinessScore,
-}: Readonly<{ facts: ExtractedFacts; transcript: string; readinessScore?: ReadinessScore }>) {
-  const [activeEvidence, setActiveEvidence] = useState<EvidenceReference | null>(null);
-
-  useEffect(() => {
-    if (!activeEvidence) {
-      return;
-    }
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setActiveEvidence(null);
-      }
-    };
-
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
-  }, [activeEvidence]);
+  canVerifyFacts,
+}: Readonly<{
+  interactionId: string;
+  facts: ExtractedFacts;
+  verifiedFactPaths: readonly string[];
+  readinessScore?: ReadinessScore;
+  canVerifyFacts: boolean;
+}>) {
+  const router = useRouter();
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
 
   if (!hasExtractedFacts(facts)) {
     return <EmptyFacts />;
   }
 
   const items = collectFactItems(facts);
-  const sourcedCount = items.filter((item) => item.evidence).length;
+  const verifiedSet = new Set(verifiedFactPaths);
+  const coverage = calculateEvidenceCoverage(facts, verifiedFactPaths);
+  const { withTranscriptProof, confirmedByConsultant, needsReview } = partitionFactItems(
+    items,
+    verifiedFactPaths
+  );
+
+  const onToggle = async (factPath: string) => {
+    const next = verifiedSet.has(factPath)
+      ? [...verifiedSet].filter((path) => path !== factPath)
+      : [...verifiedSet, factPath];
+    setPendingPath(factPath);
+
+    try {
+      const viewModel = await verifyInteractionFacts(interactionId, next);
+
+      if (viewModel.status === 'ok') {
+        toast.success(
+          verifiedSet.has(factPath) ? 'Verification removed.' : 'Fact confirmed against transcript.'
+        );
+        router.refresh();
+        return;
+      }
+
+      if (viewModel.unauthorized) {
+        router.push('/login');
+        router.refresh();
+        return;
+      }
+
+      toast.error(viewModel.message);
+    } finally {
+      setPendingPath(null);
+    }
+  };
 
   return (
-    <div className="rounded-sm border border-border bg-surface p-4 sm:p-5">
-      <AssessmentSummary
-        total={items.length}
-        sourced={sourcedCount}
-        readinessScore={readinessScore}
+    <div className="grid gap-4">
+      <ReadinessBanner readinessScore={readinessScore} coverage={coverage} />
+      <FactsWithProofSection items={withTranscriptProof} totalCount={items.length} />
+      <ConfirmedByConsultantSection
+        items={confirmedByConsultant}
+        canVerifyFacts={canVerifyFacts}
+        pendingPath={pendingPath}
+        onToggle={onToggle}
       />
-
-      <div className="mt-4 grid gap-4">
-        {FACT_GROUPS.map((group) => (
-          <FactGroupCard
-            key={group}
-            group={group}
-            items={itemsForGroup(items, group)}
-            onEvidenceOpen={setActiveEvidence}
-          />
-        ))}
-      </div>
-
-      {activeEvidence ? (
-        <EvidenceDialog
-          evidence={activeEvidence}
-          transcript={transcript}
-          onClose={() => setActiveEvidence(null)}
-        />
-      ) : null}
+      <NeedsReviewSection
+        items={needsReview}
+        canVerifyFacts={canVerifyFacts}
+        pendingPath={pendingPath}
+        onToggle={onToggle}
+      />
     </div>
   );
 }

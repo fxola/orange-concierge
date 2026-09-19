@@ -36,7 +36,7 @@ export function ClientDetailsCard({
         <div className="py-3">
           <dt className="text-xs text-muted-foreground">Review load</dt>
           <dd className="mt-1 text-sm font-medium">
-            {counts.completed} complete · {counts.received} ready · {counts.blocked} blocked
+            {counts.completed} complete · {counts.received} needs analysis · {counts.blocked} blocked
           </dd>
         </div>
       </dl>

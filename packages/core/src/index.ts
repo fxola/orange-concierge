@@ -2,6 +2,7 @@ export { AnalyzeInteraction } from './application/interaction/analyze-interactio
 export { GetInteraction } from './application/interaction/get-interaction';
 export { ListInteractions } from './application/interaction/list-interactions';
 export { SubmitInteraction } from './application/interaction/submit-interaction';
+export { VerifyInteractionFacts } from './application/interaction/verify-interaction-facts';
 export { SearchKnowledge } from './application/knowledge/search-knowledge';
 export { ListAuditEvents } from './application/audit/list-audit-events';
 export { GenerateRecommendations } from './application/recommendation/generate-recommendations';
@@ -16,6 +17,7 @@ export { canViewAuditTrail } from './application/audit/policy';
 export {
   canAnalyzeInteractions,
   canSubmitInteractions,
+  canVerifyInteractionFacts,
   canViewInteractions,
 } from './application/interaction/policy';
 export {
@@ -26,8 +28,12 @@ export {
 export {
   extractedFactsSchema,
   parseExtractedFacts,
+  calculateEvidenceCoverage,
+  factPathsFor,
+  LOW_EVIDENCE_COVERAGE_RATIO,
 } from './application/interaction/extracted-facts';
 export { calculateReadinessScore } from './domain/readiness-score';
+export { MIN_EVIDENCE_QUOTE_LENGTH } from './application/recommendation/ground-recommendations';
 export { Result } from './application/result';
 
 export {
@@ -56,6 +62,9 @@ export {
   InvalidInteractionStateError,
   UnauthorizedAnalyzeInteractionError,
   UnauthorizedSubmitInteractionError,
+  UnauthorizedVerifyFactsError,
+  InvalidFactPathError,
+  FactVerificationFailedError,
   UnauthorizedViewAuditError,
   UnauthorizedError,
 } from './errors';
@@ -77,11 +86,17 @@ export type {
   SubmitInteractionError,
   SubmitInteractionInput,
   SubmitInteractionResult,
+  VerifyInteractionFactsDependencies,
+  VerifyInteractionFactsError,
+  VerifyInteractionFactsInput,
+  VerifyInteractionFactsResult,
+  VerifyInteractionFactsSuccess,
 } from './application/interaction/types';
 export type {
   EvidenceReference,
   ExtractedFacts,
   ParseExtractedFactsResult,
+  EvidenceCoverage,
 } from './application/interaction/extracted-facts';
 export type {
   GetClientDependencies,

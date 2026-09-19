@@ -11,6 +11,7 @@ export type Interaction = Readonly<{
   transcript: string;
   createdAt: Date;
   extractedFacts?: ExtractedFacts;
+  verifiedFactPaths?: readonly string[];
 }>;
 
 export const interactionIdSchema = z.string().trim().pipe(z.uuid());

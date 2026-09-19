@@ -26,6 +26,8 @@ import type {
   SubmitInteractionResult,
   ListAuditEventsInput,
   ListAuditEventsResult,
+  VerifyInteractionFactsInput,
+  VerifyInteractionFactsResult,
 } from '@orange-concierge/core';
 
 export type {
@@ -51,6 +53,8 @@ export type {
   SearchKnowledgeResult,
   SubmitRecommendationForReviewInput,
   SubmitRecommendationForReviewResult,
+  VerifyInteractionFactsInput,
+  VerifyInteractionFactsResult,
 };
 export type { SubmitInteractionInput, SubmitInteractionResult };
 
@@ -61,6 +65,7 @@ export type Application = Readonly<{
     analyze: (input: AnalyzeInteractionInput) => Promise<AnalyzeInteractionResult>;
     getOne: (input: GetInteractionInput) => Promise<GetInteractionResult>;
     list: (input: ListInteractionsInput) => Promise<ListInteractionsResult>;
+    verifyFacts: (input: VerifyInteractionFactsInput) => Promise<VerifyInteractionFactsResult>;
   };
   clients: {
     getAll: (input: ListClientsInput) => Promise<ListClientsResult>;

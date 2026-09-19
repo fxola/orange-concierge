@@ -4,13 +4,15 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
-import type {
-  EditRecommendationDraftPatch,
-  InteractionStatus,
-  ReviewRecommendationDecision,
+import {
+  calculateEvidenceCoverage,
+  type EditRecommendationDraftPatch,
+  type InteractionStatus,
+  type ReviewRecommendationDecision,
 } from '@orange-concierge/core';
 
 import { Button } from '@/components/ui/button';
+import type { InteractionRow } from '../../../view-models/interactions';
 import { generateRecommendations } from '../../../presenters/generate-recommendations';
 import {
   editRecommendationDraft,
@@ -25,13 +27,16 @@ export function RecommendationsPanel({
   interactionId,
   status,
   recommendationsVm,
+  row,
 }: Readonly<{
   interactionId: string;
   status: InteractionStatus;
   recommendationsVm: RecommendationsViewModel;
+  row: InteractionRow;
 }>) {
   const router = useRouter();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showEmptyResult, setShowEmptyResult] = useState(false);
 
   if (status !== 'analysis_completed') {
     return null;
@@ -44,14 +49,21 @@ export function RecommendationsPanel({
     recommendationsVm.status === 'ok' ? recommendationsVm.canSubmitForReview : false;
   const canEdit = recommendationsVm.status === 'ok' ? recommendationsVm.canEdit : false;
 
+  const facts = row.extractedFacts ?? {};
+  const coverage = calculateEvidenceCoverage(facts, row.verifiedFactPaths);
+  const sourcedCount = coverage.sourced;
+  const isLowCoverage = coverage.isLowConfidence;
+
   const onGenerate = async () => {
     setIsGenerating(true);
+    setShowEmptyResult(false);
 
     try {
       const viewModel = await generateRecommendations(interactionId);
 
       if (viewModel.status === 'ok') {
         if (viewModel.recommendations.length === 0) {
+          setShowEmptyResult(true);
           toast.error('No grounded recommendations returned.');
         } else {
           toast.success('Grounded recommendations generated.');
@@ -153,19 +165,38 @@ export function RecommendationsPanel({
       </div>
 
       <div className="mt-4 grid gap-4">
-        {recommendationsVm.status === 'empty' ? (
-          <div className="rounded-sm border border-dashed border-border px-4 py-5 text-sm leading-6 text-muted-foreground">
-            Generate recommendations after analysis to inspect the exact evidence and source chunks
-            behind each draft.
+        {isGenerating ? (
+          <div
+            role="status"
+            className="rounded-sm border border-dashed border-border px-4 py-5 text-sm leading-6 text-muted-foreground"
+          >
+            Generating recommendations from transcript evidence and indexed guidance. This may
+            take up to 30 seconds.
           </div>
+        ) : null}
+        {recommendationsVm.status === 'empty' ? (
+          <>
+            <div className="rounded-sm border border-dashed border-border px-4 py-5 text-sm leading-6 text-muted-foreground">
+              Generate recommendations after analysis to inspect the exact evidence and source
+              chunks behind each draft.
+            </div>
+            {showEmptyResult ? (
+              <Alert tone="warning" className="rounded-sm">
+                {isLowCoverage
+                  ? `No recommendations generated. Evidence coverage is low (${sourcedCount}/${coverage.total}). Confirm unsourced facts against the transcript, improve transcript detail or re-run analysis, ensure relevant guidance is indexed, then retry generation.`
+                  : 'No recommendations returned. Review extracted facts against the transcript, ensure relevant guidance is indexed, then retry generation.'}
+              </Alert>
+            ) : null}
+          </>
         ) : recommendationsVm.status === 'unavailable' ? (
           <Alert tone="warning" className="rounded-sm">
             Unable to load recommendations. Please refresh the page.
           </Alert>
         ) : recommendations.length === 0 ? (
           <Alert tone="warning" className="rounded-sm">
-            No recommendation passed grounding checks. The model may need more transcript evidence
-            or more relevant indexed guidance.
+            No recommendation passed grounding checks. Review extracted facts against the
+            transcript, improve transcript detail, ensure relevant guidance is indexed, then retry
+            generation.
           </Alert>
         ) : (
           recommendations.map((recommendation, index) => (

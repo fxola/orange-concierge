@@ -37,8 +37,15 @@ export function InteractionAnalyzeButton({ interactionId }: Readonly<{ interacti
   };
 
   return (
-    <Button variant="outline" size="sm" onClick={onAnalyze} disabled={isAnalyzing}>
-      {isAnalyzing ? 'Analyzing...' : 'Analyze interaction'}
-    </Button>
+    <span className="inline-flex flex-wrap items-center justify-end gap-2">
+      {isAnalyzing ? (
+        <span role="status" className="text-xs leading-5 text-muted-foreground">
+          Analyzing transcript locally. This may take up to 30 seconds.
+        </span>
+      ) : null}
+      <Button variant="outline" size="sm" onClick={onAnalyze} disabled={isAnalyzing}>
+        {isAnalyzing ? 'Analyzing...' : 'Analyze interaction'}
+      </Button>
+    </span>
   );
 }

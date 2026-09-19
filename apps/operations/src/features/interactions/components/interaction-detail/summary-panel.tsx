@@ -1,8 +1,9 @@
 import type { ReadinessLevel } from '@orange-concierge/core';
+import { calculateEvidenceCoverage } from '@orange-concierge/core';
 import { Alert, Badge } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
 import type { InteractionRow } from '../../view-models/interactions';
-import { collectFactItems, hasExtractedFacts } from './analysis-panel/fact-model';
+import { collectFactItems, hasExtractedFacts } from '../../view-models/analysis-facts';
 
 function readinessLabel(level: ReadinessLevel): string {
   if (level === 'ready') {
@@ -43,9 +44,11 @@ function nextAction(row: InteractionRow): string {
 export function SummaryPanel({ row }: Readonly<{ row: InteractionRow }>) {
   const facts = row.extractedFacts ?? {};
   const factItems = hasExtractedFacts(facts) ? collectFactItems(facts) : [];
-  const sourcedCount = factItems.filter((item) => item.evidence).length;
+  const coverage = calculateEvidenceCoverage(facts, row.verifiedFactPaths);
+  const sourcedCount = coverage.sourced;
   const highlights = factItems.slice(0, 4);
   const readiness = row.readinessScore?.overall;
+  const isLowConfidence = coverage.isLowConfidence;
 
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]">
@@ -105,15 +108,29 @@ export function SummaryPanel({ row }: Readonly<{ row: InteractionRow }>) {
             Evidence coverage
           </Text>
           <p className="mt-2 font-display text-2xl font-medium leading-8">
-            {sourcedCount}/{factItems.length}
+            {sourcedCount}/{coverage.total}
           </p>
           <p className="mt-1 text-sm leading-5 text-muted-foreground">
             facts have transcript proof
           </p>
+          {isLowConfidence ? (
+            <div className="mt-2">
+              <Badge tone="warning">Low confidence</Badge>
+              <p className="mt-2 text-sm leading-5 text-muted-foreground">
+                Only {sourcedCount}/{coverage.total} facts have proof. Review analysis against the
+                transcript before generating recommendations.
+              </p>
+            </div>
+          ) : null}
         </section>
 
-        <Alert tone={row.status === 'analysis_blocked' ? 'danger' : 'info'} className="rounded-sm">
-          {nextAction(row)}
+        <Alert
+          tone={row.status === 'analysis_blocked' ? 'danger' : isLowConfidence ? 'warning' : 'info'}
+          className="rounded-sm"
+        >
+          {isLowConfidence
+            ? `Low evidence confidence: only ${sourcedCount}/${coverage.total} facts have transcript proof. Fix analysis coverage before generating recommendations.`
+            : nextAction(row)}
         </Alert>
       </aside>
     </div>

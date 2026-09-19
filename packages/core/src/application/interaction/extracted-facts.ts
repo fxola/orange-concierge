@@ -294,6 +294,94 @@ function resolveEvidence(
   return resolved;
 }
 
+const INCIDENT_KEYWORDS = [
+  'breach',
+  'hack',
+  'incident',
+  'compromise',
+  'phish',
+  'theft',
+  'stolen',
+  'loss',
+  'attack',
+  'scam',
+  'fraud',
+  'unauthorized',
+];
+
+function containsIncidentKeyword(value: string): boolean {
+  const lower = value.toLowerCase();
+  return INCIDENT_KEYWORDS.some((keyword) => lower.includes(keyword));
+}
+
+function extractSmsDisabledControl(transcript: string): string | null {
+  const match = /SMS recovery is disabled[^.]*\.?/i.exec(transcript);
+  if (!match) {
+    return null;
+  }
+
+  const phrase = match[0].trim();
+  return phrase.length > 0 && phrase.length <= 500 ? phrase : null;
+}
+
+/**
+ * Deterministic guard for common control/risk polarity inversions.
+ *
+ * The clean audit transcript says "SMS recovery is disabled where providers
+ * permit it", which the model split into risk "SMS recovery" and incident
+ * fragment "disabled where providers permit it". Disabled recovery is a
+ * control, and policy fragments are not incident history.
+ */
+function normalizeSecurityPolarity(facts: ExtractedFacts, transcript: string): ExtractedFacts {
+  const lowerTranscript = transcript.toLowerCase();
+  const smsDisabled = lowerTranscript.includes('sms recovery is disabled');
+  const cybersecurity = facts.cybersecurity;
+  if (!cybersecurity) {
+    return facts;
+  }
+
+  let controls = cybersecurity.controls ? [...cybersecurity.controls] : undefined;
+  let risks = cybersecurity.risks ? [...cybersecurity.risks] : undefined;
+  let incidentHistory = cybersecurity.incidentHistory;
+
+  if (smsDisabled) {
+    if (risks) {
+      const filtered = risks.filter((risk) => !risk.toLowerCase().includes('sms recovery'));
+      risks = filtered.length > 0 ? filtered : undefined;
+    }
+
+    const smsControl = extractSmsDisabledControl(transcript);
+    if (smsControl) {
+      const alreadyHasSmsControl =
+        controls?.some((control) => control.toLowerCase().includes('sms recovery')) ?? false;
+      if (!alreadyHasSmsControl) {
+        controls = [...(controls ?? []), smsControl];
+      }
+    }
+
+    if (incidentHistory && incidentHistory.toLowerCase().includes('disabled where providers')) {
+      incidentHistory = undefined;
+    }
+  }
+
+  if (incidentHistory && !containsIncidentKeyword(incidentHistory)) {
+    incidentHistory = undefined;
+  }
+
+  const nextCybersecurity = {
+    ...(controls ? { controls } : {}),
+    ...(risks ? { risks } : {}),
+    ...(incidentHistory ? { incidentHistory } : {}),
+  };
+
+  if (Object.keys(nextCybersecurity).length === 0) {
+    const { cybersecurity: _dropped, ...rest } = facts;
+    return rest;
+  }
+
+  return { ...facts, cybersecurity: nextCybersecurity };
+}
+
 export function parseExtractedFacts(raw: unknown, transcript = ''): ParseExtractedFactsResult {
   if (!hasRecognizedFactShape(raw)) {
     return { ok: false };
@@ -308,7 +396,9 @@ export function parseExtractedFacts(raw: unknown, transcript = ''): ParseExtract
     return { ok: false };
   }
 
-  const factsWithoutEvidence = dropEmptyFactGroups(result.data);
+  const factsWithoutEvidence = dropEmptyFactGroups(
+    normalizeSecurityPolarity(dropEmptyFactGroups(result.data), transcript)
+  );
 
   if (rawEvidence === undefined) {
     return { ok: true, facts: factsWithoutEvidence };
@@ -326,5 +416,81 @@ export function parseExtractedFacts(raw: unknown, transcript = ''): ParseExtract
   return {
     ok: true,
     facts: dropEmptyFactGroups({ ...factsWithoutEvidence, evidence }),
+  };
+}
+
+export const LOW_EVIDENCE_COVERAGE_RATIO = 0.5;
+
+export type EvidenceCoverage = Readonly<{
+  total: number;
+  sourced: number;
+  ratio: number;
+  isLowConfidence: boolean;
+}>;
+
+function pushListPaths(paths: string[], base: string, values: readonly string[] | undefined): void {
+  if (!values) {
+    return;
+  }
+
+  values.forEach((_, index) => {
+    paths.push(`${base}[${index}]`);
+  });
+}
+
+/**
+ * Every addressable fact path, using the same `group.field` /
+ * `group.field[index]` addressing as extraction evidence and the UI fact
+ * model. Used to validate human verification marks.
+ */
+export function factPathsFor(facts: ExtractedFacts): string[] {
+  const paths: string[] = [];
+
+  if (facts.custody?.currentArrangement) {
+    paths.push('custody.currentArrangement');
+  }
+  pushListPaths(paths, 'custody.assetsDiscussed', facts.custody?.assetsDiscussed);
+  pushListPaths(paths, 'custody.concerns', facts.custody?.concerns);
+  pushListPaths(paths, 'cybersecurity.controls', facts.cybersecurity?.controls);
+  pushListPaths(paths, 'cybersecurity.risks', facts.cybersecurity?.risks);
+  if (facts.cybersecurity?.incidentHistory) {
+    paths.push('cybersecurity.incidentHistory');
+  }
+  pushListPaths(paths, 'planning.goals', facts.planning?.goals);
+  pushListPaths(paths, 'planning.constraints', facts.planning?.constraints);
+  pushListPaths(paths, 'planning.nextSteps', facts.planning?.nextSteps);
+
+  return paths;
+}
+
+export function calculateEvidenceCoverage(
+  facts: ExtractedFacts,
+  verifiedFactPaths: readonly string[] = []
+): EvidenceCoverage {
+  const paths = factPathsFor(facts);
+  const total = paths.length;
+  const pathSet = new Set(paths);
+  const evidenced = new Set((facts.evidence ?? []).map((entry) => entry.factPath));
+
+  // Human verification only covers facts that exist and lack machine
+  // evidence. Unknown or already-evidenced paths add nothing.
+  const seen = new Set<string>();
+  let verifiedCovered = 0;
+  for (const candidate of verifiedFactPaths) {
+    if (!pathSet.has(candidate) || evidenced.has(candidate) || seen.has(candidate)) {
+      continue;
+    }
+    seen.add(candidate);
+    verifiedCovered += 1;
+  }
+
+  const sourced = Math.min(total, (facts.evidence ?? []).length + verifiedCovered);
+  const ratio = total > 0 ? sourced / total : 1;
+
+  return {
+    total,
+    sourced,
+    ratio,
+    isLowConfidence: total > 0 && ratio < LOW_EVIDENCE_COVERAGE_RATIO,
   };
 }

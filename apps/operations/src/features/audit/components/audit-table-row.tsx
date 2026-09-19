@@ -14,10 +14,7 @@ export function AuditTableRow({ row }: Readonly<{ row: AuditTrailRow }>) {
         </span>
       </td>
       <td className="w-48">
-        <span className="block truncate">
-          {row.actorLabel}
-          <span className="ml-1.5 text-xs text-muted-foreground">({row.actorRole})</span>
-        </span>
+        <span className="block truncate">{row.actorRole}</span>
       </td>
       <td className="w-48">
         {row.resourceHref ? (

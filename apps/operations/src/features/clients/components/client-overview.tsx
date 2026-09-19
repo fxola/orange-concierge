@@ -31,7 +31,7 @@ export function ClientOverview({
           <p className="mt-1 font-display text-4xl font-medium tabular-nums">{total}</p>
         </div>
         <div className="flex flex-wrap gap-x-5 gap-y-2">
-          <OverviewStat dot="bg-info" label="ready" value={received} />
+          <OverviewStat dot="bg-info" label="needs analysis" value={received} />
           <OverviewStat dot="bg-success" label="complete" value={completed} />
           <OverviewStat dot="bg-danger" label="blocked" value={blocked} />
         </div>

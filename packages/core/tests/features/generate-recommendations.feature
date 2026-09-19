@@ -30,6 +30,21 @@ Feature: Generate recommendations
     When recommendations are generated for the interaction
     Then no grounded recommendations are returned
 
+  Scenario: Block generation when evidence coverage is low
+    Given an analyzed interaction has low evidence coverage
+    And relevant internal guidance is retrieved
+    And the recommendation drafter returns a cited recommendation
+    When recommendations are generated for the interaction
+    Then no grounded recommendations are returned
+    And the recommendation drafter is not invoked
+
+  Scenario: Proceed with generation after facts are human-verified
+    Given an analyzed interaction has low evidence coverage with verified facts
+    And relevant internal guidance is retrieved
+    And the recommendation drafter returns a cited recommendation
+    When recommendations are generated for the interaction
+    Then a grounded recommendation is returned for the verified interaction
+
   Scenario: Fail when recommendation drafting fails
     Given an analyzed interaction has extracted facts with transcript evidence
     And relevant internal guidance is retrieved
