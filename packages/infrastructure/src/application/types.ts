@@ -2,6 +2,8 @@ import type { OrangeConciergeAuth } from '../auth';
 import type {
   GetClientInput,
   GetClientResult,
+  ListClientReviewSummariesInput,
+  ListClientReviewSummariesResult,
   AnalyzeInteractionInput,
   AnalyzeInteractionResult,
   EditRecommendationDraftInput,
@@ -33,6 +35,8 @@ import type {
 export type {
   GetClientInput,
   GetClientResult,
+  ListClientReviewSummariesInput,
+  ListClientReviewSummariesResult,
   AnalyzeInteractionInput,
   AnalyzeInteractionResult,
   EditRecommendationDraftInput,
@@ -70,6 +74,9 @@ export type Application = Readonly<{
   clients: {
     getAll: (input: ListClientsInput) => Promise<ListClientsResult>;
     getOne: (input: GetClientInput) => Promise<GetClientResult>;
+    getReviewSummaries: (
+      input: ListClientReviewSummariesInput
+    ) => Promise<ListClientReviewSummariesResult>;
   };
   knowledge: {
     search: (input: SearchKnowledgeInput) => Promise<SearchKnowledgeResult>;

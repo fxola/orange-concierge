@@ -9,7 +9,6 @@ import {
 } from '@/features/clients/view-models/clients';
 
 const LIST_LIMIT = 20;
-const INTERACTIONS_PER_CLIENT_LIMIT = 20;
 
 export async function getClients(): Promise<ClientListViewModel> {
   try {
@@ -26,41 +25,36 @@ export async function getClients(): Promise<ClientListViewModel> {
       return baseVm;
     }
 
-    const enrichedRows = await Promise.all(
-      baseVm.rows.map(async (row): Promise<ClientRow> => {
-        try {
-          const interactionsResult = await app.interaction.list({
-            actor,
-            clientId: row.id,
-            limit: INTERACTIONS_PER_CLIENT_LIMIT,
-            offset: 0,
-          });
+    const summariesResult = await app.clients.getReviewSummaries({
+      actor,
+      clientIds: baseVm.rows.map((row) => row.id),
+    });
 
-          if (interactionsResult.isFailure()) {
-            return row;
-          }
+    if (summariesResult.isFailure()) {
+      return { status: 'unavailable' };
+    }
 
-          const interactions = interactionsResult.getValue();
-          const needsAnalysis = interactions.filter((item) => item.status === 'received').length;
-          const completed = interactions.filter(
-            (item) => item.status === 'analysis_completed'
-          ).length;
-          const blocked = interactions.filter((item) => item.status === 'analysis_blocked').length;
-          const latest = interactions[0]?.createdAt;
-
-          return {
-            ...row,
-            totalInteractions: interactions.length,
-            needsAnalysis,
-            completed,
-            blocked,
-            latestInteractionLabel: latest ? formatDateLabel(latest) : null,
-          };
-        } catch {
-          return row;
-        }
-      })
+    const summaryByClientId = new Map(
+      summariesResult.getValue().map((summary) => [summary.clientId, summary])
     );
+
+    const enrichedRows = baseVm.rows.map((row): ClientRow => {
+      const summary = summaryByClientId.get(row.id);
+      if (!summary) {
+        return row;
+      }
+
+      return {
+        ...row,
+        totalInteractions: summary.totalInteractions,
+        needsAnalysis: summary.needsAnalysis,
+        completed: summary.completed,
+        blocked: summary.blocked,
+        latestInteractionLabel: summary.latestInteractionAt
+          ? formatDateLabel(summary.latestInteractionAt)
+          : null,
+      };
+    });
 
     enrichedRows.sort((a, b) => {
       const needsDiff = (b.needsAnalysis ?? 0) - (a.needsAnalysis ?? 0);

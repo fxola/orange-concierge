@@ -159,6 +159,14 @@ export class ClientNotFoundError extends Error {
   }
 }
 
+export class ClientListLimitExceededError extends Error {
+  readonly code = 'too_many_client_ids';
+  constructor(max: number) {
+    super(`Only a max of limit of ${max} client ids is allowed`);
+    this.name = 'ClientListLimitExceededError';
+  }
+}
+
 export class InvalidClientIdError extends Error {
   readonly code = 'invalid_client_id';
   constructor() {
@@ -244,5 +252,13 @@ export class UnauthorizedError extends Error {
   constructor() {
     super('You need to be logged in to perform this operation');
     this.name = 'UnauthorizedError';
+  }
+}
+
+export class GenericServerError extends Error {
+  readonly code = 'generic_server_error';
+  constructor(message: string) {
+    super(`Something went wrong. ${message}`);
+    this.name = 'GenericServerError';
   }
 }

@@ -11,6 +11,7 @@ export { ReviewRecommendation } from './application/recommendation/review-recomm
 export { SubmitRecommendationForReview } from './application/recommendation/submit-recommendation-for-review';
 export { ListRecommendations } from './application/recommendation/list-recommendations';
 export { ListClients } from './application/client/list-clients';
+export { ListClientReviewSummaries } from './application/client/list-client-review-summaries';
 export { GetClient } from './application/client/get-client';
 export { canViewClients } from './application/client/policy';
 export { canViewAuditTrail } from './application/audit/policy';
@@ -107,6 +108,10 @@ export type {
   ListClientsError,
   ListClientsInput,
   ListClientsResult,
+  ListClientReviewSummariesDependencies,
+  ListClientReviewSummariesError,
+  ListClientReviewSummariesInput,
+  ListClientReviewSummariesResult,
 } from './application/client/types';
 export type {
   SearchKnowledgeDependencies,
@@ -182,6 +187,10 @@ export type {
   RecommendationPriority,
 } from './ports/recommendation-drafter';
 export type { ClientRepository } from './ports/client-repository';
+export type {
+  ClientReviewSummary,
+  ClientReviewSummaryRepository,
+} from './ports/client-review-summary-repository';
 export type {
   InteractionTransactionManager,
   InteractionTransactionalPorts,

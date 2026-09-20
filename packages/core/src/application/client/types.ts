@@ -1,12 +1,17 @@
 import type { Actor } from '../../domain/actor';
 import type { Client } from '../../domain/client';
 import type {
+  ClientListLimitExceededError,
   ClientNotFoundError,
   InvalidClientIdError,
   InvalidPaginationError,
   UnauthorizedViewClientsError,
 } from '../../errors';
 import type { ClientRepository } from '../../ports/client-repository';
+import type {
+  ClientReviewSummary,
+  ClientReviewSummaryRepository,
+} from '../../ports/client-review-summary-repository';
 import type { Result } from '../result';
 
 export type ListClientsInput = Readonly<{
@@ -22,6 +27,25 @@ export type ListClientsDependencies = Readonly<{
 export type ListClientsError = UnauthorizedViewClientsError | InvalidPaginationError;
 
 export type ListClientsResult = Result<readonly Client[], ListClientsError>;
+
+export type ListClientReviewSummariesInput = Readonly<{
+  actor: Actor;
+  clientIds: readonly string[];
+}>;
+
+export type ListClientReviewSummariesDependencies = Readonly<{
+  clientReviewSummaryRepository: ClientReviewSummaryRepository;
+}>;
+
+export type ListClientReviewSummariesError =
+  | UnauthorizedViewClientsError
+  | InvalidClientIdError
+  | ClientListLimitExceededError;
+
+export type ListClientReviewSummariesResult = Result<
+  readonly ClientReviewSummary[],
+  ListClientReviewSummariesError
+>;
 
 export type GetClientInput = Readonly<{
   actor: Actor;
