@@ -1,6 +1,6 @@
 import type { Actor } from '../../domain/actor';
-import type { Recommendation } from '../../domain/recommendation';
-import type { EvidenceReference } from '../interaction/extracted-facts';
+import type { Recommendation, RecommendationPriority } from '../../domain/recommendation';
+import type { GroundedRecommendation } from '../../domain/recommendation-grounding';
 import type {
   InteractionAnalysisFailedError,
   InteractionNotFoundError,
@@ -17,13 +17,10 @@ import type {
   UnauthorizedSubmitRecommendationForReviewError,
 } from '../../errors';
 import type { InteractionRepository } from '../../ports/interaction-repository';
-import type { KnowledgeRetriever, KnowledgeSearchHit } from '../../ports/knowledge-retriever';
+import type { KnowledgeRetriever } from '../../ports/knowledge-retriever';
 import type { RecommendationRepository } from '../../ports/recommendation-repository';
 import type { RecommendationTransactionManager } from '../../ports/transaction-manager';
-import type {
-  RecommendationDrafter,
-  RecommendationPriority,
-} from '../../ports/recommendation-drafter';
+import type { RecommendationDrafter } from '../../ports/recommendation-drafter';
 import type { Result } from '../result';
 
 export type GenerateRecommendationsInput = Readonly<{
@@ -38,15 +35,6 @@ export type GenerateRecommendationsDependencies = Readonly<{
   transactionManager: RecommendationTransactionManager;
   newRecommendationId: () => string;
   now: () => Date;
-}>;
-
-export type GroundedRecommendation = Readonly<{
-  id?: string;
-  title: string;
-  summary: string;
-  priority: RecommendationPriority;
-  clientEvidence: readonly EvidenceReference[];
-  knowledgeCitations: readonly KnowledgeSearchHit[];
 }>;
 
 export type GenerateRecommendationsSuccess = Readonly<{

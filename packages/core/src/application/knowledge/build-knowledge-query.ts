@@ -1,4 +1,4 @@
-import { ExtractedFacts } from '../interaction/extracted-facts';
+import { ExtractedFacts } from '../../domain/client-assessment-facts';
 
 function appendFactText(parts: string[], value: string | readonly string[] | undefined): void {
   if (typeof value === 'string') {

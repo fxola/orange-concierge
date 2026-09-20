@@ -5,6 +5,7 @@ import { GROUP_META } from '../group-meta';
 import { ExtractedFactValue } from './extracted-fact-value';
 import type { ConfirmableSectionProps } from './section-props';
 import { VerifyToggle } from './verify-toggle';
+import { Text } from '@/components/ui/text';
 
 export function NeedsReviewSection({
   items,
@@ -22,10 +23,13 @@ export function NeedsReviewSection({
       className="overflow-hidden rounded-sm border border-warning/40 bg-surface shadow-xs"
     >
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
-        <h3 className="inline-flex items-center gap-2 font-display text-lg font-medium">
+        <Text
+          variant="h3"
+          className="inline-flex items-center gap-2 font-display text-lg font-medium"
+        >
           <AlertTriangle aria-hidden="true" className="h-4 w-4 text-warning" />
           Needs review
-        </h3>
+        </Text>
         <span className="rounded-full bg-warning-surface px-2.5 py-1 text-xs font-medium text-warning">
           {items.length} to confirm
         </span>
@@ -33,9 +37,9 @@ export function NeedsReviewSection({
       <div className="divide-y divide-border/70">
         {items.map((item) => (
           <div key={item.path} className="grid gap-2 px-4 py-3.5">
-            <p className="text-xs font-medium text-muted-foreground">
+            <Text className="text-xs font-medium text-muted-foreground">
               {GROUP_META[item.group].title} · {item.label}
-            </p>
+            </Text>
             <ExtractedFactValue value={item.value} />
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="inline-flex items-center gap-1.5 text-xs font-medium text-warning">

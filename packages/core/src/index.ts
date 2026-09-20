@@ -32,9 +32,9 @@ export {
   calculateEvidenceCoverage,
   factPathsFor,
   LOW_EVIDENCE_COVERAGE_RATIO,
-} from './application/interaction/extracted-facts';
+} from './domain/client-assessment-facts';
 export { calculateReadinessScore } from './domain/readiness-score';
-export { MIN_EVIDENCE_QUOTE_LENGTH } from './application/recommendation/ground-recommendations';
+export { MIN_EVIDENCE_QUOTE_LENGTH } from './domain/recommendation-grounding';
 export { Result } from './application/result';
 
 export {
@@ -98,7 +98,7 @@ export type {
   ExtractedFacts,
   ParseExtractedFactsResult,
   EvidenceCoverage,
-} from './application/interaction/extracted-facts';
+} from './domain/client-assessment-facts';
 export type {
   GetClientDependencies,
   GetClientError,
@@ -132,7 +132,6 @@ export type {
   GenerateRecommendationsInput,
   GenerateRecommendationsResult,
   GenerateRecommendationsSuccess,
-  GroundedRecommendation,
   EditRecommendationDraftDependencies,
   EditRecommendationDraftError,
   EditRecommendationDraftInput,
@@ -156,7 +155,15 @@ export { isActorRole } from './domain/actor';
 export type { Client } from './domain/client';
 export type { Interaction, InteractionStatus } from './domain/interaction';
 export type { ReadinessLevel, ReadinessScore, ReadinessScoreBand } from './domain/readiness-score';
-export type { Recommendation, RecommendationStatus } from './domain/recommendation';
+export type {
+  Recommendation,
+  RecommendationPriority,
+  RecommendationStatus,
+} from './domain/recommendation';
+export type {
+  GroundedRecommendation,
+  RecommendationDraft,
+} from './domain/recommendation-grounding';
 export type {
   AuditEvent,
   AuditMetadata,
@@ -184,7 +191,6 @@ export type {
   RecommendationDraftingFailureReason,
   RecommendationDraftingInput,
   RecommendationDraftingResult,
-  RecommendationPriority,
 } from './ports/recommendation-drafter';
 export type { ClientRepository } from './ports/client-repository';
 export type {

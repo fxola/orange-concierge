@@ -1,4 +1,4 @@
-import { parseClientId, parseClientIds } from '../../domain/client';
+import { parseClientIds } from '../../domain/client';
 import {
   ClientListLimitExceededError,
   InvalidClientIdError,
@@ -23,7 +23,7 @@ export class ListClientReviewSummaries {
     }
 
     const parsed = parseClientIds(clientIds);
-    if (!parsed.ok) {
+    if ('reason' in parsed) {
       if (parsed.reason === 'invalid_client_id') {
         return Result.failure(new InvalidClientIdError());
       }

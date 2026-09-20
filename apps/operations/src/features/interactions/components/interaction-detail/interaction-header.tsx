@@ -71,10 +71,12 @@ export function InteractionHeader({
             <Text variant="caption" tone="muted" className="uppercase tracking-[0.12em]">
               Next step
             </Text>
-            <h2 className="mt-1 text-base font-semibold tracking-[-0.01em]">{step.title}</h2>
-            <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
+            <Text variant="h2" className="mt-1 text-base font-semibold tracking-[-0.01em]">
+              {step.title}
+            </Text>
+            <Text className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
               {step.description}
-            </p>
+            </Text>
           </div>
           <span className="inline-flex shrink-0 flex-wrap items-center gap-2">
             {row.status === 'received' ? <InteractionAnalyzeButton interactionId={row.id} /> : null}
@@ -92,14 +94,14 @@ export function InteractionHeader({
         </div>
 
         <div className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-border pt-3">
-          <p className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+          <Text className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
             <InteractionStatus status={row.status} />
             <span aria-hidden="true" className="text-border-strong">
               ·
             </span>
             <span className="tabular-nums">{row.createdAtLabel}</span>
             <ReadinessChip readinessScore={row.readinessScore} />
-          </p>
+          </Text>
           <CopyIdButton id={row.id} />
         </div>
       </section>

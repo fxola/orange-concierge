@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { groundRecommendations } from '../../src/application/recommendation/ground-recommendations';
-import type { EvidenceReference } from '../../src/application/interaction/extracted-facts';
+import { groundRecommendations } from '../../src/domain/recommendation-grounding';
+import type { EvidenceReference } from '../../src/domain/client-assessment-facts';
 import type { KnowledgeSearchHit } from '../../src/ports/knowledge-retriever';
 
 const knowledgeHit: KnowledgeSearchHit = {

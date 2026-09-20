@@ -1,10 +1,26 @@
 import type { KnowledgeSearchHit } from '../../ports/knowledge-retriever';
-import type { DraftRecommendation } from '../../ports/recommendation-drafter';
-import type { EvidenceReference } from '../interaction/extracted-facts';
-import type { GroundedRecommendation } from './types';
+import type { EvidenceReference } from '../client-assessment-facts';
+import type { RecommendationPriority } from '../recommendation';
+
+export type RecommendationDraft = Readonly<{
+  title: string;
+  summary: string;
+  priority: RecommendationPriority;
+  clientEvidence: readonly string[];
+  knowledgeSources: readonly string[];
+}>;
+
+export type GroundedRecommendation = Readonly<{
+  id?: string;
+  title: string;
+  summary: string;
+  priority: RecommendationPriority;
+  clientEvidence: readonly EvidenceReference[];
+  knowledgeCitations: readonly KnowledgeSearchHit[];
+}>;
 
 type GroundRecommendationsInput = Readonly<{
-  drafts: readonly DraftRecommendation[];
+  drafts: readonly RecommendationDraft[];
   clientEvidence: readonly EvidenceReference[];
   knowledge: readonly KnowledgeSearchHit[];
 }>;
@@ -23,12 +39,7 @@ function citationsByChunkId(
 
 export const MIN_EVIDENCE_QUOTE_LENGTH = 15;
 
-const SCHEMA_KEY_TITLES = [
-  'currentArrangement',
-  'assetsDiscussed',
-  'incidentHistory',
-  'nextSteps',
-];
+const SCHEMA_KEY_TITLES = ['currentArrangement', 'assetsDiscussed', 'incidentHistory', 'nextSteps'];
 
 function hasSchemaKeyTitle(title: string): boolean {
   const lower = title.toLowerCase();

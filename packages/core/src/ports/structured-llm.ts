@@ -1,4 +1,4 @@
-import type { ExtractedFacts } from '../application/interaction/extracted-facts';
+import type { ExtractedFacts } from '../domain/client-assessment-facts';
 import type { Result } from '../application/result';
 
 export type StructuredLLMInput = Readonly<{

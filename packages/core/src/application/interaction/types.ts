@@ -1,6 +1,6 @@
 import type { Actor } from '../../domain/actor';
 import type { Interaction } from '../../domain/interaction';
-import type { ExtractedFacts } from './extracted-facts';
+import type { ExtractedFacts } from '../../domain/client-assessment-facts';
 import type {
   BlankTranscriptError,
   ClientNotFoundError,

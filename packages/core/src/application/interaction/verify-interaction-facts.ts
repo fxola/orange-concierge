@@ -8,7 +8,7 @@ import {
   UnauthorizedVerifyFactsError,
 } from '../../errors';
 import type { AuditEvent } from '../../ports/audit';
-import { factPathsFor } from './extracted-facts';
+import { factPathsFor } from '../../domain/client-assessment-facts';
 import { canVerifyInteractionFacts } from './policy';
 import { Result } from '../result';
 import type {

@@ -35,7 +35,7 @@ export function ReadinessBanner({
             </Badge>
           </>
         ) : (
-          <p className="text-sm text-muted-foreground">Not scored yet.</p>
+          <Text className="text-sm text-muted-foreground">Not scored yet.</Text>
         )}
         <span className="text-sm text-muted-foreground">
           <strong className="font-semibold text-foreground tabular-nums">
@@ -47,8 +47,8 @@ export function ReadinessBanner({
 
       {coverage.isLowConfidence ? (
         <Alert tone="warning" className="rounded-sm">
-          Low evidence coverage ({coverage.sourced}/{coverage.total}). Confirm the unsourced
-          facts against the transcript. Recommendations are blocked until coverage improves.
+          Low evidence coverage ({coverage.sourced}/{coverage.total}). Confirm the unsourced facts
+          against the transcript. Recommendations are blocked until coverage improves.
         </Alert>
       ) : null}
     </>

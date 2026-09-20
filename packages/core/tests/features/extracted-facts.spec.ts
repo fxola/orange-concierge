@@ -4,7 +4,7 @@ import {
   calculateEvidenceCoverage,
   factPathsFor,
   parseExtractedFacts,
-} from '../../src/application/interaction/extracted-facts';
+} from '../../src/domain/client-assessment-facts';
 
 describe('parseExtractedFacts', () => {
   it('drops blank strings and empty lists from model output', () => {

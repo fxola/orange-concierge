@@ -1,7 +1,7 @@
 import { parseInteractionId } from '../../domain/interaction';
-import { calculateEvidenceCoverage } from '../interaction/extracted-facts';
+import { calculateEvidenceCoverage } from '../../domain/client-assessment-facts';
 import { calculateReadinessScore } from '../../domain/readiness-score';
-import { Recommendation } from '../../domain/recommendation';
+import { groundRecommendations } from '../../domain/recommendation-grounding';
 import {
   InteractionAnalysisFailedError,
   InteractionNotFoundError,
@@ -10,7 +10,6 @@ import {
 } from '../../errors';
 import { buildKnowledgeQuery } from '../knowledge/build-knowledge-query';
 import { Result } from '../result';
-import { groundRecommendations } from './ground-recommendations';
 import {
   GenerateRecommendationsDependencies,
   GenerateRecommendationsInput,

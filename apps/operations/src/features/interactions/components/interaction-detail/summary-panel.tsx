@@ -56,13 +56,16 @@ export function SummaryPanel({ row }: Readonly<{ row: InteractionRow }>) {
         <Text variant="caption" tone="muted" className="uppercase tracking-[0.12em]">
           Operational brief
         </Text>
-        <h2 className="mt-1 font-display text-2xl font-medium leading-8 tracking-[-0.015em]">
+        <Text
+          variant="h2"
+          className="mt-1 font-display text-2xl font-medium leading-8 tracking-[-0.015em]"
+        >
           What matters from this interaction
-        </h2>
-        <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+        </Text>
+        <Text className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
           This summary is derived from extracted facts and evidence. It gives you a quick glance
           before drilling into the tabs.
-        </p>
+        </Text>
 
         {highlights.length > 0 ? (
           <div className="mt-5 grid gap-3">
@@ -74,7 +77,7 @@ export function SummaryPanel({ row }: Readonly<{ row: InteractionRow }>) {
                 <span className="text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
                   {item.label}
                 </span>
-                <p className="text-sm font-medium leading-6 text-foreground">{item.value}</p>
+                <Text className="text-sm font-medium leading-6 text-foreground">{item.value}</Text>
               </div>
             ))}
           </div>
@@ -92,14 +95,14 @@ export function SummaryPanel({ row }: Readonly<{ row: InteractionRow }>) {
           </Text>
           {readiness ? (
             <div className="mt-2 flex flex-wrap items-center gap-2">
-              <p className="font-display text-3xl font-medium leading-9">
+              <Text className="font-display text-3xl font-medium leading-9">
                 {readiness.score}
                 <span className="text-lg text-muted-foreground">/100</span>
-              </p>
+              </Text>
               <Badge tone={readinessTone(readiness.level)}>{readinessLabel(readiness.level)}</Badge>
             </div>
           ) : (
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">Not scored yet.</p>
+            <Text className="mt-2 text-sm leading-6 text-muted-foreground">Not scored yet.</Text>
           )}
         </section>
 
@@ -107,19 +110,19 @@ export function SummaryPanel({ row }: Readonly<{ row: InteractionRow }>) {
           <Text variant="caption" tone="muted" className="uppercase tracking-[0.12em]">
             Evidence coverage
           </Text>
-          <p className="mt-2 font-display text-2xl font-medium leading-8">
+          <Text className="mt-2 font-display text-2xl font-medium leading-8">
             {sourcedCount}/{coverage.total}
-          </p>
-          <p className="mt-1 text-sm leading-5 text-muted-foreground">
+          </Text>
+          <Text className="mt-1 text-sm leading-5 text-muted-foreground">
             facts have transcript proof
-          </p>
+          </Text>
           {isLowConfidence ? (
             <div className="mt-2">
               <Badge tone="warning">Low confidence</Badge>
-              <p className="mt-2 text-sm leading-5 text-muted-foreground">
+              <Text className="mt-2 text-sm leading-5 text-muted-foreground">
                 Only {sourcedCount}/{coverage.total} facts have proof. Review analysis against the
                 transcript before generating recommendations.
-              </p>
+              </Text>
             </div>
           ) : null}
         </section>
