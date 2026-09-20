@@ -29,6 +29,7 @@ export const auditAction = pgEnum('audit_action', [
   'interaction_scan_blocked',
   'interaction_analysis_completed',
   'interaction_analysis_failed',
+  'interaction_facts_verified',
   'recommendation_reviewed',
   'recommendation_edited',
 ]);
@@ -64,6 +65,7 @@ export const interactions = pgTable('interactions', {
   status: interactionStatus('status').notNull(),
   transcript: text('transcript').notNull(),
   extractedFacts: jsonb('extracted_facts').$type<ExtractedFacts>(),
+  verifiedFactPaths: jsonb('verified_fact_paths').$type<string[]>(),
   createdAt: timestamp('created_at', { mode: 'date', withTimezone: true }).notNull(),
 });
 

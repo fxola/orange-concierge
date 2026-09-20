@@ -11,6 +11,7 @@ export const auditActions = [
   'interaction_scan_blocked',
   'interaction_analysis_completed',
   'interaction_analysis_failed',
+  'interaction_facts_verified',
   'recommendation_reviewed',
   'recommendation_edited',
 ] as const;

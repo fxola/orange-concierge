@@ -6,6 +6,7 @@ const ACTION_DOT_CLASSES: Record<AuditAction, string> = {
   interaction_scan_blocked: 'bg-danger',
   interaction_analysis_completed: 'bg-success',
   interaction_analysis_failed: 'bg-danger',
+  interaction_facts_verified: 'bg-info',
   recommendation_reviewed: 'bg-success',
   recommendation_edited: 'bg-warning',
 };

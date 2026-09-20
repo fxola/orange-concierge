@@ -1,3 +1,6 @@
+'use client';
+
+import { useId, useState } from 'react';
 import type { GroundedRecommendation, Recommendation } from '@orange-concierge/core';
 
 type CardRecommendation = Recommendation | GroundedRecommendation;
@@ -5,22 +8,34 @@ type CardRecommendation = Recommendation | GroundedRecommendation;
 export function RecommendationProof({
   recommendation,
 }: Readonly<{ recommendation: CardRecommendation }>) {
+  const [open, setOpen] = useState(false);
+  const panelId = useId();
   const evidence = recommendation.clientEvidence ?? [];
   const citations = recommendation.knowledgeCitations ?? [];
   const summary = `${evidence.length} ${evidence.length === 1 ? 'quote' : 'quotes'} • ${citations.length} ${citations.length === 1 ? 'guide' : 'guides'}`;
 
   return (
-    <details className="group rounded-sm border border-border bg-background/40 px-3 py-2">
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm leading-6 text-muted-foreground transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden">
+    <div className="rounded-sm border border-border bg-background/40 px-3 py-2">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={panelId}
+        aria-label={`${open ? 'Hide' : 'Show'} proof for ${recommendation.title}`}
+        onClick={() => setOpen((value) => !value)}
+        className="flex w-full cursor-pointer items-center justify-between gap-3 text-sm leading-6 text-muted-foreground transition-colors hover:text-foreground"
+      >
         <span className="tabular-nums">{summary}</span>
-        <span className="text-xs font-semibold text-muted-foreground group-open:hidden">
-          Show details
+        <span className="text-xs font-semibold text-muted-foreground">
+          {open ? 'Hide' : 'Show details'}
         </span>
-        <span className="hidden text-xs font-semibold text-muted-foreground group-open:inline">
-          Hide
-        </span>
-      </summary>
-      <div className="grid min-w-0 gap-3 pb-1 pt-3">
+      </button>
+      {open ? (
+        <div
+          id={panelId}
+          role="region"
+          aria-label={`Proof for ${recommendation.title}`}
+          className="grid min-w-0 gap-3 pb-1 pt-3"
+        >
         <div className="grid min-w-0 gap-2">
           {evidence.map((item) => (
             <blockquote
@@ -49,7 +64,8 @@ export function RecommendationProof({
             </div>
           ))}
         </div>
-      </div>
-    </details>
+        </div>
+      ) : null}
+    </div>
   );
 }

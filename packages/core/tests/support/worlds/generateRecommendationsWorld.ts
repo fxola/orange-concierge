@@ -97,6 +97,39 @@ function analyzedInteraction(): Interaction {
   };
 }
 
+function lowCoverageInteraction(): Interaction {
+  const currentArrangementQuote = 'hold bitcoin on Coinbase';
+
+  return {
+    id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+    clientId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+    submittedBy: consultant.id,
+    status: 'analysis_completed',
+    transcript,
+    createdAt: fixedDate,
+    extractedFacts: {
+      custody: {
+        currentArrangement: 'Client holds bitcoin on Coinbase.',
+        concerns: ['Needs recovery plan before moving funds off exchange'],
+      },
+      cybersecurity: {
+        controls: ['Hardware wallet controls should be documented'],
+      },
+      planning: {
+        goals: ['Learn safe self-custody'],
+      },
+      evidence: [
+        {
+          factPath: 'custody.currentArrangement',
+          quote: currentArrangementQuote,
+          startOffset: transcript.indexOf(currentArrangementQuote),
+          endOffset: transcript.indexOf(currentArrangementQuote) + currentArrangementQuote.length,
+        },
+      ],
+    },
+  };
+}
+
 export function generateRecommendationsWorld() {
   const operations: string[] = [];
   const recommendationRepository = new InMemoryRecommendationRepository(null);
@@ -113,6 +146,19 @@ export function generateRecommendationsWorld() {
   return {
     givenAnalyzedInteractionWithEvidence() {
       interaction = analyzedInteraction();
+      interactionsRepo = new InMemoryInteractionRepository(interaction);
+    },
+
+    givenAnalyzedInteractionWithLowEvidenceCoverage() {
+      interaction = lowCoverageInteraction();
+      interactionsRepo = new InMemoryInteractionRepository(interaction);
+    },
+
+    givenAnalyzedInteractionWithLowEvidenceCoverageAndVerifiedFacts() {
+      interaction = {
+        ...lowCoverageInteraction(),
+        verifiedFactPaths: ['custody.concerns[0]'],
+      };
       interactionsRepo = new InMemoryInteractionRepository(interaction);
     },
 

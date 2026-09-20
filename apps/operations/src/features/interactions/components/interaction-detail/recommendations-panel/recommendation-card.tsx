@@ -12,6 +12,7 @@ import type {
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { RecommendationProof } from './recommendation-citations';
+import { RecommendationChecklist, getRecommendationChecks } from './recommendation-checklist';
 
 type PendingAction = 'submit' | 'approve' | 'reject' | 'save';
 
@@ -54,6 +55,7 @@ export function RecommendationCard({
 }>) {
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [reviewed, setReviewed] = useState(false);
   const [editTitle, setEditTitle] = useState(recommendation.title);
   const [editSummary, setEditSummary] = useState(recommendation.summary);
   const [editPriority, setEditPriority] =
@@ -90,6 +92,10 @@ export function RecommendationCard({
     editSummary.trim() !== recommendation.summary ||
     editPriority !== recommendation.priority;
 
+  const checks = getRecommendationChecks(recommendation);
+  const checksPass = checks.every((check) => check.pass);
+  const canSubmitDraft = checksPass && reviewed;
+
   const runSaveEdit = async () => {
     setPendingAction('save');
     try {
@@ -100,6 +106,7 @@ export function RecommendationCard({
       });
       if (saved) {
         setIsEditing(false);
+        setReviewed(false);
       }
     } finally {
       setPendingAction(null);
@@ -177,6 +184,13 @@ export function RecommendationCard({
         <div className="mt-3">
           <RecommendationProof recommendation={recommendation} />
         </div>
+        {recommendation.status === 'draft' && canSubmitForReview ? (
+          <RecommendationChecklist
+            recommendation={recommendation}
+            reviewed={reviewed}
+            onReviewedChange={setReviewed}
+          />
+        ) : null}
         {recommendation.status === 'draft' && (canSubmitForReview || canEdit) ? (
           <div className="mt-3 flex flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
             {isEditing ? (
@@ -223,7 +237,12 @@ export function RecommendationCard({
                     variant="outline"
                     size="sm"
                     onClick={runSubmitForReview}
-                    disabled={disabled}
+                    disabled={disabled || !canSubmitDraft}
+                    title={
+                      canSubmitDraft
+                        ? undefined
+                        : 'Complete the review checklist above to enable submission.'
+                    }
                     className="w-full sm:w-auto"
                   >
                     <Send aria-hidden="true" className="h-3.5 w-3.5" />

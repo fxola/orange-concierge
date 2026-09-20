@@ -1,7 +1,14 @@
 import type { EvidenceReference, ExtractedFacts } from '@orange-concierge/core';
-import type { FactGroupKey, FactItem } from './types';
 
-export const FACT_GROUPS: readonly FactGroupKey[] = ['custody', 'cybersecurity', 'planning'];
+export type FactGroupKey = 'custody' | 'cybersecurity' | 'planning';
+
+export type FactItem = Readonly<{
+  group: FactGroupKey;
+  label: string;
+  value: string;
+  path: string;
+  evidence?: EvidenceReference;
+}>;
 
 function evidenceFor(
   evidence: readonly EvidenceReference[] | undefined,
@@ -113,9 +120,23 @@ export function collectFactItems(facts: ExtractedFacts): readonly FactItem[] {
   return items;
 }
 
-export function itemsForGroup(
+export type PartitionedFactItems = Readonly<{
+  withTranscriptProof: readonly FactItem[];
+  confirmedByConsultant: readonly FactItem[];
+  needsReview: readonly FactItem[];
+}>;
+
+export function partitionFactItems(
   items: readonly FactItem[],
-  group: FactGroupKey
-): readonly FactItem[] {
-  return items.filter((item) => item.group === group);
+  verifiedFactPaths: readonly string[]
+): PartitionedFactItems {
+  const verifiedSet = new Set(verifiedFactPaths);
+
+  return {
+    withTranscriptProof: items.filter((item) => item.evidence),
+    confirmedByConsultant: items.filter(
+      (item) => !item.evidence && verifiedSet.has(item.path)
+    ),
+    needsReview: items.filter((item) => !item.evidence && !verifiedSet.has(item.path)),
+  };
 }

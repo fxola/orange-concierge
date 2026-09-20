@@ -155,6 +155,72 @@ describeFeature(feature, ({ Scenario }) => {
     });
   });
 
+  Scenario('Block generation when evidence coverage is low', ({ Given, And, When, Then }) => {
+    const world = generateRecommendationsWorld();
+    let result: GenerateRecommendationsResult;
+
+    Given('an analyzed interaction has low evidence coverage', () => {
+      world.givenAnalyzedInteractionWithLowEvidenceCoverage();
+    });
+
+    And('relevant internal guidance is retrieved', () => {
+      world.givenRelevantInternalGuidanceIsRetrieved();
+    });
+
+    And('the recommendation drafter returns a cited recommendation', () => {
+      world.givenRecommendationDrafterReturnsCitedRecommendation();
+    });
+
+    When('recommendations are generated for the interaction', async () => {
+      result = await world.generateRecommendations().execute({
+        actor: world.consultant(),
+        interactionId: world.interaction().id,
+      });
+    });
+
+    Then('no grounded recommendations are returned', () => {
+      expect(result.isSuccess()).toBe(true);
+      expect(result.getValue().recommendations).toEqual(world.expectedNoGroundedRecommendations());
+    });
+
+    And('the recommendation drafter is not invoked', () => {
+      expect(world.recommendationDrafter().inputs).toHaveLength(0);
+    });
+  });
+
+  Scenario(
+    'Proceed with generation after facts are human-verified',
+    ({ Given, And, When, Then }) => {
+      const world = generateRecommendationsWorld();
+      let result: GenerateRecommendationsResult;
+
+      Given('an analyzed interaction has low evidence coverage with verified facts', () => {
+        world.givenAnalyzedInteractionWithLowEvidenceCoverageAndVerifiedFacts();
+      });
+
+      And('relevant internal guidance is retrieved', () => {
+        world.givenRelevantInternalGuidanceIsRetrieved();
+      });
+
+      And('the recommendation drafter returns a cited recommendation', () => {
+        world.givenRecommendationDrafterReturnsCitedRecommendation();
+      });
+
+      When('recommendations are generated for the interaction', async () => {
+        result = await world.generateRecommendations().execute({
+          actor: world.consultant(),
+          interactionId: world.interaction().id,
+        });
+      });
+
+      Then('a grounded recommendation is returned for the verified interaction', () => {
+        expect(result.isSuccess()).toBe(true);
+        expect(result.getValue().recommendations).toHaveLength(1);
+        expect(world.recommendationDrafter().inputs).toHaveLength(1);
+      });
+    }
+  );
+
   Scenario('Fail when recommendation drafting fails', ({ Given, And, When, Then }) => {
     const world = generateRecommendationsWorld();
     let result: GenerateRecommendationsResult;

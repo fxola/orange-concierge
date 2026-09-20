@@ -159,6 +159,14 @@ export class ClientNotFoundError extends Error {
   }
 }
 
+export class ClientListLimitExceededError extends Error {
+  readonly code = 'too_many_client_ids';
+  constructor(max: number) {
+    super(`Only a max of limit of ${max} client ids is allowed`);
+    this.name = 'ClientListLimitExceededError';
+  }
+}
+
 export class InvalidClientIdError extends Error {
   readonly code = 'invalid_client_id';
   constructor() {
@@ -215,10 +223,42 @@ export class UnauthorizedViewClientsError extends Error {
   }
 }
 
+export class UnauthorizedVerifyFactsError extends Error {
+  readonly code = 'unauthorized_verify_facts';
+  constructor(role: Actor['role']) {
+    super(`Actor role ${role} cannot verify interaction facts`);
+    this.name = 'UnauthorizedVerifyFactsError';
+  }
+}
+
+export class InvalidFactPathError extends Error {
+  readonly code = 'invalid_fact_path';
+  constructor(reason: string) {
+    super(`Fact path is invalid: ${reason}`);
+    this.name = 'InvalidFactPathError';
+  }
+}
+
+export class FactVerificationFailedError extends Error {
+  readonly code = 'fact_verification_failed';
+  constructor() {
+    super('Fact verification failed');
+    this.name = 'FactVerificationFailedError';
+  }
+}
+
 export class UnauthorizedError extends Error {
   readonly code = 'unauthorized';
   constructor() {
     super('You need to be logged in to perform this operation');
     this.name = 'UnauthorizedError';
+  }
+}
+
+export class GenericServerError extends Error {
+  readonly code = 'generic_server_error';
+  constructor(message: string) {
+    super(`Something went wrong. ${message}`);
+    this.name = 'GenericServerError';
   }
 }

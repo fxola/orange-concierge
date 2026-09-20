@@ -1,4 +1,4 @@
-import type { ExtractedFacts } from '../application/interaction/extracted-facts';
+import type { ExtractedFacts } from './client-assessment-facts';
 
 export type ReadinessLevel = 'needs_attention' | 'developing' | 'ready';
 

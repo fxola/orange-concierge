@@ -6,6 +6,19 @@ Feature: View clients
     When the consultant lists clients
     Then both clients are returned
 
+  Scenario: Consultant lists client review summaries
+    Given a consultant actor
+    And two known clients exist
+    When the consultant lists review summaries for known clients
+    Then exact review summaries are returned
+
+  Scenario: Reject invalid review summary client id without touching the repository
+    Given a consultant actor
+    And two known clients exist
+    When the consultant lists review summaries with an invalid client id
+    Then the request is rejected as invalid client id
+    And the client review summary repository is never queried
+
   Scenario: Consultant opens a known client
     Given a consultant actor
     And two known clients exist

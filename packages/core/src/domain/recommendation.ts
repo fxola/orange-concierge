@@ -1,9 +1,10 @@
 import z from 'zod';
 import { InvalidRecommendationEditError } from '../errors';
 import { Result } from '../application/result';
-import type { EvidenceReference } from '../application/interaction/extracted-facts';
+import type { EvidenceReference } from './client-assessment-facts';
 import type { KnowledgeSearchHit } from '../ports/knowledge-retriever';
-import type { RecommendationPriority } from '../ports/recommendation-drafter';
+
+export type RecommendationPriority = 'low' | 'medium' | 'high';
 
 export type RecommendationStatus =
   | 'draft'

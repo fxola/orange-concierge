@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Compass, KeyRound, ShieldCheck } from 'lucide-react';
-import type { FactGroupKey } from './types';
+import type { FactGroupKey } from '../../../view-models/analysis-facts';
 
 export type FactGroupMeta = Readonly<{
   eyebrow: string;

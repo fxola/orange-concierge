@@ -1,5 +1,5 @@
 import z from 'zod';
-import type { ExtractedFacts } from '../application/interaction/extracted-facts';
+import type { ExtractedFacts } from './client-assessment-facts';
 
 export type InteractionStatus = 'received' | 'analysis_blocked' | 'analysis_completed';
 
@@ -11,6 +11,7 @@ export type Interaction = Readonly<{
   transcript: string;
   createdAt: Date;
   extractedFacts?: ExtractedFacts;
+  verifiedFactPaths?: readonly string[];
 }>;
 
 export const interactionIdSchema = z.string().trim().pipe(z.uuid());

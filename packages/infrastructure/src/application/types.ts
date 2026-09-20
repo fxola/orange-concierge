@@ -2,6 +2,8 @@ import type { OrangeConciergeAuth } from '../auth';
 import type {
   GetClientInput,
   GetClientResult,
+  ListClientReviewSummariesInput,
+  ListClientReviewSummariesResult,
   AnalyzeInteractionInput,
   AnalyzeInteractionResult,
   EditRecommendationDraftInput,
@@ -26,11 +28,15 @@ import type {
   SubmitInteractionResult,
   ListAuditEventsInput,
   ListAuditEventsResult,
+  VerifyInteractionFactsInput,
+  VerifyInteractionFactsResult,
 } from '@orange-concierge/core';
 
 export type {
   GetClientInput,
   GetClientResult,
+  ListClientReviewSummariesInput,
+  ListClientReviewSummariesResult,
   AnalyzeInteractionInput,
   AnalyzeInteractionResult,
   EditRecommendationDraftInput,
@@ -51,6 +57,8 @@ export type {
   SearchKnowledgeResult,
   SubmitRecommendationForReviewInput,
   SubmitRecommendationForReviewResult,
+  VerifyInteractionFactsInput,
+  VerifyInteractionFactsResult,
 };
 export type { SubmitInteractionInput, SubmitInteractionResult };
 
@@ -61,10 +69,14 @@ export type Application = Readonly<{
     analyze: (input: AnalyzeInteractionInput) => Promise<AnalyzeInteractionResult>;
     getOne: (input: GetInteractionInput) => Promise<GetInteractionResult>;
     list: (input: ListInteractionsInput) => Promise<ListInteractionsResult>;
+    verifyFacts: (input: VerifyInteractionFactsInput) => Promise<VerifyInteractionFactsResult>;
   };
   clients: {
     getAll: (input: ListClientsInput) => Promise<ListClientsResult>;
     getOne: (input: GetClientInput) => Promise<GetClientResult>;
+    getReviewSummaries: (
+      input: ListClientReviewSummariesInput
+    ) => Promise<ListClientReviewSummariesResult>;
   };
   knowledge: {
     search: (input: SearchKnowledgeInput) => Promise<SearchKnowledgeResult>;

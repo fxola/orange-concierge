@@ -15,6 +15,7 @@ export const AUDIT_ACTION_LABELS: Record<AuditAction, string> = {
   interaction_scan_blocked: 'Security scan blocked',
   interaction_analysis_completed: 'Analysis completed',
   interaction_analysis_failed: 'Analysis failed',
+  interaction_facts_verified: 'Facts verified',
   recommendation_reviewed: 'Recommendation reviewed',
   recommendation_edited: 'Recommendation draft edited',
 };
@@ -26,6 +27,7 @@ const METADATA_LABELS: Readonly<Record<string, string>> = {
   findingCount: 'Findings',
   failureSource: 'Failure source',
   failureReason: 'Failure reason',
+  factPathCount: 'Verified facts',
 };
 
 export type AuditTrailDetail = Readonly<{ label: string; value: string }>;

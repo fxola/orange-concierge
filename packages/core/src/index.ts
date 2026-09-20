@@ -2,6 +2,7 @@ export { AnalyzeInteraction } from './application/interaction/analyze-interactio
 export { GetInteraction } from './application/interaction/get-interaction';
 export { ListInteractions } from './application/interaction/list-interactions';
 export { SubmitInteraction } from './application/interaction/submit-interaction';
+export { VerifyInteractionFacts } from './application/interaction/verify-interaction-facts';
 export { SearchKnowledge } from './application/knowledge/search-knowledge';
 export { ListAuditEvents } from './application/audit/list-audit-events';
 export { GenerateRecommendations } from './application/recommendation/generate-recommendations';
@@ -10,12 +11,14 @@ export { ReviewRecommendation } from './application/recommendation/review-recomm
 export { SubmitRecommendationForReview } from './application/recommendation/submit-recommendation-for-review';
 export { ListRecommendations } from './application/recommendation/list-recommendations';
 export { ListClients } from './application/client/list-clients';
+export { ListClientReviewSummaries } from './application/client/list-client-review-summaries';
 export { GetClient } from './application/client/get-client';
 export { canViewClients } from './application/client/policy';
 export { canViewAuditTrail } from './application/audit/policy';
 export {
   canAnalyzeInteractions,
   canSubmitInteractions,
+  canVerifyInteractionFacts,
   canViewInteractions,
 } from './application/interaction/policy';
 export {
@@ -26,8 +29,12 @@ export {
 export {
   extractedFactsSchema,
   parseExtractedFacts,
-} from './application/interaction/extracted-facts';
+  calculateEvidenceCoverage,
+  factPathsFor,
+  LOW_EVIDENCE_COVERAGE_RATIO,
+} from './domain/client-assessment-facts';
 export { calculateReadinessScore } from './domain/readiness-score';
+export { MIN_EVIDENCE_QUOTE_LENGTH } from './domain/recommendation-grounding';
 export { Result } from './application/result';
 
 export {
@@ -56,6 +63,9 @@ export {
   InvalidInteractionStateError,
   UnauthorizedAnalyzeInteractionError,
   UnauthorizedSubmitInteractionError,
+  UnauthorizedVerifyFactsError,
+  InvalidFactPathError,
+  FactVerificationFailedError,
   UnauthorizedViewAuditError,
   UnauthorizedError,
 } from './errors';
@@ -77,12 +87,18 @@ export type {
   SubmitInteractionError,
   SubmitInteractionInput,
   SubmitInteractionResult,
+  VerifyInteractionFactsDependencies,
+  VerifyInteractionFactsError,
+  VerifyInteractionFactsInput,
+  VerifyInteractionFactsResult,
+  VerifyInteractionFactsSuccess,
 } from './application/interaction/types';
 export type {
   EvidenceReference,
   ExtractedFacts,
   ParseExtractedFactsResult,
-} from './application/interaction/extracted-facts';
+  EvidenceCoverage,
+} from './domain/client-assessment-facts';
 export type {
   GetClientDependencies,
   GetClientError,
@@ -92,6 +108,10 @@ export type {
   ListClientsError,
   ListClientsInput,
   ListClientsResult,
+  ListClientReviewSummariesDependencies,
+  ListClientReviewSummariesError,
+  ListClientReviewSummariesInput,
+  ListClientReviewSummariesResult,
 } from './application/client/types';
 export type {
   SearchKnowledgeDependencies,
@@ -112,7 +132,6 @@ export type {
   GenerateRecommendationsInput,
   GenerateRecommendationsResult,
   GenerateRecommendationsSuccess,
-  GroundedRecommendation,
   EditRecommendationDraftDependencies,
   EditRecommendationDraftError,
   EditRecommendationDraftInput,
@@ -136,7 +155,15 @@ export { isActorRole } from './domain/actor';
 export type { Client } from './domain/client';
 export type { Interaction, InteractionStatus } from './domain/interaction';
 export type { ReadinessLevel, ReadinessScore, ReadinessScoreBand } from './domain/readiness-score';
-export type { Recommendation, RecommendationStatus } from './domain/recommendation';
+export type {
+  Recommendation,
+  RecommendationPriority,
+  RecommendationStatus,
+} from './domain/recommendation';
+export type {
+  GroundedRecommendation,
+  RecommendationDraft,
+} from './domain/recommendation-grounding';
 export type {
   AuditEvent,
   AuditMetadata,
@@ -164,9 +191,12 @@ export type {
   RecommendationDraftingFailureReason,
   RecommendationDraftingInput,
   RecommendationDraftingResult,
-  RecommendationPriority,
 } from './ports/recommendation-drafter';
 export type { ClientRepository } from './ports/client-repository';
+export type {
+  ClientReviewSummary,
+  ClientReviewSummaryRepository,
+} from './ports/client-review-summary-repository';
 export type {
   InteractionTransactionManager,
   InteractionTransactionalPorts,

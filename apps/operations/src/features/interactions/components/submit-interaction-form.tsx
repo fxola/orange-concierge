@@ -43,10 +43,11 @@ export function SubmitInteractionForm({
       const viewModel = await submitInteraction({ clientId, transcript });
 
       if (viewModel.status === 'ok') {
+        const effectiveClientId = fixedClient?.id ?? clientId;
         setTranscript('');
-        toast.success('Interaction received. Queued for analysis.');
+        toast.success('Transcript saved. Next step: analyze this interaction.');
         onSubmitted?.();
-        router.refresh();
+        router.push(`/clients/${effectiveClientId}/interactions/${viewModel.interactionId}`);
         return;
       }
 
@@ -106,7 +107,7 @@ export function SubmitInteractionForm({
             {isPending ? 'Submitting…' : 'Submit interaction'}
           </Button>
           <Text tone="muted" variant="caption">
-            Saved as received, then ready for analysis.
+            Saved as received, then needs analysis.
           </Text>
         </div>
       </form>

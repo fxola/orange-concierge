@@ -3,14 +3,19 @@ import { Text } from '@/components/ui/text';
 import type { InteractionRow } from '../../../view-models/interactions';
 import { ExtractedFactsView } from './extracted-facts-view';
 
-export function AnalysisPanel({ row }: Readonly<{ row: InteractionRow }>) {
+export function AnalysisPanel({
+  row,
+  canVerifyFacts,
+}: Readonly<{ row: InteractionRow; canVerifyFacts: boolean }>) {
   if (row.status === 'analysis_completed') {
     return (
       <div className="grid gap-4">
         <ExtractedFactsView
+          interactionId={row.id}
           facts={row.extractedFacts ?? {}}
-          transcript={row.transcript}
+          verifiedFactPaths={row.verifiedFactPaths}
           readinessScore={row.readinessScore}
+          canVerifyFacts={canVerifyFacts}
         />
       </div>
     );
@@ -20,7 +25,7 @@ export function AnalysisPanel({ row }: Readonly<{ row: InteractionRow }>) {
     return (
       <div className="rounded-sm border border-border bg-surface p-5 shadow-xs sm:p-6">
         <Text variant="small" tone="muted">
-          Analysis has not run yet. Use the action at the top of the page when you are ready.
+          Analysis has not run yet. Use Analyze interaction at the top of the page to continue.
         </Text>
       </div>
     );

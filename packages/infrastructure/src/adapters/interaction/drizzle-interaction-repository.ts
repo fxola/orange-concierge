@@ -14,6 +14,7 @@ function toDomain(row: InteractionRow): Interaction {
     transcript: row.transcript,
     createdAt: row.createdAt,
     ...(row.extractedFacts ? { extractedFacts: row.extractedFacts } : {}),
+    ...(row.verifiedFactPaths ? { verifiedFactPaths: [...row.verifiedFactPaths] } : {}),
   };
 }
 
@@ -25,6 +26,7 @@ export function toInteractionRow(interaction: Interaction): typeof interactions.
     status: interaction.status,
     transcript: interaction.transcript,
     extractedFacts: interaction.extractedFacts ?? null,
+    verifiedFactPaths: interaction.verifiedFactPaths ? [...interaction.verifiedFactPaths] : null,
     createdAt: interaction.createdAt,
   };
 }

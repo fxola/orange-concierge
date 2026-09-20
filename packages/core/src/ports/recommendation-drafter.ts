@@ -1,17 +1,10 @@
 import type { KnowledgeSearchHit } from './knowledge-retriever';
-import type { EvidenceReference, ExtractedFacts } from '../application/interaction/extracted-facts';
+import type { EvidenceReference, ExtractedFacts } from '../domain/client-assessment-facts';
 import type { ReadinessScore } from '../domain/readiness-score';
 import type { Result } from '../application/result';
+import type { RecommendationDraft } from '../domain/recommendation-grounding';
 
-export type RecommendationPriority = 'low' | 'medium' | 'high';
-
-export type DraftRecommendation = Readonly<{
-  title: string;
-  summary: string;
-  priority: RecommendationPriority;
-  clientEvidence: readonly string[];
-  knowledgeSources: readonly string[];
-}>;
+export type DraftRecommendation = RecommendationDraft;
 
 export type RecommendationDraftingInput = Readonly<{
   interactionId: string;

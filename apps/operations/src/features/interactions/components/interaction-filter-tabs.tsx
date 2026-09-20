@@ -11,7 +11,7 @@ const TABS: ReadonlyArray<
   Readonly<{ id: InteractionFilterTab; label: string; count: (counts: InteractionTabCounts) => number }>
 > = [
   { id: 'all', label: 'All', count: (counts) => counts.total },
-  { id: 'received', label: 'Ready', count: (counts) => counts.received },
+  { id: 'received', label: 'Needs analysis', count: (counts) => counts.received },
   { id: 'completed', label: 'Complete', count: (counts) => counts.completed },
   { id: 'blocked', label: 'Blocked', count: (counts) => counts.blocked },
 ];

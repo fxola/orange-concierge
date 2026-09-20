@@ -1,6 +1,7 @@
 import { parseInteractionId } from '../../domain/interaction';
+import { calculateEvidenceCoverage } from '../../domain/client-assessment-facts';
 import { calculateReadinessScore } from '../../domain/readiness-score';
-import { Recommendation } from '../../domain/recommendation';
+import { groundRecommendations } from '../../domain/recommendation-grounding';
 import {
   InteractionAnalysisFailedError,
   InteractionNotFoundError,
@@ -9,7 +10,6 @@ import {
 } from '../../errors';
 import { buildKnowledgeQuery } from '../knowledge/build-knowledge-query';
 import { Result } from '../result';
-import { groundRecommendations } from './ground-recommendations';
 import {
   GenerateRecommendationsDependencies,
   GenerateRecommendationsInput,
@@ -38,6 +38,11 @@ export class GenerateRecommendations {
     }
 
     const facts = interaction.extractedFacts;
+    const coverage = calculateEvidenceCoverage(facts, interaction.verifiedFactPaths ?? []);
+    if (coverage.total === 0 || coverage.isLowConfidence) {
+      return Result.success({ recommendations: [] });
+    }
+
     const clientEvidence = facts.evidence ?? [];
     const readinessScore = calculateReadinessScore(facts);
     const knowledge = await this.deps.knowledgeRetriever.search({

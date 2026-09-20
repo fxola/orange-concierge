@@ -1,7 +1,6 @@
 import type { ClientDetailViewModel } from '@/features/clients/view-models/clients';
 import type { InteractionDetailViewModel } from '../view-models/interactions';
 import type { RecommendationsViewModel } from '../view-models/recommendations';
-import { InteractionDetailHeader } from '../components/interaction-detail/interaction-detail-header';
 import { InteractionDetailUnavailable } from '../components/interaction-detail/interaction-detail-unavailable';
 import { InteractionDetailTabs } from '../components/interaction-detail/interaction-detail-tabs';
 import Link from 'next/link';
@@ -34,8 +33,11 @@ export function InteractionDetailPage({
       >
         <span aria-hidden="true">←</span> Back to {client.displayName}
       </Link>
-      <InteractionDetailHeader row={row} />
-      <InteractionDetailTabs row={row} recommendationsVm={recommendationsVm} />
+      <InteractionDetailTabs
+        row={row}
+        recommendationsVm={recommendationsVm}
+        canVerifyFacts={interactionVm.canVerifyFacts}
+      />
     </div>
   );
 }

@@ -11,6 +11,7 @@ import {
   GenerateRecommendations,
   GetInteraction,
   GetClient,
+  ListClientReviewSummaries,
   ListClients,
   ListInteractions,
   ListRecommendations,
@@ -19,6 +20,7 @@ import {
   SubmitRecommendationForReview,
   SubmitInteraction,
   ListAuditEvents,
+  VerifyInteractionFacts,
   AuditPort,
 } from '@orange-concierge/core';
 import { PatternSecretScanner } from '@orange-concierge/security';
@@ -33,9 +35,9 @@ import { createDatabaseFromUrl, OrangeConciergeDB } from '../database/connection
 import { config, type BackendConfig } from './config';
 import type { Application } from './types';
 import { DrizzleClientRepository } from '../adapters/client/drizzle-client-repository';
+import { DrizzleClientReviewSummaryRepository } from '../adapters/client/drizzle-client-review-summary-repository';
 import { DrizzleKnowledgeSearch } from '../adapters/knowledge/drizzle-knowledge-search';
 import { createKnowledgeEmbedder } from '../knowledge/embedder-factory';
-import { input } from 'zod';
 
 type ApplicationRuntime = Readonly<{
   application: Application;
@@ -57,7 +59,7 @@ const createApplicationRuntime = (runtimeConfig: BackendConfig): ApplicationRunt
 
   const auth = createAuth({ db, baseURL, secret, trustedOrigins });
   const interaction = buildInteraction(db, clientRepository, auditPort, runtimeConfig.ai);
-  const clients = buildClients(clientRepository);
+  const clients = buildClients(db, clientRepository);
   const knowledge = buildKnowledge(db, runtimeConfig.ai);
   const recommendations = buildRecommendations(db, runtimeConfig.ai);
   const audit = buildAuditEvents(auditPort);
@@ -112,20 +114,37 @@ const buildInteraction = (
 
   const getInteractionUseCase = new GetInteraction({ interactionsRepo: interactionRepository });
 
+  const verifyInteractionFactsUseCase = new VerifyInteractionFacts({
+    interactionsRepo: interactionRepository,
+    audit,
+    transactionManager,
+    now: () => new Date(),
+  });
+
   return {
     submit: (input) => submitInteractionUseCase.execute(input),
     analyze: (input) => analyzeInteractionUseCase.execute(input),
     getOne: (input) => getInteractionUseCase.execute(input),
     list: (input) => listInteractionsUseCase.execute(input),
+    verifyFacts: (input) => verifyInteractionFactsUseCase.execute(input),
   };
 };
 
-const buildClients = (clientRepository: DrizzleClientRepository): Application['clients'] => {
+const buildClients = (
+  db: OrangeConciergeDB,
+  clientRepository: DrizzleClientRepository
+): Application['clients'] => {
+  const clientReviewSummaryRepository = new DrizzleClientReviewSummaryRepository(db);
+
   const listClientsUseCase = new ListClients({ clientRepository });
   const getClientUseCase = new GetClient({ clientRepository });
+  const listClientReviewSummariesUseCase = new ListClientReviewSummaries({
+    clientReviewSummaryRepository,
+  });
   return {
     getAll: (input) => listClientsUseCase.execute(input),
     getOne: (input) => getClientUseCase.execute(input),
+    getReviewSummaries: (input) => listClientReviewSummariesUseCase.execute(input),
   };
 };
 
@@ -155,6 +174,7 @@ const buildRecommendations = (
     newRecommendationId: randomUUID,
     now: () => new Date(),
   });
+
   const listRecommendationsUseCase = new ListRecommendations({
     recommendationRepository,
     interactionRepository: interactionsRepo,
