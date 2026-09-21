@@ -27,6 +27,7 @@ export {
   canSubmitRecommendationsForReview,
 } from './application/recommendation/policy';
 export {
+  assessmentModelOutputJsonSchema,
   extractedFactsSchema,
   parseExtractedFacts,
   calculateEvidenceCoverage,

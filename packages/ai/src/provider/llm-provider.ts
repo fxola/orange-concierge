@@ -8,6 +8,7 @@ export type StructuredGenerationRequest = Readonly<{
   systemPrompt: string;
   userPrompt: string;
   maxOutputTokens?: number;
+  jsonSchema?: Readonly<Record<string, unknown>>;
 }>;
 
 export interface LLMProvider {

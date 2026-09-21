@@ -1,7 +1,4 @@
-import type {
-  BaseProviderConfig,
-  StructuredGenerationRequest,
-} from '../provider/llm-provider';
+import type { BaseProviderConfig, StructuredGenerationRequest } from '../provider/llm-provider';
 import { ProviderError } from '../provider/provider-error';
 import { BaseHttpAdapter, isRecord } from './base-adapter';
 
@@ -45,6 +42,7 @@ export class GeminiAdapter extends BaseHttpAdapter {
       generationConfig: {
         temperature: 0,
         responseMimeType: 'application/json',
+        ...(input.jsonSchema ? { responseSchema: input.jsonSchema } : {}),
         ...(input.maxOutputTokens ? { maxOutputTokens: input.maxOutputTokens } : {}),
       },
     };

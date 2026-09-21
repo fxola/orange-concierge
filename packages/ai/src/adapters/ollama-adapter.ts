@@ -21,7 +21,7 @@ export class OllamaAdapter extends BaseHttpAdapter {
     return {
       model: this.model,
       stream: false,
-      format: 'json',
+      format: input.jsonSchema ?? 'json',
       options: {
         temperature: 0,
         ...(input.maxOutputTokens ? { num_predict: input.maxOutputTokens } : {}),

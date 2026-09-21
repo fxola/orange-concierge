@@ -8,6 +8,16 @@ export const FACT_FIELD_KEYS = {
   planning: ['goals', 'constraints', 'nextSteps'],
 } satisfies Record<FactGroupKey, readonly string[]>;
 
+export const LIST_FACT_FIELDS = new Set([
+  'custody.assetsDiscussed',
+  'custody.concerns',
+  'cybersecurity.controls',
+  'cybersecurity.risks',
+  'planning.goals',
+  'planning.constraints',
+  'planning.nextSteps',
+] as const);
+
 export const PLACEHOLDER_VALUES = new Set([
   'string',
   'n/a',
@@ -18,20 +28,5 @@ export const PLACEHOLDER_VALUES = new Set([
   'tbd',
   '-',
 ]);
-
-export const INCIDENT_KEYWORDS = [
-  'breach',
-  'hack',
-  'incident',
-  'compromise',
-  'phish',
-  'theft',
-  'stolen',
-  'loss',
-  'attack',
-  'scam',
-  'fraud',
-  'unauthorized',
-] as const;
 
 export const LOW_EVIDENCE_COVERAGE_RATIO = 0.5;
