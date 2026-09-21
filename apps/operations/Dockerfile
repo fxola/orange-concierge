@@ -8,7 +8,6 @@ COPY apps/operations/package.json ./apps/operations/package.json
 COPY packages/ai/package.json ./packages/ai/package.json
 COPY packages/core/package.json ./packages/core/package.json
 COPY packages/infrastructure/package.json ./packages/infrastructure/package.json
-COPY packages/security/package.json ./packages/security/package.json
 COPY packages/observability/package.json ./packages/observability/package.json
 RUN pnpm install --frozen-lockfile
 

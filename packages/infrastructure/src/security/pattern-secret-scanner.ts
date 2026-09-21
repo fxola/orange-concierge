@@ -15,7 +15,9 @@ const MAX_FINDINGS = 20;
 type PendingFinding = SecretFinding & Readonly<{ order: number }>;
 
 function normalizeFindings(findings: readonly PendingFinding[]): readonly SecretFinding[] {
-  const sorted = [...findings].sort((left, right) => left.start - right.start || left.order - right.order);
+  const sorted = [...findings].sort(
+    (left, right) => left.start - right.start || left.order - right.order
+  );
   const normalized: SecretFinding[] = [];
 
   for (const { order, ...finding } of sorted) {

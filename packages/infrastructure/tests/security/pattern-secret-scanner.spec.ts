@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { PatternSecretScanner } from '../src';
+import { PatternSecretScanner } from '../../src/security';
 
 describe('PatternSecretScanner', () => {
   it('flags a 12-word seed phrase without copying the secret into the label', async () => {
@@ -162,8 +162,9 @@ describe('PatternSecretScanner', () => {
   it('caps findings at 20', () => {
     const scanner = new PatternSecretScanner();
     const code = '1234-5678-9012';
-    const text = Array.from({ length: 25 }, (_, index) => `Backup code: ${code}-${index}`)
-      .join('\n');
+    const text = Array.from({ length: 25 }, (_, index) => `Backup code: ${code}-${index}`).join(
+      '\n'
+    );
 
     const result = scanner.scan({ text });
 

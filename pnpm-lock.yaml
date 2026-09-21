@@ -100,16 +100,13 @@ importers:
     dependencies:
       '@better-auth/drizzle-adapter':
         specifier: ^1.7.2
-        version: 1.7.2(@better-auth/core@1.7.2(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-call@1.4.0(zod@4.5.4))(jose@6.2.10)(kysely@0.29.5)(nanostores@1.5.3))(@better-auth/utils@0.4.2)(drizzle-orm@0.45.2(gel@2.2.0)(kysely@0.29.5)(postgres@3.4.9))
+        version: 1.7.2(@better-auth/core@1.7.2(@better-auth/utils@0.5.0)(@better-fetch/fetch@1.3.1)(better-call@1.4.0(zod@4.5.4))(jose@6.2.10)(kysely@0.29.5)(nanostores@1.5.3))(@better-auth/utils@0.5.0)(drizzle-orm@0.45.2(gel@2.2.0)(kysely@0.29.5)(postgres@3.4.9))
       '@orange-concierge/ai':
         specifier: workspace:*
         version: link:../ai
       '@orange-concierge/core':
         specifier: workspace:*
         version: link:../core
-      '@orange-concierge/security':
-        specifier: workspace:*
-        version: link:../security
       '@t3-oss/env-core':
         specifier: ^0.13.11
         version: 0.13.11(typescript@5.9.3)(zod@4.5.4)
@@ -147,22 +144,6 @@ importers:
       pino:
         specifier: ^9.6.0
         version: 9.14.0
-    devDependencies:
-      typescript:
-        specifier: ^5.7.0
-        version: 5.9.3
-      vitest:
-        specifier: ^4.1.11
-        version: 4.1.11(@types/node@22.20.1)(vite@8.2.2(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12))
-
-  packages/security:
-    dependencies:
-      '@orange-concierge/core':
-        specifier: workspace:*
-        version: link:../core
-      zod:
-        specifier: ^4.5.4
-        version: 4.5.4
     devDependencies:
       typescript:
         specifier: ^5.7.0
@@ -2017,10 +1998,29 @@ snapshots:
       nanostores: 1.5.3
       zod: 4.5.4
 
+  '@better-auth/core@1.7.2(@better-auth/utils@0.5.0)(@better-fetch/fetch@1.3.1)(better-call@1.4.0(zod@4.5.4))(jose@6.2.10)(kysely@0.29.5)(nanostores@1.5.3)':
+    dependencies:
+      '@better-auth/utils': 0.5.0
+      '@better-fetch/fetch': 1.3.1
+      '@opentelemetry/semantic-conventions': 1.43.0
+      '@standard-schema/spec': 1.1.0
+      better-call: 1.4.0(zod@4.5.4)
+      jose: 6.2.10
+      kysely: 0.29.5
+      nanostores: 1.5.3
+      zod: 4.5.4
+
   '@better-auth/drizzle-adapter@1.7.2(@better-auth/core@1.7.2(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-call@1.4.0(zod@4.5.4))(jose@6.2.10)(kysely@0.29.5)(nanostores@1.5.3))(@better-auth/utils@0.4.2)(drizzle-orm@0.45.2(gel@2.2.0)(kysely@0.29.5)(postgres@3.4.9))':
     dependencies:
       '@better-auth/core': 1.7.2(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-call@1.4.0(zod@4.5.4))(jose@6.2.10)(kysely@0.29.5)(nanostores@1.5.3)
       '@better-auth/utils': 0.4.2
+    optionalDependencies:
+      drizzle-orm: 0.45.2(gel@2.2.0)(kysely@0.29.5)(postgres@3.4.9)
+
+  '@better-auth/drizzle-adapter@1.7.2(@better-auth/core@1.7.2(@better-auth/utils@0.5.0)(@better-fetch/fetch@1.3.1)(better-call@1.4.0(zod@4.5.4))(jose@6.2.10)(kysely@0.29.5)(nanostores@1.5.3))(@better-auth/utils@0.5.0)(drizzle-orm@0.45.2(gel@2.2.0)(kysely@0.29.5)(postgres@3.4.9))':
+    dependencies:
+      '@better-auth/core': 1.7.2(@better-auth/utils@0.5.0)(@better-fetch/fetch@1.3.1)(better-call@1.4.0(zod@4.5.4))(jose@6.2.10)(kysely@0.29.5)(nanostores@1.5.3)
+      '@better-auth/utils': 0.5.0
     optionalDependencies:
       drizzle-orm: 0.45.2(gel@2.2.0)(kysely@0.29.5)(postgres@3.4.9)
 
