@@ -1,6 +1,7 @@
 import type { EvidenceCoverage, ReadinessScore } from '@orange-concierge/core';
 import { Alert, Badge } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
+import { readinessLabel, readinessTone } from '../../../../view-models/readiness-presentation';
 
 export function ReadinessBanner({
   readinessScore,
@@ -18,20 +19,8 @@ export function ReadinessBanner({
               {readinessScore.overall.score}
               <span className="text-base text-muted-foreground">/100</span>
             </p>
-            <Badge
-              tone={
-                readinessScore.overall.level === 'ready'
-                  ? 'success'
-                  : readinessScore.overall.level === 'developing'
-                    ? 'warning'
-                    : 'danger'
-              }
-            >
-              {readinessScore.overall.level === 'ready'
-                ? 'Ready'
-                : readinessScore.overall.level === 'developing'
-                  ? 'Developing'
-                  : 'Needs attention'}
+            <Badge tone={readinessTone(readinessScore.overall.level)}>
+              {readinessLabel(readinessScore.overall.level)}
             </Badge>
           </>
         ) : (
