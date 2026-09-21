@@ -36,34 +36,34 @@ export function RecommendationProof({
           aria-label={`Proof for ${recommendation.title}`}
           className="grid min-w-0 gap-3 pb-1 pt-3"
         >
-        <div className="grid min-w-0 gap-2">
-          {evidence.map((item) => (
-            <blockquote
-              key={`${recommendation.title}-${item.factPath}`}
-              title={`Source: ${item.factPath}`}
-              className="min-w-0 cursor-help border-l-2 border-border px-3 text-sm leading-6 text-muted-foreground [overflow-wrap:anywhere]"
-            >
-              “{item.quote}”
-            </blockquote>
-          ))}
-        </div>
-        <div className="grid min-w-0 gap-1">
-          {citations.map((citation) => (
-            <div
-              key={`${recommendation.title}-${citation.chunkId}`}
-              title={`Source: ${citation.sourcePath} • ${citation.chunkId}`}
-              className="flex min-w-0 cursor-help items-baseline justify-between gap-3"
-            >
-              <p className="min-w-0 truncate text-xs leading-5 text-muted-foreground">
-                {citation.sourceTitle}
-                {citation.heading ? ` — ${citation.heading}` : ''}
-              </p>
-              <span className="shrink-0 text-[11px] font-semibold text-muted-foreground tabular-nums">
-                {Math.round(citation.score * 100)}% match
-              </span>
-            </div>
-          ))}
-        </div>
+          <div className="grid min-w-0 gap-2">
+            {evidence.map((item) => (
+              <blockquote
+                key={`${recommendation.title}-${item.factPath}`}
+                title={`Source: ${item.factPath}`}
+                className="min-w-0 cursor-help border-l-2 border-border px-3 text-sm leading-6 text-muted-foreground [overflow-wrap:anywhere]"
+              >
+                “{item.quote}”
+              </blockquote>
+            ))}
+          </div>
+          <div className="grid min-w-0 gap-1">
+            {citations.map((citation) => (
+              <div
+                key={`${recommendation.title}-${citation.chunkId}`}
+                title={`Source: ${citation.sourcePath} • ${citation.chunkId}`}
+                className="flex min-w-0 cursor-help items-baseline justify-between gap-3"
+              >
+                <p className="min-w-0 truncate text-xs leading-5 text-muted-foreground">
+                  From {citation.sourceTitle}
+                  {citation.heading ? ` — in the "${citation.heading}" section` : ''}
+                </p>
+                <span className="shrink-0 text-[11px] font-semibold text-muted-foreground tabular-nums">
+                  {Math.round(citation.score * 100)}% match
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       ) : null}
     </div>

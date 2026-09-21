@@ -2,7 +2,7 @@ import type { KnowledgeSearchHit } from './knowledge-retriever';
 import type { EvidenceReference, ExtractedFacts } from '../domain/client-assessment-facts';
 import type { ReadinessScore } from '../domain/readiness-score';
 import type { Result } from '../application/result';
-import type { RecommendationDraft } from '../domain/recommendation-grounding';
+import type { RecommendationDraft } from '../domain/recommendation/grounding';
 
 export type DraftRecommendation = RecommendationDraft;
 

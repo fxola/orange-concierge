@@ -35,7 +35,12 @@ export {
   LOW_EVIDENCE_COVERAGE_RATIO,
 } from './domain/client-assessment-facts';
 export { calculateReadinessScore } from './domain/readiness-score';
-export { MIN_EVIDENCE_QUOTE_LENGTH } from './domain/recommendation-grounding';
+export { MIN_EVIDENCE_QUOTE_LENGTH } from './domain/recommendation';
+export { parseRecommendationModelOutput } from './domain/recommendation/model-output';
+export {
+  recommendationModelOutputJsonSchema,
+  recommendationModelOutputSchema,
+} from './domain/recommendation/schemas';
 export { Result } from './application/result';
 
 export {
@@ -164,7 +169,7 @@ export type {
 export type {
   GroundedRecommendation,
   RecommendationDraft,
-} from './domain/recommendation-grounding';
+} from './domain/recommendation/grounding';
 export type {
   AuditEvent,
   AuditMetadata,

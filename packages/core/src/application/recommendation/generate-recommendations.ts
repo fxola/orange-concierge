@@ -1,7 +1,7 @@
 import { parseInteractionId } from '../../domain/interaction';
 import { calculateEvidenceCoverage } from '../../domain/client-assessment-facts';
 import { calculateReadinessScore } from '../../domain/readiness-score';
-import { groundRecommendations } from '../../domain/recommendation-grounding';
+import { groundRecommendations } from '../../domain/recommendation/grounding';
 import {
   InteractionAnalysisFailedError,
   InteractionNotFoundError,
