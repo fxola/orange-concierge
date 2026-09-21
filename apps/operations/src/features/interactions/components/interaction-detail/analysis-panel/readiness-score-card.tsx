@@ -1,43 +1,13 @@
 import { useId } from 'react';
-import type { ReadinessLevel, ReadinessScore } from '@orange-concierge/core';
+import type { ReadinessScore } from '@orange-concierge/core';
 import { Info } from 'lucide-react';
 import { Badge } from '@/components/ui/card';
-
-function readinessTone(level: ReadinessLevel): 'success' | 'warning' | 'danger' {
-  if (level === 'ready') {
-    return 'success';
-  }
-
-  if (level === 'developing') {
-    return 'warning';
-  }
-
-  return 'danger';
-}
-
-function readinessLabel(level: ReadinessLevel): string {
-  if (level === 'ready') {
-    return 'Ready';
-  }
-
-  if (level === 'developing') {
-    return 'Developing';
-  }
-
-  return 'Needs attention';
-}
-
-function readinessTranslation(level: ReadinessLevel): string {
-  if (level === 'ready') {
-    return 'Ready to draft recommendations after human review.';
-  }
-
-  if (level === 'developing') {
-    return 'Continue review before relying on recommendations.';
-  }
-
-  return 'Pause recommendations until risks are reviewed.';
-}
+import {
+  readinessLabel,
+  readinessScoreLabel,
+  readinessTone,
+  readinessTranslation,
+} from '../../../view-models/readiness-presentation';
 
 function ScoreHelp({ score }: Readonly<{ score: ReadinessScore }>) {
   const tooltipId = useId();
@@ -63,7 +33,8 @@ function ScoreHelp({ score }: Readonly<{ score: ReadinessScore }>) {
           confidence, approval, or advice.
         </span>
         <span className="mt-2 block border-t border-border pt-2 tabular-nums">
-          Custody {score.custody.score}/100 · Security {score.cybersecurity.score}/100
+          Custody {readinessScoreLabel(score.custody.score)} · Security{' '}
+          {readinessScoreLabel(score.cybersecurity.score)}
         </span>
       </span>
     </span>
@@ -87,7 +58,9 @@ export function ReadinessScoreCard({ score }: Readonly<{ score?: ReadinessScore 
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <Badge tone={readinessTone(score.overall.level)}>{score.overall.score}/100</Badge>
+          <Badge tone={readinessTone(score.overall.level)}>
+            {readinessScoreLabel(score.overall.score)}
+          </Badge>
           <ScoreHelp score={score} />
         </div>
       </div>

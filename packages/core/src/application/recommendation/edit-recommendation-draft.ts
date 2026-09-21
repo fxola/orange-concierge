@@ -1,4 +1,5 @@
-import { parseRecommendationId, Recommendation } from '../../domain/recommendation';
+import { parseRecommendationId } from '../../domain/recommendation';
+import { editRecommendationDraft } from '../../domain/recommendation/edit-draft';
 import type { AuditEvent } from '../../ports/audit';
 import {
   InvalidRecommendationIdError,
@@ -45,7 +46,7 @@ export class EditRecommendationDraft {
       );
     }
 
-    const editResult = Recommendation.editDraft(recommendation, patch);
+    const editResult = editRecommendationDraft(recommendation, patch);
     if (editResult.isFailure()) {
       return Result.failure(editResult.getError());
     }

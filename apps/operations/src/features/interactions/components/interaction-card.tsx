@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react';
 
 import { shortId } from '@/lib/short-id';
 import type { InteractionRow } from '../view-models/interactions';
+import { readinessCue } from '../view-models/readiness-presentation';
 import { InteractionStatus } from './interaction-status';
 
 function transcriptPreview(transcript: string): string {
@@ -15,25 +16,17 @@ function transcriptPreview(transcript: string): string {
   return `${compact.slice(0, 120)}...`;
 }
 
-function readinessLabel(row: InteractionRow): string | null {
+function cardReadinessCue(row: InteractionRow): string | null {
   const readiness = row.readinessScore?.overall;
   if (!readiness) {
     return null;
   }
 
-  if (readiness.level === 'ready') {
-    return `Ready · ${readiness.score}/100`;
-  }
-
-  if (readiness.level === 'developing') {
-    return `Developing · ${readiness.score}/100`;
-  }
-
-  return `Needs attention · ${readiness.score}/100`;
+  return readinessCue(readiness);
 }
 
 function interactionCue(row: InteractionRow): string {
-  const readiness = readinessLabel(row);
+  const readiness = cardReadinessCue(row);
   if (readiness) {
     return readiness;
   }

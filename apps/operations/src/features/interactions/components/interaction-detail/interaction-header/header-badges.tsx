@@ -1,6 +1,7 @@
 import { Check } from 'lucide-react';
 import type { ReadinessScore } from '@orange-concierge/core';
 import type { StepState } from '../../../view-models/interaction-workflow';
+import { readinessScoreLabel } from '../../../view-models/readiness-presentation';
 
 export function ReadinessChip({ readinessScore }: Readonly<{ readinessScore?: ReadinessScore }>) {
   if (!readinessScore) {
@@ -9,7 +10,7 @@ export function ReadinessChip({ readinessScore }: Readonly<{ readinessScore?: Re
 
   return (
     <span className="rounded-full bg-surface-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
-      Readiness {readinessScore.overall.score}/100
+      Readiness {readinessScoreLabel(readinessScore.overall.score)}
     </span>
   );
 }

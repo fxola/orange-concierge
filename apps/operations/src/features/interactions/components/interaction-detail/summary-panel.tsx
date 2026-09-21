@@ -1,33 +1,9 @@
-import type { ReadinessLevel } from '@orange-concierge/core';
 import { calculateEvidenceCoverage } from '@orange-concierge/core';
 import { Alert, Badge } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
 import type { InteractionRow } from '../../view-models/interactions';
 import { collectFactItems, hasExtractedFacts } from '../../view-models/analysis-facts';
-
-function readinessLabel(level: ReadinessLevel): string {
-  if (level === 'ready') {
-    return 'Ready';
-  }
-
-  if (level === 'developing') {
-    return 'Developing';
-  }
-
-  return 'Needs attention';
-}
-
-function readinessTone(level: ReadinessLevel): 'success' | 'warning' | 'danger' {
-  if (level === 'ready') {
-    return 'success';
-  }
-
-  if (level === 'developing') {
-    return 'warning';
-  }
-
-  return 'danger';
-}
+import { readinessLabel, readinessTone } from '../../view-models/readiness-presentation';
 
 function nextAction(row: InteractionRow): string {
   if (row.status === 'received') {

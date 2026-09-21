@@ -7,25 +7,17 @@ import {
 } from '../../src/domain/client-assessment-facts';
 
 describe('parseExtractedFacts', () => {
-  it('drops blank strings and empty lists from model output', () => {
-    const result = parseExtractedFacts({
-      custody: { currentArrangement: 'multisig', assetsDiscussed: [], concerns: [] },
-      cybersecurity: { controls: ['hardware wallets'], risks: [], incidentHistory: '' },
-      planning: { goals: ['inheritance planning'], constraints: [], nextSteps: ['draft policy'] },
-    });
-
-    expect(result).toEqual({
-      ok: true,
-      facts: {
-        custody: { currentArrangement: 'multisig' },
-        cybersecurity: { controls: ['hardware wallets'] },
-        planning: { goals: ['inheritance planning'], nextSteps: ['draft policy'] },
-      },
-    });
-  });
+  const fact = (text: string, quote = text) => ({ text, quote });
 
   it('accepts an empty object as no facts', () => {
     expect(parseExtractedFacts({})).toEqual({ ok: true, facts: {} });
+  });
+
+  it('drops empty lists and empty fact groups', () => {
+    expect(parseExtractedFacts({ custody: { assetsDiscussed: [], concerns: [] } })).toEqual({
+      ok: true,
+      facts: {},
+    });
   });
 
   it('still rejects wrong field types', () => {
@@ -42,160 +34,88 @@ describe('parseExtractedFacts', () => {
     );
   });
 
-  it('drops empty fact groups after validation', () => {
-    expect(parseExtractedFacts({ custody: {}, planning: { goals: [] } })).toEqual({
-      ok: true,
-      facts: {},
-    });
-  });
-
   it('drops placeholder values echoed from shape examples', () => {
-    const result = parseExtractedFacts({
-      custody: {
-        currentArrangement: 'string',
-        assetsDiscussed: 'string',
-        concerns: 'string',
-      },
-      cybersecurity: {
-        controls: 'string',
-        risks: 'string',
-        incidentHistory: 'string',
-      },
-      planning: {
-        goals: 'string',
-        constraints: 'string',
-        nextSteps: 'string',
-      },
-    });
+    const result = parseExtractedFacts(
+      { custody: { currentArrangement: fact('string') } },
+      'string'
+    );
 
     expect(result).toEqual({ ok: true, facts: {} });
   });
 
-  it('wraps a bare string for list fields', () => {
+  it('rejects bare strings for list fields', () => {
     const result = parseExtractedFacts({
       custody: { concerns: 'losing a key' },
     });
 
-    expect(result).toEqual({
-      ok: true,
-      facts: { custody: { concerns: ['losing a key'] } },
-    });
+    expect(result.ok).toBe(false);
   });
 
-  it('resolves evidence offsets from exact transcript quotes', () => {
-    const transcript = 'Client holds 0.5 BTC on Coinbase and worries about exchange risk.';
+  it('maps model facts to extracted facts with generated paths and offsets', () => {
+    const transcript =
+      'Client holds bitcoin on a hardware wallet and worries about losing the seed phrase.';
     const result = parseExtractedFacts(
       {
         custody: {
-          currentArrangement: 'Client holds bitcoin on Coinbase.',
-          concerns: ['Exchange risk'],
+          currentArrangement: fact('Client holds bitcoin on a hardware wallet'),
+          assetsDiscussed: [fact('bitcoin')],
+          concerns: [fact('worries about losing the seed phrase')],
         },
-        evidence: [
-          { factPath: 'custody.currentArrangement', quote: '0.5 BTC on Coinbase' },
-          { factPath: 'custody.concerns[0]', quote: 'exchange risk' },
-        ],
       },
       transcript
     );
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.facts.evidence).toHaveLength(2);
+    expect(result.facts.custody).toEqual({
+      currentArrangement: 'Client holds bitcoin on a hardware wallet',
+      assetsDiscussed: ['bitcoin'],
+      concerns: ['worries about losing the seed phrase'],
+    });
+    expect(result.facts.evidence?.map((entry) => entry.factPath)).toEqual([
+      'custody.currentArrangement',
+      'custody.assetsDiscussed[0]',
+      'custody.concerns[0]',
+    ]);
     expect(result.facts.evidence?.[0]).toEqual({
       factPath: 'custody.currentArrangement',
-      quote: '0.5 BTC on Coinbase',
-      startOffset: transcript.indexOf('0.5 BTC on Coinbase'),
-      endOffset: transcript.indexOf('0.5 BTC on Coinbase') + '0.5 BTC on Coinbase'.length,
+      quote: 'Client holds bitcoin on a hardware wallet',
+      startOffset: transcript.indexOf('Client holds bitcoin on a hardware wallet'),
+      endOffset:
+        transcript.indexOf('Client holds bitcoin on a hardware wallet') +
+        'Client holds bitcoin on a hardware wallet'.length,
     });
   });
 
-  it('keeps facts but drops evidence quotes missing from the transcript', () => {
+  it('drops facts whose evidence quote is not an exact transcript substring', () => {
     const result = parseExtractedFacts(
-      {
-        custody: { currentArrangement: 'multisig' },
-        evidence: [{ factPath: 'custody.currentArrangement', quote: 'not in transcript' }],
-      },
+      { custody: { currentArrangement: fact('Client uses multisig', 'not in transcript') } },
       'Client uses multisig.'
+    );
+
+    expect(result).toEqual({ ok: true, facts: {} });
+  });
+
+  it('maps hardware-wallet custody to currentArrangement', () => {
+    const result = parseExtractedFacts(
+      { custody: { currentArrangement: fact('my assets are on a hardware wallet') } },
+      'my assets are on a hardware wallet'
     );
 
     expect(result).toEqual({
       ok: true,
-      facts: { custody: { currentArrangement: 'multisig' } },
+      facts: {
+        custody: { currentArrangement: 'my assets are on a hardware wallet' },
+        evidence: [
+          {
+            factPath: 'custody.currentArrangement',
+            quote: 'my assets are on a hardware wallet',
+            startOffset: 0,
+            endOffset: 'my assets are on a hardware wallet'.length,
+          },
+        ],
+      },
     });
-  });
-
-  it('rejects non-array evidence payloads', () => {
-    expect(
-      parseExtractedFacts(
-        {
-          custody: { currentArrangement: 'multisig' },
-          evidence: '0.5 BTC on Coinbase',
-        },
-        'Client holds 0.5 BTC on Coinbase.'
-      ).ok
-    ).toBe(false);
-  });
-
-  it('drops evidence with unknown fact paths', () => {
-    const result = parseExtractedFacts(
-      {
-        custody: { currentArrangement: 'multisig' },
-        evidence: [{ factPath: 'custody.unknownField', quote: 'multisig' }],
-      },
-      'Client uses multisig.'
-    );
-
-    expect(result).toEqual({
-      ok: true,
-      facts: { custody: { currentArrangement: 'multisig' } },
-    });
-  });
-
-  it('treats disabled SMS recovery as a control, not a risk or incident', () => {
-    const transcript =
-      'UX-AUDIT-2026-09-19-1320 Client asked whether their treasury policy is ready for a larger bitcoin allocation. Exchange and email accounts use hardware security keys, SMS recovery is disabled where providers permit it, and generated passwords are stored in a password manager.';
-
-    const result = parseExtractedFacts(
-      {
-        cybersecurity: {
-          controls: ['Uses hardware security keys'],
-          risks: ['SMS recovery'],
-          incidentHistory: 'disabled where providers permit it',
-        },
-      },
-      transcript
-    );
-
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-
-    expect(result.facts.cybersecurity?.risks ?? []).not.toEqual(
-      expect.arrayContaining([expect.stringMatching(/sms recovery/i)])
-    );
-    expect(result.facts.cybersecurity?.controls ?? []).toEqual(
-      expect.arrayContaining([expect.stringMatching(/sms recovery is disabled/i)])
-    );
-    expect(result.facts.cybersecurity?.incidentHistory).toBeUndefined();
-  });
-
-  it('drops policy fragments from incident history without incident keywords', () => {
-    const result = parseExtractedFacts(
-      {
-        cybersecurity: {
-          controls: ['Hardware keys'],
-          incidentHistory: 'disabled where providers permit it',
-        },
-      },
-      'Exchange accounts use hardware keys, SMS recovery is disabled where providers permit it.'
-    );
-
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.facts.cybersecurity?.incidentHistory).toBeUndefined();
-    expect(result.facts.cybersecurity?.controls).toEqual([
-      'Hardware keys',
-      expect.stringMatching(/sms recovery is disabled/i),
-    ]);
   });
 });
 

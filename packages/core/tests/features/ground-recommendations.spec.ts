@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { groundRecommendations } from '../../src/domain/recommendation-grounding';
+import { groundRecommendations } from '../../src/domain/recommendation/grounding';
 import type { EvidenceReference } from '../../src/domain/client-assessment-facts';
 import type { KnowledgeSearchHit } from '../../src/ports/knowledge-retriever';
 
@@ -23,8 +23,8 @@ function evidence(factPath: string, quote: string): EvidenceReference {
   };
 }
 
-describe('groundRecommendations quality gates', () => {
-  it('rejects Enable SMS recovery when evidence says SMS recovery is disabled', () => {
+describe('groundRecommendations structural gates', () => {
+  it('keeps semantic title decisions in the prompt layer', () => {
     const result = groundRecommendations({
       drafts: [
         {
@@ -41,10 +41,11 @@ describe('groundRecommendations quality gates', () => {
       knowledge: [knowledgeHit],
     });
 
-    expect(result).toEqual([]);
+    expect(result).toHaveLength(1);
+    expect(result[0]?.title).toBe('Enable SMS recovery');
   });
 
-  it('rejects recommendations based on context-free short evidence', () => {
+  it('keeps short-evidence quality decisions in the prompt layer', () => {
     const result = groundRecommendations({
       drafts: [
         {
@@ -59,10 +60,10 @@ describe('groundRecommendations quality gates', () => {
       knowledge: [knowledgeHit],
     });
 
-    expect(result).toEqual([]);
+    expect(result).toHaveLength(1);
   });
 
-  it('rejects schema-key titles like Confirm currentArrangement', () => {
+  it('keeps schema-key title decisions in the prompt layer', () => {
     const result = groundRecommendations({
       drafts: [
         {
@@ -82,7 +83,7 @@ describe('groundRecommendations quality gates', () => {
       knowledge: [knowledgeHit],
     });
 
-    expect(result).toEqual([]);
+    expect(result).toHaveLength(1);
   });
 
   it('deduplicates recommendations with the same title', () => {

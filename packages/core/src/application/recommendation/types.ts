@@ -1,6 +1,6 @@
 import type { Actor } from '../../domain/actor';
 import type { Recommendation, RecommendationPriority } from '../../domain/recommendation';
-import type { GroundedRecommendation } from '../../domain/recommendation-grounding';
+import type { GroundedRecommendation } from '../../domain/recommendation/grounding';
 import type {
   InteractionAnalysisFailedError,
   InteractionNotFoundError,
