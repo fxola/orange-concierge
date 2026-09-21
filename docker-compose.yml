@@ -22,10 +22,11 @@ services:
       dockerfile: apps/operations/Dockerfile
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "${WEB_PORT:-3000}:3000"
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-concierge}:${POSTGRES_PASSWORD:-concierge}@db:5432/${POSTGRES_DB:-concierge}
-      AUTH_SECRET: ${AUTH_SECRET:-change-me}
+      AUTH_SECRET: ${AUTH_SECRET:-local-docker-only-secret-1234567890abcdef}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-local-docker-only-secret-abcdef1234567890}
       AI_PROVIDER: ${AI_PROVIDER:-ollama}
       AI_MODEL: ${AI_MODEL:-llama3.2}
       AI_TIMEOUT_MS: ${AI_TIMEOUT_MS:-300000}
