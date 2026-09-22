@@ -2,13 +2,12 @@ import { mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { PatternSecretScanner } from '@orange-concierge/security';
-
-import { indexKnowledgeCorpus } from '../src/knowledge/indexer.js';
+import { indexKnowledgeCorpus } from '../../src/knowledge/indexer';
 import {
   InMemoryKnowledgeEmbedder,
   inMemoryKnowledgeIndexRepository,
-} from '../src/adapters/knowledge/in-memory-adapters';
+} from '../../src/adapters/knowledge/in-memory-adapters';
+import { PatternSecretScanner } from '../../src/security';
 
 describe('indexKnowledgeCorpus', () => {
   it('reads the seeded Markdown corpus into stable chunks', async () => {

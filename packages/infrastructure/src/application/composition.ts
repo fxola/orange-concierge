@@ -23,7 +23,6 @@ import {
   VerifyInteractionFacts,
   AuditPort,
 } from '@orange-concierge/core';
-import { PatternSecretScanner } from '@orange-concierge/security';
 
 import { DrizzleAuditPort } from '../adapters/audit/drizzle-audit-port';
 import { DrizzleTransactionManager } from '../adapters/interaction/drizzle-transaction-manager';
@@ -38,6 +37,7 @@ import { DrizzleClientRepository } from '../adapters/client/drizzle-client-repos
 import { DrizzleClientReviewSummaryRepository } from '../adapters/client/drizzle-client-review-summary-repository';
 import { DrizzleKnowledgeSearch } from '../adapters/knowledge/drizzle-knowledge-search';
 import { createKnowledgeEmbedder } from '../knowledge/embedder-factory';
+import { PatternSecretScanner } from '../security';
 
 type ApplicationRuntime = Readonly<{
   application: Application;

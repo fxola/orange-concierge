@@ -1,8 +1,8 @@
-import { PatternSecretScanner } from '@orange-concierge/security';
 import { createDatabaseFromUrl } from '../database';
 import { env } from '../env';
 import { DrizzleKnowledgeIndexRepository } from '../adapters/knowledge/drizzle-knowledge-index-repository';
 import { config } from '../application/config';
+import { PatternSecretScanner } from '../security';
 import { createKnowledgeEmbedder } from './embedder-factory';
 import { indexKnowledgeCorpus } from './indexer';
 
