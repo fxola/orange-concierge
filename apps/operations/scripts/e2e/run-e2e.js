@@ -1,5 +1,6 @@
 // run-e2e.js
 
+import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -11,8 +12,13 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 
 const paths = {
   app: path.resolve(scriptDir, '../..'),
-  repo: path.resolve(scriptDir, '../../..'),
+  repo: path.resolve(scriptDir, '../../../..'),
 };
+
+const nextManagedFiles = [
+  path.join(paths.app, 'next-env.d.ts'),
+  path.join(paths.app, 'tsconfig.json'),
+];
 
 const args = process.argv.slice(2);
 const playwrightArgs = args[0] === '--' ? args.slice(1) : args;
@@ -48,7 +54,30 @@ async function runTests(env) {
   });
 }
 
-function registerShutdown(postgres) {
+async function snapshotFiles(filePaths) {
+  const snapshots = await Promise.all(
+    filePaths.map(async (filePath) => ({
+      filePath,
+      content: await readFile(filePath, 'utf8'),
+    }))
+  );
+
+  let restored = false;
+
+  return async function restoreFiles() {
+    if (restored) {
+      return;
+    }
+
+    restored = true;
+
+    await Promise.all(
+      snapshots.map((snapshot) => writeFile(snapshot.filePath, snapshot.content, 'utf8'))
+    );
+  };
+}
+
+function registerShutdown(postgres, restoreNextManagedFiles) {
   let shuttingDown = false;
 
   async function shutdown(signal) {
@@ -60,6 +89,7 @@ function registerShutdown(postgres) {
     stopActiveProcess(signal);
 
     try {
+      await restoreNextManagedFiles();
       await postgres.stop();
     } finally {
       process.exit(signal === 'SIGINT' ? 130 : 143);
@@ -72,7 +102,8 @@ function registerShutdown(postgres) {
 
 async function main() {
   const postgres = await startPostgres();
-  registerShutdown(postgres);
+  const restoreNextManagedFiles = await snapshotFiles(nextManagedFiles);
+  registerShutdown(postgres, restoreNextManagedFiles);
 
   try {
     const env = createTestEnvironment(postgres.databaseUrl);
@@ -82,6 +113,7 @@ async function main() {
 
     process.exitCode = await runTests(env);
   } finally {
+    await restoreNextManagedFiles();
     await postgres.stop();
   }
 }
