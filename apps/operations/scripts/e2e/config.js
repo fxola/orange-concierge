@@ -6,7 +6,14 @@ export const postgresConfig = {
   image: 'pgvector/pgvector:pg16',
 };
 
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+
 export const baseURL = process.env.E2E_BASE_URL ?? 'http://localhost:3100';
+
+export const knowledgeDir = path.resolve(scriptDir, '../../e2e/knowledge');
 
 export const AIConfig = {
   image: 'orange-concierge/e2e-ai-provider:latest',
@@ -64,6 +71,7 @@ export function createTestEnvironment(databaseUrl, AIProviderBaseURL) {
     AI_BASE_URL: AIProviderBaseURL,
     AI_TIMEOUT_MS: '1000',
     E2E_AI_BASE_URL: AIProviderBaseURL,
+    KNOWLEDGE_DIR: knowledgeDir,
 
     AUTH_SECRET: 'e2e-auth-secret-1234567890abcdef',
     BETTER_AUTH_SECRET: 'e2e-better-auth-secret-1234567890abcdef',

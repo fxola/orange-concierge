@@ -30,6 +30,7 @@ export const env = createEnv({
     AI_BASE_URL: z.string().optional(),
     AI_API_KEY: z.string().optional(),
     AI_TIMEOUT_MS: z.coerce.number().optional(),
+    KNOWLEDGE_DIR: z.string().optional(),
 
     NODE_ENV: z.string().optional(),
     ALLOW_DEMO_SEED: z.string().optional(),

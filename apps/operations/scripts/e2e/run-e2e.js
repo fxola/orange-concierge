@@ -1,5 +1,3 @@
-// run-e2e.js
-
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -42,6 +40,14 @@ async function migrateDatabase(env) {
 async function seedDatabase(env) {
   console.log('[e2e] Running demo seed...');
   await runRequired(pnpm, ['--filter', '@orange-concierge/infrastructure', 'seed'], {
+    cwd: paths.repo,
+    env,
+  });
+}
+
+async function indexKnowledge(env) {
+  console.log('[e2e] Indexing deterministic knowledge corpus...');
+  await runRequired(pnpm, ['--filter', '@orange-concierge/infrastructure', 'knowledge:index'], {
     cwd: paths.repo,
     env,
   });
@@ -113,6 +119,7 @@ async function main() {
 
     await migrateDatabase(env);
     await seedDatabase(env);
+    await indexKnowledge(env);
 
     process.exitCode = await runTests(env);
   } finally {
