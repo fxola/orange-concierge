@@ -8,7 +8,7 @@ const AIProviderDir = path.join(path.dirname(fileURLToPath(import.meta.url)), 'a
 export async function startAIContainer() {
   console.log('[e2e] Building AI Provider image (cached)...');
 
-  const builder = GenericContainer.fromDockerfile(AIProviderDir, 'Dockerfile').withCache(false);
+  const builder = GenericContainer.fromDockerfile(AIProviderDir, 'Dockerfile').withCache(true);
 
   const built = await builder.build(AIConfig.image, { deleteOnExit: false });
 
