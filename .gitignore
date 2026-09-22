@@ -8,3 +8,7 @@ pgdata
 ollama_data
 .DS_Store
 *.tsbuildinfo
+test-results
+playwright-report
+**/test-results
+**/playwright-report

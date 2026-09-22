@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "test:e2e": "node scripts/e2e/run-e2e.js"
   },
   "dependencies": {
     "@orange-concierge/core": "workspace:*",
@@ -23,10 +24,12 @@
     "zod": "^4.5.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "tailwindcss": "^4",
+    "testcontainers": "^12.1.0",
     "typescript": "^5.7.0",
     "vitest": "^4.1.11"
   }
