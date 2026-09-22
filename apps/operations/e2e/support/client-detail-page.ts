@@ -11,10 +11,10 @@ export class ClientDetailPage extends BasePage {
         (response) =>
           response.url().endsWith('/api/interactions') && response.request().method() === 'POST'
       ),
+      this.page.waitForURL(/\/clients\/[^/]+\/interactions\/[^/]+$/, { timeout: 15_000 }),
       this.page.getByRole('button', { name: 'Submit interaction' }).click(),
     ]);
 
     expect(submitResponse.status(), await submitResponse.text()).toBe(201);
-    await expect(this.page).toHaveURL(/\/clients\/[^/]+\/interactions\/[^/]+$/);
   }
 }

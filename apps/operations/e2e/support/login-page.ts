@@ -1,4 +1,3 @@
-import { expect } from '@playwright/test';
 import { seedUsers } from 'scripts/e2e/config';
 import { BasePage } from './base-page';
 
@@ -10,7 +9,10 @@ export class LoginPage extends BasePage {
     await this.page.goto('/login');
     await this.page.getByLabel('Email').fill(user.email);
     await this.page.getByLabel('Password').fill(user.password);
-    await this.page.getByRole('button', { name: 'Sign in' }).click();
-    await expect(this.page).toHaveURL(/\/clients$/);
+
+    await Promise.all([
+      this.page.waitForURL(/\/clients$/, { timeout: 15_000 }),
+      this.page.getByRole('button', { name: 'Sign in' }).click(),
+    ]);
   }
 }
