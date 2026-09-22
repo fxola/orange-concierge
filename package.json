@@ -16,6 +16,7 @@
     "typecheck:core": "pnpm --filter @orange-concierge/core typecheck",
     "test": "pnpm -r test",
     "test:core": "pnpm --filter @orange-concierge/core test",
+    "test:e2e": "pnpm --filter ./apps/operations test:e2e",
     "db:generate": "pnpm --filter @orange-concierge/infrastructure generate",
     "db:migrate": "pnpm --filter @orange-concierge/infrastructure migrate",
     "db:seed": "pnpm --filter @orange-concierge/infrastructure seed",

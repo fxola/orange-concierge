@@ -11,6 +11,7 @@ async function run(): Promise<void> {
 
   try {
     const result = await indexKnowledgeCorpus({
+      knowledgeDir: env.KNOWLEDGE_DIR,
       embedder: createKnowledgeEmbedder(config.ai),
       store: new DrizzleKnowledgeIndexRepository(db),
       secretScanner: new PatternSecretScanner(),

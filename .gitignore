@@ -2,9 +2,15 @@ docs/internal
 node_modules
 dist
 .next
+.next-e2e
+**/.next-e2e
 .env
 backups/*.gpg
 pgdata
 ollama_data
 .DS_Store
 *.tsbuildinfo
+test-results
+playwright-report
+**/test-results
+**/playwright-report
