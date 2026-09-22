@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { createTestEnvironment } from './config.js';
 import { runCommand, runRequired, stopActiveProcess } from './process.js';
 import { startPostgres } from './postgres-test-container.js';
+import { startAIContainer } from './ai-test-container.js';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -77,7 +78,7 @@ async function snapshotFiles(filePaths) {
   };
 }
 
-function registerShutdown(postgres, restoreNextManagedFiles) {
+function registerShutdown(postgres, aiProvider, restoreNextManagedFiles) {
   let shuttingDown = false;
 
   async function shutdown(signal) {
@@ -90,6 +91,7 @@ function registerShutdown(postgres, restoreNextManagedFiles) {
 
     try {
       await restoreNextManagedFiles();
+      await aiProvider.stop();
       await postgres.stop();
     } finally {
       process.exit(signal === 'SIGINT' ? 130 : 143);
@@ -102,11 +104,12 @@ function registerShutdown(postgres, restoreNextManagedFiles) {
 
 async function main() {
   const postgres = await startPostgres();
+  const aiProvider = await startAIContainer();
   const restoreNextManagedFiles = await snapshotFiles(nextManagedFiles);
-  registerShutdown(postgres, restoreNextManagedFiles);
+  registerShutdown(postgres, aiProvider, restoreNextManagedFiles);
 
   try {
-    const env = createTestEnvironment(postgres.databaseUrl);
+    const env = createTestEnvironment(postgres.databaseUrl, aiProvider.baseURL);
 
     await migrateDatabase(env);
     await seedDatabase(env);
@@ -114,6 +117,7 @@ async function main() {
     process.exitCode = await runTests(env);
   } finally {
     await restoreNextManagedFiles();
+    await aiProvider.stop();
     await postgres.stop();
   }
 }

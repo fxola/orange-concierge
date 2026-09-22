@@ -7,6 +7,12 @@ export const postgresConfig = {
 };
 
 export const baseURL = process.env.E2E_BASE_URL ?? 'http://localhost:3100';
+
+export const AIConfig = {
+  image: 'orange-concierge/e2e-ai-provider:latest',
+  internalPort: 8080,
+};
+
 export const seedUsers = {
   admin: {
     email: 'admin@orangeconcierge.test',
@@ -37,7 +43,7 @@ export function getE2EAppConfig() {
   };
 }
 
-export function createTestEnvironment(databaseUrl) {
+export function createTestEnvironment(databaseUrl, AIProviderBaseURL) {
   return {
     ...process.env,
 
@@ -52,6 +58,12 @@ export function createTestEnvironment(databaseUrl) {
 
     NEXT_PUBLIC_APP_URL: baseURL,
     BETTER_AUTH_URL: baseURL,
+
+    AI_PROVIDER: 'ollama',
+    AI_MODEL: 'e2e-ai-model',
+    AI_BASE_URL: AIProviderBaseURL,
+    AI_TIMEOUT_MS: '1000',
+    E2E_AI_BASE_URL: AIProviderBaseURL,
 
     AUTH_SECRET: 'e2e-auth-secret-1234567890abcdef',
     BETTER_AUTH_SECRET: 'e2e-better-auth-secret-1234567890abcdef',
