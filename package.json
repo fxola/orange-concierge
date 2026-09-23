@@ -25,10 +25,29 @@
     "eval": "pnpm --filter @orange-concierge/ai eval"
   },
   "keywords": [
-    "mastra",
-    "self-hosted",
     "bitcoin",
-    "sovereign"
+    "ai",
+    "llm",
+    "rag",
+    "self-hosted",
+    "sovereign",
+    "ai-safety",
+    "human-in-the-loop",
+    "audit-trail",
+    "bitcoin",
+    "nextjs",
+    "typescript",
+    "hexagonal-architecture",
+    "postgres",
+    "pgvector",
+    "docker",
+    "ollama",
+    "gemini",
+    "playwright",
+    "testcontainers",
+    "better-auth",
+    "gherkin",
+    "vitest-cucumber"
   ],
   "devDependencies": {
     "vite": "^8.2.2"
